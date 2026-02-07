@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Counter Overlay</title>
+<!--
+  COUNTER OVERLAY
+  ===============
+  Params:
+    value, label (default: Subscribers), prefix, suffix
+    icon = heart|star|users|eye|zap|fire|trophy|bell|none
+    size (px), labelsize (px), font (mono|display|body)
+    theme, gradient, bg (true|false), align, layout (stack|inline)
+    animate (true|false), duration (sec), separator (true|false), decimals
+    poll = URL to poll JSON, pollkey = JSON path, pollrate = seconds
+-->
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:transparent;overflow:hidden;width:100vw;height:100vh;display:flex;align-items:center;justify-content:center;font-family:var(--ff)}
+  .ctr{display:flex;padding:24px;gap:12px;opacity:0;animation:fin .6s ease-out .5s forwards}
+  .ctr.stack{flex-direction:column;align-items:center}
+  .ctr.inline{flex-direction:row;align-items:baseline}
+  .ctr.has-bg{background:var(--pbg);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:16px;border:1px solid var(--pbr);box-shadow:0 4px 24px rgba(0,0,0,.2)}
+  .top{display:flex;align-items:center;gap:12px}
+  .ico svg{width:calc(var(--fs)*.7);height:calc(var(--fs)*.7);color:var(--ac)}
+  .num{font-family:var(--nf);font-size:var(--fs);font-weight:700;color:var(--tc);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .pre,.suf{font-family:var(--nf);font-size:calc(var(--fs)*.6);font-weight:500;color:var(--ac);opacity:.8}
+  .lbl{font-size:var(--ls);font-weight:500;color:var(--tm);letter-spacing:.05em;text-transform:uppercase}
+  .bump{animation:bump .3s ease-out}
+  @keyframes fin{to{opacity:1}}
+  @keyframes bump{50%{transform:scale(1.1)}}
+</style>
+</head>
+<body>
+<script src="brand.js"></script>
+<script src="brand-helpers.js"></script>
+<script>
+const ICONS={
+  heart:`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>`,
+  star:`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`,
+  users:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>`,
+  eye:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`,
+  zap:`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h9l-1 10 10-12h-9l1-10z"/></svg>`,
+  fire:`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 23c-3.6 0-8-3.1-8-8.5C4 9.1 10.3 2 11.3 1c.2-.2.5-.1.7.1.1.1.1.2.1.3-.4 2.5.5 4.1 1.6 5.5 1-1.2 1.4-2.6 1.3-4.2 0-.3.2-.5.4-.6.2-.1.5 0 .6.2C18.4 6 20 9.5 20 12.5c0 6.8-5.2 10.5-8 10.5z"/></svg>`,
+  trophy:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 010-5H6m12 5h1.5a2.5 2.5 0 000-5H18M4 22h16M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22m7-7.34V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22M18 2H6v7a6 6 0 0012 0V2z"/></svg>`,
+  bell:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>`,
+};
+
+const t=$.theme(), ac=$.accents();
+let val=$.num('value',0);
+const label=$.str('label','Subscribers'), prefix=$.str('prefix',''), suffix=$.str('suffix','');
+const icon=$.str('icon','none'), sz=$.num('size',48), lsz=$.num('labelsize',16);
+const font=$.str('font','mono'), showBg=$.bool('bg',true), layout=$.str('layout','stack');
+const animate=$.bool('animate',true), dur=$.num('duration',2);
+const sep=$.bool('separator',true), dec=$.num('decimals',0);
+const poll=$.str('poll',''), pollKey=$.str('pollkey','value'), pollRate=$.num('pollrate',30);
+
+$.css('--ff',B.fonts.body); $.css('--nf',B.fonts[font]||B.fonts.mono);
+$.css('--fs',sz+'px'); $.css('--ls',lsz+'px');
+$.css('--tc',t.text); $.css('--tm',t.textMuted); $.css('--ac',ac.primary);
+$.css('--pbg',t.bg+'cc'); $.css('--pbr',t.border);
+
+function fmt(n){
+  const f=n.toFixed(dec);
+  if(!sep)return f;
+  const[i,d]=f.split('.');
+  return parseInt(i).toLocaleString('en-US')+(d!==undefined?'.'+d:'');
+}
+
+const wrap=document.createElement('div');
+wrap.className=`ctr ${layout}`+(showBg?' has-bg':'');
+const top=document.createElement('div');top.className='top';
+
+if(icon!=='none'&&ICONS[icon]){const ic=document.createElement('div');ic.className='ico';ic.innerHTML=ICONS[icon];top.appendChild(ic);}
+if(prefix){const p=document.createElement('span');p.className='pre';p.textContent=prefix;top.appendChild(p);}
+const numEl=document.createElement('span');numEl.className='num';numEl.id='n';top.appendChild(numEl);
+if(suffix){const s=document.createElement('span');s.className='suf';s.textContent=suffix;top.appendChild(s);}
+wrap.appendChild(top);
+if(label){const l=document.createElement('div');l.className='lbl';l.textContent=label;wrap.appendChild(l);}
+document.body.appendChild(wrap);
+
+function countUp(from,to,d){
+  const s=performance.now(),ms=d*1000;
+  (function tk(now){
+    let p=Math.min((now-s)/ms,1);
+    p=1-Math.pow(1-p,3);
+    numEl.textContent=fmt(from+(to-from)*Math.min(p,1));
+    if(p<1)requestAnimationFrame(tk);else numEl.textContent=fmt(to);
+  })(performance.now());
+}
+
+if(animate){numEl.textContent=fmt(0);setTimeout(()=>countUp(0,val,dur),500);}
+else numEl.textContent=fmt(val);
+
+if(poll){
+  setInterval(async()=>{
+    try{
+      const r=await fetch(poll);const d=await r.json();
+      let nv=d;pollKey.split('.').forEach(k=>{if(nv)nv=nv[k];});nv=parseFloat(nv);
+      if(!isNaN(nv)&&nv!==val){const old=val;val=nv;countUp(old,nv,1);numEl.classList.add('bump');setTimeout(()=>numEl.classList.remove('bump'),300);}
+    }catch(e){console.warn('Poll failed:',e);}
+  },pollRate*1000);
+}
+</script>
+</body>
+</html>

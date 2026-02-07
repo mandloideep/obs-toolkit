@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Border Overlay</title>
+<!--
+  ANIMATED BORDER OVERLAY v2
+  ==========================
+  Params:
+    shape      = rect | circle                          (default: rect)
+    style      = solid | dashed | dotted | double | neon  (default: solid)
+    animation  = dash | rotate | pulse | breathe | none   (default: dash)
+    gradient   = indigo|cyan|sunset|emerald|neon|frost|fire|ocean|purple|mono|rainbow
+    colors     = custom hex comma-sep (overrides gradient)
+    random     = true to randomize gradient
+    r          = corner radius px (rect only)            (default: 16)
+    thickness  = border width px                         (default: 2)
+    speed      = cycle seconds                           (default: 4)
+    dash       = visible portion 0-1 (for dash anim)     (default: 0.3)
+    glow       = true|false                              (default: true)
+    glowsize   = glow blur px                            (default: 8)
+    opacity    = 0-1                                     (default: 0.85)
+    theme      = dark | light
+
+  Style+Animation combos:
+    solid+dash     = traveling gradient segment
+    solid+rotate   = rotating gradient fill
+    solid+pulse    = breathing opacity
+    solid+breathe  = breathing glow intensity
+    dashed+dash    = traveling dashed line
+    dashed+rotate  = rotating gradient on dashes
+    dotted+dash    = traveling dotted line
+    double+dash    = dual-line traveling border
+    neon+breathe   = neon glow breathing effect
+    neon+pulse     = neon pulsing
+-->
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:transparent;overflow:hidden;width:100vw;height:100vh;display:flex;align-items:center;justify-content:center}
+  .wrap{position:relative;width:100%;height:100%}
+  .wrap svg{position:absolute;inset:0;width:100%;height:100%}
+  svg *{fill:none;stroke-linecap:round}
+</style>
+</head>
+<body>
+<div class="wrap" id="w"></div>
+<script src="brand.js"></script>
+<script src="brand-helpers.js"></script>
+<script>
+const C = {
+  shape:     $.str('shape','rect'),
+  style:     $.str('style','solid'),
+  animation: $.str('animation','dash'),
+  gradient:  $.gradient(),
+  r:         $.num('r',16),
+  t:         $.num('thickness',2),
+  speed:     $.num('speed',4),
+  dashRatio: $.num('dash',0.3),
+  glow:      $.bool('glow',true),
+  glowSize:  $.num('glowsize',8),
+  opacity:   $.num('opacity',0.85),
+};
+
+const w = window.innerWidth, h = window.innerHeight;
+const wrap = document.getElementById('w');
+
+function makeSVG() {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('viewBox',`0 0 ${w} ${h}`);
+  
+  // Gradient def
+  const defs = document.createElementNS('http://www.w3.org/2000/svg','defs');
+  const grad = document.createElementNS('http://www.w3.org/2000/svg','linearGradient');
+  grad.id = 'g'; grad.setAttribute('gradientUnits','userSpaceOnUse');
+  C.gradient.forEach((c,i) => {
+    const s = document.createElementNS('http://www.w3.org/2000/svg','stop');
+    s.setAttribute('offset', (i/(C.gradient.length-1)*100)+'%');
+    s.setAttribute('stop-color', c);
+    grad.appendChild(s);
+  });
+  defs.appendChild(grad);
+  svg.appendChild(defs);
+  return { svg, grad, defs };
+}
+
+function makeShape(svg, strokeW) {
+  let el, peri;
+  const t = strokeW || C.t;
+  if (C.shape === 'circle') {
+    el = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    const r = Math.min(w,h)/2 - t - 2;
+    el.setAttribute('cx',w/2); el.setAttribute('cy',h/2); el.setAttribute('r',r);
+    peri = 2*Math.PI*r;
+  } else {
+    el = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    const p = t + 2;
+    el.setAttribute('x',p); el.setAttribute('y',p);
+    el.setAttribute('width',w-p*2); el.setAttribute('height',h-p*2);
+    el.setAttribute('rx',C.r); el.setAttribute('ry',C.r);
+    peri = 2*((w-p*2)+(h-p*2));
+  }
+  el.setAttribute('stroke','url(#g)');
+  el.setAttribute('stroke-width',t);
+  svg.appendChild(el);
+  return { el, peri };
+}
+
+// ===== STYLE APPLICATION =====
+function applyStyle(el, peri) {
+  const s = C.style;
+  if (s === 'dashed') {
+    // Dashed: 16px dash, 10px gap
+    el.style.strokeDasharray = '16 10';
+    return 26; // pattern length for animation calc
+  } else if (s === 'dotted') {
+    // Dotted: 2px dot, 8px gap
+    el.setAttribute('stroke-linecap','round');
+    el.style.strokeDasharray = `${C.t} 8`;
+    return C.t + 8;
+  } else if (s === 'double') {
+    // Double handled by creating two shapes (done externally)
+    return null;
+  } else if (s === 'neon') {
+    // Neon: solid but thicker glow, handled in glow layer
+    return null;
+  }
+  // solid: no dasharray (or set by animation)
+  return null;
+}
+
+// ===== BUILD LAYERS =====
+
+// Glow layer
+if (C.glow) {
+  const { svg: gs } = makeSVG();
+  gs.style.opacity = C.style === 'neon' ? 0.7 : 0.4;
+  gs.style.filter = `blur(${C.style === 'neon' ? C.glowSize * 2 : C.glowSize}px)`;
+  const { el: ge, peri: gp } = makeShape(gs, C.style === 'neon' ? C.t * 3 : C.t);
+  applyStyle(ge, gp);
+  wrap.appendChild(gs);
+  
+  // Extra glow for neon
+  if (C.style === 'neon') {
+    const { svg: gs2 } = makeSVG();
+    gs2.style.opacity = 0.3;
+    gs2.style.filter = `blur(${C.glowSize * 4}px)`;
+    makeShape(gs2, C.t * 5);
+    wrap.appendChild(gs2);
+  }
+}
+
+// Main layer
+const { svg: ms, grad: mainGrad } = makeSVG();
+ms.style.opacity = C.opacity;
+
+let mainEl, mainPeri;
+
+if (C.style === 'double') {
+  // Double border: two lines with gap
+  const { el: outer, peri: op } = makeShape(ms, C.t);
+  // Inner line (offset inward)
+  const inner = outer.cloneNode();
+  const gap = C.t * 3;
+  if (C.shape === 'circle') {
+    inner.setAttribute('r', parseFloat(outer.getAttribute('r')) - gap);
+  } else {
+    inner.setAttribute('x', parseFloat(outer.getAttribute('x')) + gap);
+    inner.setAttribute('y', parseFloat(outer.getAttribute('y')) + gap);
+    inner.setAttribute('width', parseFloat(outer.getAttribute('width')) - gap*2);
+    inner.setAttribute('height', parseFloat(outer.getAttribute('height')) - gap*2);
+  }
+  inner.setAttribute('stroke','url(#g)');
+  inner.setAttribute('stroke-width', C.t);
+  ms.appendChild(inner);
+  mainEl = outer; mainPeri = op;
+} else {
+  const { el, peri } = makeShape(ms);
+  const patternLen = applyStyle(el, peri);
+  mainEl = el; mainPeri = peri;
+}
+
+wrap.appendChild(ms);
+
+// ===== ANIMATIONS =====
+const spd = C.speed * 1000;
+
+function getAllShapes() {
+  return wrap.querySelectorAll('rect, circle');
+}
+
+if (C.animation === 'dash') {
+  // For solid: traveling segment. For dashed/dotted: traveling pattern
+  if (C.style === 'solid') {
+    const dLen = mainPeri * C.dashRatio;
+    const gLen = mainPeri - dLen;
+    getAllShapes().forEach(s => { s.style.strokeDasharray = `${dLen} ${gLen}`; });
+  }
+  
+  let t0 = null;
+  (function tick(ts) {
+    if (!t0) t0 = ts;
+    const off = -mainPeri * (((ts-t0)%spd)/spd);
+    getAllShapes().forEach(s => { s.style.strokeDashoffset = off; });
+    requestAnimationFrame(tick);
+  })(performance.now());
+
+} else if (C.animation === 'rotate') {
+  let t0 = null;
+  const allGrads = wrap.querySelectorAll('linearGradient');
+  (function tick(ts) {
+    if (!t0) t0 = ts;
+    const a = (((ts-t0)%spd)/spd)*Math.PI*2;
+    const cx=w/2, cy=h/2, len=Math.max(w,h);
+    const x1=cx+Math.cos(a)*len, y1=cy+Math.sin(a)*len;
+    const x2=cx-Math.cos(a)*len, y2=cy-Math.sin(a)*len;
+    allGrads.forEach(g => {
+      g.setAttribute('x1',x1); g.setAttribute('y1',y1);
+      g.setAttribute('x2',x2); g.setAttribute('y2',y2);
+    });
+    requestAnimationFrame(tick);
+  })(performance.now());
+
+} else if (C.animation === 'pulse') {
+  let t0 = null;
+  (function tick(ts) {
+    if (!t0) t0 = ts;
+    const p = ((ts-t0)%spd)/spd;
+    const o = 0.3 + 0.7 * Math.sin(p*Math.PI*2)**2;
+    wrap.querySelectorAll('svg').forEach(s => {
+      s.style.opacity = o * (s.style.filter ? 0.5 : C.opacity);
+    });
+    requestAnimationFrame(tick);
+  })(performance.now());
+
+} else if (C.animation === 'breathe') {
+  // Glow intensity breathing — border stays solid, glow pulses
+  let t0 = null;
+  (function tick(ts) {
+    if (!t0) t0 = ts;
+    const p = ((ts-t0)%spd)/spd;
+    const intensity = 0.2 + 0.8 * Math.sin(p*Math.PI*2)**2;
+    wrap.querySelectorAll('svg').forEach((s,i) => {
+      if (s.style.filter) { // glow layers
+        s.style.opacity = intensity * (C.style === 'neon' ? 0.8 : 0.5);
+      }
+    });
+    requestAnimationFrame(tick);
+  })(performance.now());
+}
+</script>
+</body>
+</html>

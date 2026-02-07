@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Text Overlay</title>
+<!--
+  TEXT OVERLAY v2
+  ===============
+  Params:
+    PRESETS (use instead of manual config):
+      preset = brb | chatting | starting | ending | technical | custom
+      
+    MANUAL:
+      text, sub, size, subsize, weight, font (display|body|mono),
+      align (left|center|right), valign (top|center|bottom),
+      theme, gradient, bg (true|false), pad, maxwidth
+      
+    LINE DECORATION:
+      line (true|false), linestyle (solid|dashed|dotted|gradient),
+      lineanim (slide|grow|pulse|none), linespeed, linewidth, linepos (top|bottom|both), linelength (%)
+      
+    ENTRANCE:
+      entrance (fade|slideUp|slideLeft|slideDown|typewriter|scale|none),
+      entrancespeed, delay
+      
+    EXIT (for timed display):
+      exit (fade|slideDown|slideUp|scale|none), exitafter (seconds, 0=never), exitspeed
+      
+    LOOP (appear, hold, disappear, repeat):
+      loop (true|false), hold (seconds visible), pause (seconds hidden)
+-->
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:transparent;overflow:hidden;width:100vw;height:100vh;display:flex;font-family:var(--ff)}
+  
+  .container{padding:var(--pad);max-width:var(--mw);opacity:0;transition:all var(--es) ease-out}
+  .container.bg-panel{background:var(--pbg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:14px;border:1px solid var(--pbr)}
+  .container.visible{opacity:1;transform:none}
+  .container.hidden{opacity:0}
+  
+  .main-text{color:var(--tc);font-size:var(--fs);font-weight:var(--fw);line-height:1.25;letter-spacing:-0.02em}
+  .sub-text{color:var(--tm);font-size:var(--ss);font-weight:400;margin-top:6px;letter-spacing:0.01em}
+  .emoji{font-size:calc(var(--fs) * 1.2);margin-right:8px}
+  
+  .sig-line{position:relative;height:var(--lw);overflow:hidden;width:var(--ll)}
+  .sig-line.bottom{margin-top:14px}
+  .sig-line.top{margin-bottom:14px}
+  
+  .sig-inner{position:absolute;inset:0;height:100%;transform:translateX(-101%)}
+  .sig-inner.style-solid{background:var(--ac)}
+  .sig-inner.style-dashed{background:repeating-linear-gradient(90deg,var(--ac) 0px,var(--ac) 12px,transparent 12px,transparent 20px)}
+  .sig-inner.style-dotted{background:repeating-linear-gradient(90deg,var(--ac) 0px,var(--ac) 4px,transparent 4px,transparent 12px)}
+  .sig-inner.style-gradient{background:linear-gradient(90deg,var(--gc))}
+  
+  .sig-inner.anim-slide{animation:lSlide var(--ls) ease-out forwards}
+  .sig-inner.anim-grow{animation:lGrow var(--ls) ease-out forwards;transform:scaleX(0);transform-origin:left}
+  .sig-inner.anim-pulse{animation:lPulse calc(var(--ls)*1.5) ease-in-out infinite;transform:none}
+  .sig-inner.anim-none{transform:none}
+  
+  @keyframes lSlide{to{transform:translateX(0)}}
+  @keyframes lGrow{to{transform:scaleX(1)}}
+  @keyframes lPulse{0%,100%{opacity:.4}50%{opacity:1}}
+  
+  /* Exit animations */
+  .exit-fade{animation:eFade var(--xs) ease-in forwards!important}
+  .exit-slideDown{animation:eDown var(--xs) ease-in forwards!important}
+  .exit-slideUp{animation:eUp var(--xs) ease-in forwards!important}
+  .exit-scale{animation:eScale var(--xs) ease-in forwards!important}
+  @keyframes eFade{to{opacity:0}}
+  @keyframes eDown{to{opacity:0;transform:translateY(20px)}}
+  @keyframes eUp{to{opacity:0;transform:translateY(-20px)}}
+  @keyframes eScale{to{opacity:0;transform:scale(0.8)}}
+</style>
+</head>
+<body>
+<script src="brand.js"></script>
+<script src="brand-helpers.js"></script>
+<script>
+// ===== PRESETS =====
+const PRESETS = {
+  brb: {
+    text:'Be Right Back', sub:'Stream will resume shortly', size:48, font:'display',
+    align:'center', valign:'center', entrance:'scale', line:true, linestyle:'gradient',
+    lineanim:'pulse', bg:true, weight:700,
+  },
+  chatting: {
+    text:'Just Chatting', sub:'', size:36, font:'display',
+    align:'center', valign:'center', entrance:'fade', line:true, linestyle:'gradient',
+    lineanim:'slide', bg:true, weight:600,
+  },
+  starting: {
+    text:'Starting Soon', sub:'Stream begins in a moment...', size:52, font:'display',
+    align:'center', valign:'center', entrance:'slideUp', line:true, linestyle:'gradient',
+    lineanim:'grow', bg:true, weight:700,
+  },
+  ending: {
+    text:'Thanks for Watching!', sub:'See you next time', size:44, font:'display',
+    align:'center', valign:'center', entrance:'fade', line:true, linestyle:'gradient',
+    lineanim:'slide', bg:true, weight:700,
+  },
+  technical: {
+    text:'Technical Difficulties', sub:'Please stand by...', size:40, font:'mono',
+    align:'center', valign:'center', entrance:'fade', line:true, linestyle:'dashed',
+    lineanim:'pulse', bg:true, weight:600,
+  },
+  custom: {},
+};
+
+const preset = $.str('preset','');
+const P = preset && PRESETS[preset] ? PRESETS[preset] : {};
+
+// Merge: URL params > preset > defaults
+const get = (name, presetVal, def) => {
+  const urlVal = _params.get(name);
+  if (urlVal !== null) return urlVal;
+  if (presetVal !== undefined) return presetVal;
+  return def;
+};
+const getN = (name, presetVal, def) => {
+  const v = parseFloat(_params.get(name));
+  if (!isNaN(v)) return v;
+  if (presetVal !== undefined) return presetVal;
+  return def;
+};
+const getB = (name, presetVal, def) => {
+  const v = _params.get(name);
+  if (v !== null) return v !== 'false' && v !== '0';
+  if (presetVal !== undefined) return presetVal;
+  return def;
+};
+
+const t = $.theme();
+const g = $.gradient();
+const ac = $.accents();
+
+const cfg = {
+  text:      get('text', P.text, B.name),
+  sub:       get('sub', P.sub, ''),
+  size:      getN('size', P.size, 32),
+  subsize:   getN('subsize', P.subsize, 18),
+  weight:    getN('weight', P.weight, 600),
+  font:      get('font', P.font, 'display'),
+  align:     get('align', P.align, 'left'),
+  valign:    get('valign', P.valign, 'bottom'),
+  showLine:  getB('line', P.line, true),
+  lineStyle: get('linestyle', P.linestyle, 'gradient'),
+  lineAnim:  get('lineanim', P.lineanim, 'slide'),
+  lineSpeed: getN('linespeed', P.linespeed, 2),
+  lineWidth: getN('linewidth', P.linewidth, 2),
+  linePos:   get('linepos', P.linepos, 'bottom'),
+  lineLen:   getN('linelength', P.linelength, 100),
+  entrance:  get('entrance', P.entrance, 'fade'),
+  eSpeed:    getN('entrancespeed', P.entrancespeed, 0.8),
+  delay:     getN('delay', P.delay, 0.3),
+  exit:      get('exit', P.exit, 'none'),
+  exitAfter: getN('exitafter', P.exitafter, 0),
+  exitSpeed: getN('exitspeed', P.exitspeed, 0.6),
+  showBg:    getB('bg', P.bg, false),
+  pad:       getN('pad', P.pad, 28),
+  maxwidth:  get('maxwidth', P.maxwidth, 'auto'),
+  loop:      getB('loop', P.loop, false),
+  hold:      getN('hold', P.hold, 4),
+  pause:     getN('pause', P.pause, 2),
+};
+
+// CSS vars
+$.css('--ff', B.fonts[cfg.font] || B.fonts.display);
+$.css('--fs', cfg.size+'px'); $.css('--ss', cfg.subsize+'px'); $.css('--fw', cfg.weight);
+$.css('--pad', cfg.pad+'px'); $.css('--mw', cfg.maxwidth==='auto' ? 'none' : cfg.maxwidth+'px');
+$.css('--tc', t.text); $.css('--tm', t.textMuted); $.css('--ac', ac.primary);
+$.css('--ls', cfg.lineSpeed+'s'); $.css('--lw', cfg.lineWidth+'px');
+$.css('--ll', cfg.lineLen+'%'); $.css('--es', cfg.eSpeed+'s'); $.css('--xs', cfg.exitSpeed+'s');
+$.css('--gc', g.join(',')); $.css('--pbg', t.bg+'cc'); $.css('--pbr', t.border);
+
+// Body alignment
+const vMap = { top:'flex-start', center:'center', bottom:'flex-end' };
+const hMap = { left:'flex-start', center:'center', right:'flex-end' };
+document.body.style.alignItems = vMap[cfg.valign] || 'flex-end';
+document.body.style.justifyContent = hMap[cfg.align] || 'flex-start';
+
+// Build DOM
+const el = document.createElement('div');
+el.className = 'container' + (cfg.showBg ? ' bg-panel' : '');
+el.style.textAlign = cfg.align;
+
+// Initial transform based on entrance
+const entrTransform = {
+  slideUp:'translateY(20px)', slideDown:'translateY(-20px)', slideLeft:'translateX(-30px)',
+  scale:'scale(0.85)', fade:'none', typewriter:'none', none:'none'
+};
+el.style.transform = entrTransform[cfg.entrance] || 'none';
+
+function makeLine(pos) {
+  if (!cfg.showLine) return;
+  if (cfg.linePos !== pos && cfg.linePos !== 'both') return;
+  const line = document.createElement('div');
+  line.className = 'sig-line ' + pos;
+  const inner = document.createElement('div');
+  inner.className = `sig-inner style-${cfg.lineStyle} anim-${cfg.lineAnim}`;
+  line.appendChild(inner);
+  return line;
+}
+
+const topLine = makeLine('top');
+if (topLine) el.appendChild(topLine);
+
+const mainEl = document.createElement('div');
+mainEl.className = 'main-text';
+mainEl.textContent = cfg.text;
+el.appendChild(mainEl);
+
+if (cfg.sub) {
+  const subEl = document.createElement('div');
+  subEl.className = 'sub-text';
+  subEl.textContent = cfg.sub;
+  el.appendChild(subEl);
+}
+
+const botLine = makeLine('bottom');
+if (botLine) el.appendChild(botLine);
+
+document.body.appendChild(el);
+
+// ===== ANIMATION CONTROLLER =====
+function show() {
+  el.style.transition = `all ${cfg.eSpeed}s ease-out`;
+  el.classList.add('visible');
+  el.classList.remove('exit-fade','exit-slideDown','exit-slideUp','exit-scale');
+  el.style.transform = 'none';
+  el.style.opacity = '1';
+  
+  // Reset line animations
+  el.querySelectorAll('.sig-inner').forEach(l => {
+    l.style.animation = 'none';
+    l.offsetHeight; // reflow
+    l.style.animation = '';
+  });
+}
+
+function hide(cb) {
+  if (cfg.exit && cfg.exit !== 'none') {
+    el.classList.add('exit-' + cfg.exit);
+    setTimeout(cb, cfg.exitSpeed * 1000);
+  } else {
+    el.style.opacity = '0';
+    setTimeout(cb, 100);
+  }
+}
+
+function reset() {
+  el.classList.remove('visible','exit-fade','exit-slideDown','exit-slideUp','exit-scale');
+  el.style.opacity = '0';
+  el.style.transform = entrTransform[cfg.entrance] || 'none';
+}
+
+// Initial entrance
+setTimeout(show, cfg.delay * 1000);
+
+// Timed exit
+if (cfg.exitAfter > 0 && !cfg.loop) {
+  setTimeout(() => hide(() => {}), (cfg.delay + cfg.eSpeed + cfg.exitAfter) * 1000);
+}
+
+// Loop mode: appear → hold → exit → pause → repeat
+if (cfg.loop) {
+  const cycleTime = (cfg.eSpeed + cfg.hold + cfg.exitSpeed + cfg.pause) * 1000;
+  
+  function cycle() {
+    reset();
+    setTimeout(() => {
+      show();
+      setTimeout(() => {
+        hide(() => {
+          setTimeout(cycle, cfg.pause * 1000);
+        });
+      }, cfg.hold * 1000);
+    }, 100);
+  }
+  
+  // First appearance with initial delay
+  setTimeout(() => {
+    show();
+    setTimeout(() => {
+      hide(() => {
+        setTimeout(cycle, cfg.pause * 1000);
+      });
+    }, cfg.hold * 1000);
+  }, cfg.delay * 1000);
+}
+</script>
+</body>
+</html>

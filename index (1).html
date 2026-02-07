@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OBS Overlay Toolkit — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{--bg:#0a0a0f;--s1:#12121a;--s2:#1a1a26;--s3:#222230;--br:#2a2a3a;--tx:#e8e8f0;--mt:#8888a0;--ac:#818cf8;--a2:#6366f1;--ok:#10b981;--wr:#f59e0b}
+  body{background:var(--bg);color:var(--tx);font-family:'Inter',sans-serif;line-height:1.5}
+  a{color:var(--ac);text-decoration:none}
+
+  /* Layout */
+  .header{padding:32px 32px 20px;border-bottom:1px solid var(--br)}
+  .header h1{font-size:26px;font-weight:700;letter-spacing:-.03em;display:flex;align-items:center;gap:10px}
+  .header p{color:var(--mt);font-size:14px;margin-top:4px}
+  .wrap{max-width:1100px;margin:0 auto;padding:24px 32px 60px}
+  .section{margin-bottom:40px}
+  .stitle{font-size:17px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+  .badge{background:var(--a2);color:#fff;font-size:11px;padding:2px 8px;border-radius:4px;font-weight:500}
+  .badge.new{background:var(--ok)}
+  .card{background:var(--s1);border:1px solid var(--br);border-radius:12px;padding:20px;margin-bottom:12px}
+  .card-desc{color:var(--mt);font-size:13px;margin-bottom:14px}
+
+  /* Controls */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:14px}
+  .grid.wide{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+  .f{display:flex;flex-direction:column;gap:3px}
+  .f label{font-size:11px;font-weight:500;color:var(--mt);text-transform:uppercase;letter-spacing:.04em}
+  .f input,.f select{background:var(--s2);border:1px solid var(--br);border-radius:6px;color:var(--tx);padding:7px 10px;font-size:13px;font-family:'Inter',sans-serif;outline:none;transition:border .15s}
+  .f input:focus,.f select:focus{border-color:var(--ac)}
+  .f input[type=checkbox]{width:16px;height:16px;accent-color:var(--ac)}
+  .f .row{display:flex;align-items:center;gap:8px}
+
+  /* URL output */
+  .url-box{background:var(--s2);border:1px solid var(--br);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;margin-top:10px}
+  .url-box code{flex:1;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ac);word-break:break-all;line-height:1.4;user-select:all}
+  .btn{border:none;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:opacity .15s;white-space:nowrap}
+  .btn:hover{opacity:.85}
+  .btn-p{background:var(--a2);color:#fff}
+  .btn-o{background:transparent;border:1px solid var(--br);color:var(--tx)}
+  .btn-ok{background:var(--ok);color:#fff}
+
+  /* Preview */
+  .preview{background:#000;border:1px solid var(--br);border-radius:8px;overflow:hidden;margin-top:10px}
+  .preview iframe{width:100%;height:180px;border:none}
+
+  /* Gradient swatches */
+  .swatches{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px}
+  .sw{height:26px;border-radius:5px;flex:1;min-width:55px;cursor:pointer;transition:transform .12s;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+  .sw:hover{transform:scaleY(1.35)}
+
+  /* Tabs */
+  .tabs{display:flex;gap:2px;margin-bottom:16px;background:var(--s2);border-radius:8px;padding:3px;border:1px solid var(--br)}
+  .tab{padding:8px 16px;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;color:var(--mt);transition:all .15s}
+  .tab:hover{color:var(--tx)}
+  .tab.active{background:var(--a2);color:#fff}
+  .panel{display:none}
+  .panel.active{display:block}
+
+  /* Divider */
+  .divider{border:none;border-top:1px solid var(--br);margin:10px 0}
+
+  /* Quick ref */
+  .ref{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+  .ref-card{background:var(--s1);border:1px solid var(--br);border-radius:8px;padding:14px}
+  .ref-card h4{font-size:13px;font-weight:600;color:var(--ac);margin-bottom:6px}
+  .ref-card ul{list-style:none;font-size:12px;color:var(--mt)}
+  .ref-card li{margin-bottom:3px}
+  .ref-card code{font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--s2);padding:1px 5px;border-radius:3px;color:var(--tx)}
+
+  /* Responsive */
+  @media(max-width:700px){
+    .grid{grid-template-columns:1fr 1fr}
+    .header,.wrap{padding-left:16px;padding-right:16px}
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🎬 OBS Overlay Toolkit</h1>
+  <p>Configure → Copy URL → Paste into OBS Browser Source. All overlays work standalone or with <code style="background:var(--s2);padding:1px 6px;border-radius:3px;font-size:12px">brand.js</code>.</p>
+</div>
+
+<div class="wrap">
+
+  <!-- BASE URL -->
+  <div class="section">
+    <div class="card" style="background:var(--a2);border:none">
+      <div class="f" style="max-width:550px">
+        <label style="color:rgba(255,255,255,.7)">Your GitHub Pages Base URL</label>
+        <input type="text" id="base" value="https://yourusername.github.io/obs-toolkit/"
+          style="background:rgba(0,0,0,.3);border-color:rgba(255,255,255,.2);color:#fff;font-family:'JetBrains Mono',monospace;font-size:12px"
+          oninput="updateAll()">
+      </div>
+    </div>
+  </div>
+
+  <!-- GRADIENT SWATCHES -->
+  <div class="section">
+    <div class="stitle">Gradient Presets <span style="color:var(--mt);font-size:12px;font-weight:400;margin-left:8px">Click to apply across all configurators</span></div>
+    <div class="swatches" id="swatches"></div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs" id="tabs">
+    <div class="tab active" data-t="border">Border</div>
+    <div class="tab" data-t="text">Text</div>
+    <div class="tab" data-t="socials">Socials</div>
+    <div class="tab" data-t="cta">CTA</div>
+    <div class="tab" data-t="counter">Counter</div>
+  </div>
+
+  <!-- ======== BORDER ======== -->
+  <div class="panel active" id="p-border">
+    <div class="card">
+      <div class="card-desc">Animated gradient border for screen/camera frames. Supports solid, dashed, dotted, double, and neon styles.</div>
+      <div class="grid">
+        <div class="f"><label>Shape</label><select id="b-shape" onchange="uBorder()"><option value="rect">Rectangle</option><option value="circle">Circle</option></select></div>
+        <div class="f"><label>Border Style</label><select id="b-style" onchange="uBorder()"><option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option><option value="double">Double</option><option value="neon">Neon</option></select></div>
+        <div class="f"><label>Animation</label><select id="b-anim" onchange="uBorder()"><option value="dash">Dash (traveling)</option><option value="rotate">Rotate gradient</option><option value="pulse">Pulse opacity</option><option value="breathe">Breathe glow</option><option value="none">None</option></select></div>
+        <div class="f"><label>Gradient</label><select id="b-grad" onchange="uBorder()"></select></div>
+        <div class="f"><label>Thickness (px)</label><input type="number" id="b-thick" value="2" min="1" max="8" onchange="uBorder()"></div>
+        <div class="f"><label>Speed (sec)</label><input type="number" id="b-speed" value="4" min="0.5" max="20" step="0.5" onchange="uBorder()"></div>
+        <div class="f"><label>Corner Radius</label><input type="number" id="b-r" value="16" min="0" max="50" onchange="uBorder()"></div>
+        <div class="f"><label>Dash Length (0-1)</label><input type="number" id="b-dash" value="0.3" min="0.05" max="1" step="0.05" onchange="uBorder()"></div>
+        <div class="f"><label>Glow</label><select id="b-glow" onchange="uBorder()"><option value="true">On</option><option value="false">Off</option></select></div>
+        <div class="f"><label>Glow Size (px)</label><input type="number" id="b-glowsz" value="8" min="2" max="30" onchange="uBorder()"></div>
+      </div>
+      <div class="url-box"><code id="u-border"></code><button class="btn btn-p" onclick="copy('u-border')">Copy</button><button class="btn btn-o" onclick="prev('u-border','pv-border')">Preview</button></div>
+      <div class="preview" id="pv-border" style="display:none"><iframe></iframe></div>
+    </div>
+  </div>
+
+  <!-- ======== TEXT ======== -->
+  <div class="panel" id="p-text">
+    <div class="card">
+      <div class="card-desc">Name plates, lower thirds, and stream screens (BRB, Starting Soon, etc.) with animated signature lines.</div>
+
+      <div style="margin-bottom:12px">
+        <label style="font-size:11px;color:var(--mt);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px">Quick Preset</label>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn btn-o" onclick="textPreset('')">Custom</button>
+          <button class="btn btn-o" onclick="textPreset('brb')">🔴 BRB</button>
+          <button class="btn btn-o" onclick="textPreset('chatting')">💬 Just Chatting</button>
+          <button class="btn btn-o" onclick="textPreset('starting')">🟢 Starting Soon</button>
+          <button class="btn btn-o" onclick="textPreset('ending')">👋 Ending</button>
+          <button class="btn btn-o" onclick="textPreset('technical')">⚠️ Technical</button>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="f"><label>Text</label><input type="text" id="t-text" value="Deep Mandloi" oninput="uText()"></div>
+        <div class="f"><label>Subtitle</label><input type="text" id="t-sub" value="" oninput="uText()"></div>
+        <div class="f"><label>Size (px)</label><input type="number" id="t-size" value="32" min="12" max="120" onchange="uText()"></div>
+        <div class="f"><label>Font</label><select id="t-font" onchange="uText()"><option value="display">Display</option><option value="body">Body</option><option value="mono">Mono</option></select></div>
+        <div class="f"><label>Align</label><select id="t-align" onchange="uText()"><option value="left">Left</option><option value="center">Center</option><option value="right">Right</option></select></div>
+        <div class="f"><label>V-Align</label><select id="t-valign" onchange="uText()"><option value="bottom">Bottom</option><option value="center">Center</option><option value="top">Top</option></select></div>
+        <div class="f"><label>Gradient</label><select id="t-grad" onchange="uText()"></select></div>
+        <div class="f"><label>Background</label><select id="t-bg" onchange="uText()"><option value="false">None</option><option value="true">Panel</option></select></div>
+      </div>
+
+      <hr class="divider">
+      <div style="font-size:12px;font-weight:600;color:var(--mt);margin-bottom:8px">LINE DECORATION</div>
+      <div class="grid">
+        <div class="f"><label>Show Line</label><select id="t-line" onchange="uText()"><option value="true">Yes</option><option value="false">No</option></select></div>
+        <div class="f"><label>Line Style</label><select id="t-lstyle" onchange="uText()"><option value="gradient">Gradient</option><option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option></select></div>
+        <div class="f"><label>Line Anim</label><select id="t-lanim" onchange="uText()"><option value="slide">Slide In</option><option value="grow">Grow</option><option value="pulse">Pulse</option><option value="none">None</option></select></div>
+        <div class="f"><label>Line Position</label><select id="t-lpos" onchange="uText()"><option value="bottom">Bottom</option><option value="top">Top</option><option value="both">Both</option></select></div>
+      </div>
+
+      <hr class="divider">
+      <div style="font-size:12px;font-weight:600;color:var(--mt);margin-bottom:8px">ENTRANCE / EXIT / LOOP</div>
+      <div class="grid">
+        <div class="f"><label>Entrance</label><select id="t-entr" onchange="uText()"><option value="fade">Fade</option><option value="slideUp">Slide Up</option><option value="slideLeft">Slide Left</option><option value="slideDown">Slide Down</option><option value="scale">Scale</option><option value="typewriter">Typewriter</option><option value="none">None</option></select></div>
+        <div class="f"><label>Exit</label><select id="t-exit" onchange="uText()"><option value="none">None (stay)</option><option value="fade">Fade</option><option value="slideDown">Slide Down</option><option value="slideUp">Slide Up</option><option value="scale">Scale</option></select></div>
+        <div class="f"><label>Exit After (sec, 0=never)</label><input type="number" id="t-exitafter" value="0" min="0" max="120" onchange="uText()"></div>
+        <div class="f"><label>Loop</label><select id="t-loop" onchange="uText()"><option value="false">No</option><option value="true">Yes</option></select></div>
+        <div class="f"><label>Hold (sec)</label><input type="number" id="t-hold" value="4" min="1" max="60" onchange="uText()"></div>
+        <div class="f"><label>Pause (sec)</label><input type="number" id="t-pause" value="2" min="0.5" max="60" step="0.5" onchange="uText()"></div>
+      </div>
+
+      <div class="url-box"><code id="u-text"></code><button class="btn btn-p" onclick="copy('u-text')">Copy</button><button class="btn btn-o" onclick="prev('u-text','pv-text')">Preview</button></div>
+      <div class="preview" id="pv-text" style="display:none"><iframe></iframe></div>
+    </div>
+  </div>
+
+  <!-- ======== SOCIALS ======== -->
+  <div class="panel" id="p-socials">
+    <div class="card">
+      <div class="card-desc">Social handles with platform icons. Supports cycling, one-by-one reveal, and appear/disappear loops.</div>
+      <div class="grid wide">
+        <div class="f"><label>Platforms (comma-sep)</label><input type="text" id="s-show" value="github,linkedin,youtube" oninput="uSocials()"></div>
+        <div class="f"><label>Handle Overrides (plat:handle,...)</label><input type="text" id="s-handles" value="" placeholder="github:user,youtube:@chan" oninput="uSocials()"></div>
+      </div>
+      <div style="font-size:11px;color:var(--mt);margin-bottom:10px">Available: github, linkedin, youtube, twitch, kick, twitter, instagram, discord, website</div>
+      <div class="grid">
+        <div class="f"><label>Layout</label><select id="s-layout" onchange="uSocials()"><option value="horizontal">Horizontal</option><option value="vertical">Vertical</option></select></div>
+        <div class="f"><label>Icon Size</label><select id="s-size" onchange="uSocials()"><option value="sm">Small</option><option value="md" selected>Medium</option><option value="lg">Large</option><option value="xl">XL</option></select></div>
+        <div class="f"><label>Icon Color</label><select id="s-color" onchange="uSocials()"><option value="brand">Brand Accent</option><option value="platform">Platform Colors</option><option value="white">White</option><option value="gradient">Gradient</option></select></div>
+        <div class="f"><label>Show Handles</label><select id="s-text" onchange="uSocials()"><option value="true">Yes</option><option value="false">Icons Only</option></select></div>
+        <div class="f"><label>Entrance</label><select id="s-entr" onchange="uSocials()"><option value="stagger" selected>Stagger</option><option value="fade">Fade</option><option value="slideUp">Slide Up</option><option value="none">None</option></select></div>
+        <div class="f"><label>Background</label><select id="s-bg" onchange="uSocials()"><option value="true">Panel</option><option value="false">None</option></select></div>
+        <div class="f"><label>Gradient</label><select id="s-grad" onchange="uSocials()"></select></div>
+      </div>
+
+      <hr class="divider">
+      <div style="font-size:12px;font-weight:600;color:var(--mt);margin-bottom:8px">CYCLING / VISIBILITY</div>
+      <div class="grid">
+        <div class="f"><label>Mode</label><select id="s-mode" onchange="uSocials()"><option value="static">Static (stay visible)</option><option value="loop">Loop (appear/disappear)</option><option value="onebyone">One by One (cycle each)</option><option value="timed">Timed (exit after N sec)</option></select></div>
+        <div class="f"><label>Hold / Each (sec)</label><input type="number" id="s-hold" value="5" min="1" max="60" onchange="uSocials()"></div>
+        <div class="f"><label>Pause (sec)</label><input type="number" id="s-pause" value="3" min="0.5" max="60" step="0.5" onchange="uSocials()"></div>
+        <div class="f"><label>Exit After (sec, timed mode)</label><input type="number" id="s-exitafter" value="10" min="1" max="120" onchange="uSocials()"></div>
+      </div>
+
+      <div class="url-box"><code id="u-socials"></code><button class="btn btn-p" onclick="copy('u-socials')">Copy</button><button class="btn btn-o" onclick="prev('u-socials','pv-socials')">Preview</button></div>
+      <div class="preview" id="pv-socials" style="display:none"><iframe></iframe></div>
+    </div>
+  </div>
+
+  <!-- ======== CTA ======== -->
+  <div class="panel" id="p-cta">
+    <div class="card">
+      <div class="card-desc">Like & Subscribe, Follow, and other call-to-action popups with animated icons and auto-looping.</div>
+
+      <div style="margin-bottom:12px">
+        <label style="font-size:11px;color:var(--mt);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px">Quick Preset</label>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn btn-o" onclick="ctaPreset('subscribe')">📩 Subscribe</button>
+          <button class="btn btn-o" onclick="ctaPreset('like')">👍 Like</button>
+          <button class="btn btn-o" onclick="ctaPreset('follow')">➕ Follow</button>
+          <button class="btn btn-o" onclick="ctaPreset('share')">📤 Share</button>
+          <button class="btn btn-o" onclick="ctaPreset('notify')">🔔 Notifications</button>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="f"><label>Text</label><input type="text" id="c-text" value="Subscribe" oninput="uCta()"></div>
+        <div class="f"><label>Subtitle</label><input type="text" id="c-sub" value="Don't miss out!" oninput="uCta()"></div>
+        <div class="f"><label>Size (px)</label><input type="number" id="c-size" value="28" min="14" max="80" onchange="uCta()"></div>
+        <div class="f"><label>Icon</label><select id="c-icon" onchange="uCta()"><option value="sub">Subscribe</option><option value="like">Thumbs Up</option><option value="follow">Follow</option><option value="share">Share</option><option value="bell">Bell</option><option value="heart">Heart</option><option value="star">Star</option><option value="none">None</option></select></div>
+        <div class="f"><label>Icon Animation</label><select id="c-iconanim" onchange="uCta()"><option value="bounce">Bounce</option><option value="shake">Shake</option><option value="pulse">Pulse</option><option value="spin">Spin</option><option value="none">None</option></select></div>
+        <div class="f"><label>Entrance</label><select id="c-entr" onchange="uCta()"><option value="bounce">Bounce</option><option value="slideUp">Slide Up</option><option value="slideLeft">Slide Left</option><option value="fade">Fade</option><option value="scale">Scale</option></select></div>
+        <div class="f"><label>Gradient</label><select id="c-grad" onchange="uCta()"></select></div>
+        <div class="f"><label>Background</label><select id="c-bg" onchange="uCta()"><option value="true">Panel</option><option value="false">None</option></select></div>
+        <div class="f"><label>Align</label><select id="c-align" onchange="uCta()"><option value="center">Center</option><option value="left">Left</option><option value="right">Right</option></select></div>
+        <div class="f"><label>V-Align</label><select id="c-valign" onchange="uCta()"><option value="bottom">Bottom</option><option value="center">Center</option><option value="top">Top</option></select></div>
+      </div>
+
+      <hr class="divider">
+      <div style="font-size:12px;font-weight:600;color:var(--mt);margin-bottom:8px">LOOP TIMING</div>
+      <div class="grid">
+        <div class="f"><label>Loop</label><select id="c-loop" onchange="uCta()"><option value="true">Yes</option><option value="false">No (show once)</option></select></div>
+        <div class="f"><label>Hold (sec visible)</label><input type="number" id="c-hold" value="6" min="1" max="60" onchange="uCta()"></div>
+        <div class="f"><label>Pause (sec hidden)</label><input type="number" id="c-pause" value="20" min="1" max="300" onchange="uCta()"></div>
+      </div>
+
+      <div class="url-box"><code id="u-cta"></code><button class="btn btn-p" onclick="copy('u-cta')">Copy</button><button class="btn btn-o" onclick="prev('u-cta','pv-cta')">Preview</button></div>
+      <div class="preview" id="pv-cta" style="display:none"><iframe></iframe></div>
+    </div>
+  </div>
+
+  <!-- ======== COUNTER ======== -->
+  <div class="panel" id="p-counter">
+    <div class="card">
+      <div class="card-desc">Animated number counter for subscribers, followers, viewers. Supports live API polling.</div>
+      <div class="grid">
+        <div class="f"><label>Value</label><input type="number" id="n-val" value="1234" onchange="uCounter()"></div>
+        <div class="f"><label>Label</label><input type="text" id="n-label" value="Subscribers" oninput="uCounter()"></div>
+        <div class="f"><label>Prefix</label><input type="text" id="n-pre" value="" oninput="uCounter()"></div>
+        <div class="f"><label>Suffix</label><input type="text" id="n-suf" value="" oninput="uCounter()"></div>
+        <div class="f"><label>Icon</label><select id="n-icon" onchange="uCounter()"><option value="users" selected>Users</option><option value="heart">Heart</option><option value="star">Star</option><option value="eye">Eye</option><option value="zap">Zap</option><option value="fire">Fire</option><option value="trophy">Trophy</option><option value="bell">Bell</option><option value="none">None</option></select></div>
+        <div class="f"><label>Size (px)</label><input type="number" id="n-size" value="48" min="16" max="120" onchange="uCounter()"></div>
+        <div class="f"><label>Font</label><select id="n-font" onchange="uCounter()"><option value="mono" selected>Mono</option><option value="display">Display</option><option value="body">Body</option></select></div>
+        <div class="f"><label>Layout</label><select id="n-layout" onchange="uCounter()"><option value="stack">Stack</option><option value="inline">Inline</option></select></div>
+        <div class="f"><label>Gradient</label><select id="n-grad" onchange="uCounter()"></select></div>
+        <div class="f"><label>Background</label><select id="n-bg" onchange="uCounter()"><option value="true">Panel</option><option value="false">None</option></select></div>
+      </div>
+      <div class="url-box"><code id="u-counter"></code><button class="btn btn-p" onclick="copy('u-counter')">Copy</button><button class="btn btn-o" onclick="prev('u-counter','pv-counter')">Preview</button></div>
+      <div class="preview" id="pv-counter" style="display:none"><iframe></iframe></div>
+    </div>
+  </div>
+
+  <!-- QUICK REF -->
+  <div class="section" style="margin-top:32px">
+    <div class="stitle">Quick Reference</div>
+    <div class="ref">
+      <div class="ref-card">
+        <h4>Common Params</h4>
+        <ul>
+          <li><code>theme</code> = dark | light</li>
+          <li><code>gradient</code> = indigo, cyan, sunset, emerald, neon, frost, fire, ocean, purple, mono, rainbow</li>
+          <li><code>colors</code> = ff0000,00ff00 (custom hex)</li>
+          <li><code>random</code> = true (randomize)</li>
+        </ul>
+      </div>
+      <div class="ref-card">
+        <h4>OBS Browser Source</h4>
+        <ul>
+          <li>Paste URL (don't use Local file)</li>
+          <li>Set Width/Height to match area</li>
+          <li>✅ Shutdown when not visible</li>
+          <li>✅ Refresh when active</li>
+        </ul>
+      </div>
+      <div class="ref-card">
+        <h4>Files to Deploy</h4>
+        <ul>
+          <li><code>brand.js</code> — Edit once for global brand</li>
+          <li><code>brand-helpers.js</code> — Shared + fallback</li>
+          <li><code>border.html</code> — Animated borders</li>
+          <li><code>text.html</code> — Text / stream screens</li>
+          <li><code>socials.html</code> — Social bar</li>
+          <li><code>cta.html</code> — Call to action</li>
+          <li><code>counter.html</code> — Number counter</li>
+          <li><code>index.html</code> — This dashboard</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ===== GRADIENT DATA =====
+const G={indigo:["#6366f1","#8b5cf6","#a78bfa","#c4b5fd","#818cf8"],cyan:["#06b6d4","#22d3ee","#67e8f9","#a5f3fc","#0891b2"],sunset:["#f43f5e","#f59e0b","#fbbf24","#f97316","#ef4444"],emerald:["#10b981","#34d399","#6ee7b7","#a7f3d0","#059669"],neon:["#6366f1","#06b6d4","#10b981","#f59e0b","#f43f5e"],frost:["#818cf8","#93c5fd","#a5b4fc","#c7d2fe","#e0e7ff"],fire:["#ef4444","#f97316","#f59e0b","#fbbf24","#fde68a"],ocean:["#0ea5e9","#06b6d4","#14b8a6","#2dd4bf","#5eead4"],purple:["#7c3aed","#8b5cf6","#a78bfa","#c4b5fd","#ddd6fe"],mono:["#6b7280","#9ca3af","#d1d5db","#9ca3af","#6b7280"],rainbow:["#ef4444","#f59e0b","#10b981","#06b6d4","#6366f1","#8b5cf6"]};
+
+// Render gradient swatches
+const sw=document.getElementById('swatches');
+Object.entries(G).forEach(([n,c])=>{
+  const d=document.createElement('div');d.className='sw';
+  d.style.background=`linear-gradient(90deg,${c.join(',')})`;
+  d.textContent=n;
+  d.onclick=()=>{document.querySelectorAll('select[id$="-grad"]').forEach(s=>{s.value=n});updateAll()};
+  sw.appendChild(d);
+});
+
+// Populate gradient selects
+document.querySelectorAll('select[id$="-grad"]').forEach(sel=>{
+  Object.keys(G).forEach(n=>{
+    const o=document.createElement('option');o.value=n;o.textContent=n.charAt(0).toUpperCase()+n.slice(1);
+    sel.appendChild(o);
+  });
+});
+
+// ===== TABS =====
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.onclick=()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('p-'+tab.dataset.t).classList.add('active');
+  };
+});
+
+// ===== HELPERS =====
+const v=id=>document.getElementById(id).value;
+const base=()=>document.getElementById('base').value.replace(/\/+$/,'')+'/';
+
+function url(file,params){
+  const p=Object.entries(params).filter(([k,v])=>v!==''&&v!==undefined&&v!==null).map(([k,v])=>`${k}=${encodeURIComponent(v)}`).join('&');
+  return p?base()+file+'?'+p:base()+file;
+}
+
+function copy(id){
+  navigator.clipboard.writeText(document.getElementById(id).textContent).then(()=>{
+    const b=document.getElementById(id).parentElement.querySelector('.btn-p');
+    const o=b.textContent;b.textContent='Copied!';b.classList.add('btn-ok');
+    setTimeout(()=>{b.textContent=o;b.classList.remove('btn-ok')},1200);
+  });
+}
+
+function prev(urlId,pvId){
+  const c=document.getElementById(pvId);
+  const f=c.querySelector('iframe');
+  if(c.style.display==='none'){c.style.display='block';f.src=document.getElementById(urlId).textContent}
+  else{c.style.display='none';f.src=''}
+}
+
+// ===== UPDATERS =====
+function uBorder(){
+  document.getElementById('u-border').textContent=url('border.html',{
+    shape:v('b-shape'),style:v('b-style'),animation:v('b-anim'),gradient:v('b-grad'),
+    thickness:v('b-thick'),speed:v('b-speed'),r:v('b-r'),dash:v('b-dash'),
+    glow:v('b-glow'),glowsize:v('b-glowsz')
+  });
+}
+
+function uText(){
+  const p={text:v('t-text'),sub:v('t-sub'),size:v('t-size'),font:v('t-font'),
+    align:v('t-align'),valign:v('t-valign'),gradient:v('t-grad'),bg:v('t-bg'),
+    line:v('t-line'),linestyle:v('t-lstyle'),lineanim:v('t-lanim'),linepos:v('t-lpos'),
+    entrance:v('t-entr')};
+  if(v('t-exit')!=='none')p.exit=v('t-exit');
+  if(parseInt(v('t-exitafter'))>0)p.exitafter=v('t-exitafter');
+  if(v('t-loop')==='true'){p.loop='true';p.hold=v('t-hold');p.pause=v('t-pause')}
+  document.getElementById('u-text').textContent=url('text.html',p);
+}
+
+function uSocials(){
+  const mode=v('s-mode');
+  const p={show:v('s-show'),layout:v('s-layout'),size:v('s-size'),
+    iconcolor:v('s-color'),showtext:v('s-text'),entrance:v('s-entr'),
+    bg:v('s-bg'),gradient:v('s-grad')};
+  if(v('s-handles'))p.handles=v('s-handles');
+  if(mode==='loop'){p.loop='true';p.hold=v('s-hold');p.pause=v('s-pause')}
+  else if(mode==='onebyone'){p.onebyone='true';p.each=v('s-hold');p.eachpause=v('s-pause')}
+  else if(mode==='timed'){p.exitafter=v('s-exitafter');p.exit='fade'}
+  document.getElementById('u-socials').textContent=url('socials.html',p);
+}
+
+function uCta(){
+  document.getElementById('u-cta').textContent=url('cta.html',{
+    text:v('c-text'),sub:v('c-sub'),size:v('c-size'),icon:v('c-icon'),
+    iconanim:v('c-iconanim'),entrance:v('c-entr'),gradient:v('c-grad'),
+    bg:v('c-bg'),align:v('c-align'),valign:v('c-valign'),
+    loop:v('c-loop'),hold:v('c-hold'),pause:v('c-pause')
+  });
+}
+
+function uCounter(){
+  document.getElementById('u-counter').textContent=url('counter.html',{
+    value:v('n-val'),label:v('n-label'),prefix:v('n-pre'),suffix:v('n-suf'),
+    icon:v('n-icon'),size:v('n-size'),font:v('n-font'),layout:v('n-layout'),
+    gradient:v('n-grad'),bg:v('n-bg')
+  });
+}
+
+function updateAll(){uBorder();uText();uSocials();uCta();uCounter()}
+
+// ===== PRESETS =====
+function textPreset(p){
+  const presets={
+    brb:{text:'Be Right Back',sub:'Stream will resume shortly',size:48,font:'display',align:'center',valign:'center',entr:'scale',bg:'true',line:'true',lstyle:'gradient',lanim:'pulse'},
+    chatting:{text:'Just Chatting',sub:'',size:36,font:'display',align:'center',valign:'center',entr:'fade',bg:'true',line:'true',lstyle:'gradient',lanim:'slide'},
+    starting:{text:'Starting Soon',sub:'Stream begins in a moment...',size:52,font:'display',align:'center',valign:'center',entr:'slideUp',bg:'true',line:'true',lstyle:'gradient',lanim:'grow'},
+    ending:{text:'Thanks for Watching!',sub:'See you next time',size:44,font:'display',align:'center',valign:'center',entr:'fade',bg:'true',line:'true',lstyle:'gradient',lanim:'slide'},
+    technical:{text:'Technical Difficulties',sub:'Please stand by...',size:40,font:'mono',align:'center',valign:'center',entr:'fade',bg:'true',line:'true',lstyle:'dashed',lanim:'pulse'},
+  };
+  const d=presets[p]||{text:'',sub:'',size:32,font:'display',align:'left',valign:'bottom',entr:'fade',bg:'false',line:'true',lstyle:'gradient',lanim:'slide'};
+  document.getElementById('t-text').value=d.text;
+  document.getElementById('t-sub').value=d.sub;
+  document.getElementById('t-size').value=d.size;
+  document.getElementById('t-font').value=d.font;
+  document.getElementById('t-align').value=d.align;
+  document.getElementById('t-valign').value=d.valign;
+  document.getElementById('t-entr').value=d.entr;
+  document.getElementById('t-bg').value=d.bg;
+  document.getElementById('t-line').value=d.line;
+  document.getElementById('t-lstyle').value=d.lstyle;
+  document.getElementById('t-lanim').value=d.lanim;
+  uText();
+}
+
+function ctaPreset(p){
+  const presets={
+    subscribe:{text:'Subscribe',sub:"Don't miss out!",icon:'sub',iconanim:'bounce'},
+    like:{text:'Like this stream',sub:'It helps a lot!',icon:'like',iconanim:'shake'},
+    follow:{text:'Follow',sub:'Stay connected',icon:'follow',iconanim:'bounce'},
+    share:{text:'Share with a friend',sub:'',icon:'share',iconanim:'spin'},
+    notify:{text:'Turn on notifications',sub:'Never miss a stream',icon:'bell',iconanim:'shake'},
+  };
+  const d=presets[p]||presets.subscribe;
+  document.getElementById('c-text').value=d.text;
+  document.getElementById('c-sub').value=d.sub;
+  document.getElementById('c-icon').value=d.icon;
+  document.getElementById('c-iconanim').value=d.iconanim;
+  uCta();
+}
+
+// Init
+updateAll();
+</script>
+</body>
+</html>
