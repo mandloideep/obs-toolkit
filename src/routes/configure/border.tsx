@@ -5,6 +5,7 @@
 
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
+import { ConfigLayout } from '../../components/configure/ConfigLayout'
 import { URLGenerator } from '../../components/configure/URLGenerator'
 import { BORDER_DEFAULTS } from '../../types/border.types'
 import type { BorderOverlayParams } from '../../types/border.types'
@@ -33,11 +34,9 @@ function BorderConfigurator() {
     }, {} as Record<string, string>)
   ).toString()}`
 
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8 max-w-7xl mx-auto">
-      {/* Configuration Form */}
-      <div>
-        <div className="config-section">
+  const configSections = (
+    <>
+      <div className="config-section">
           <h2 className="text-2xl font-semibold mb-6">Border Configuration</h2>
 
           <div className="space-y-5">
@@ -139,25 +138,21 @@ function BorderConfigurator() {
             </div>
           </div>
         </div>
-      </div>
+    </>
+  )
 
-      {/* Preview & URL Generator */}
-      <div className="lg:sticky lg:top-8 space-y-6">
-        <div className="config-section">
-          <h3 className="text-xl font-semibold mb-6">Live Preview</h3>
-          <iframe
-            src={previewUrl}
-            className="w-full h-96 border border-dark-border rounded-xl bg-black"
-            title="Border Preview"
-          />
-        </div>
-
+  return (
+    <ConfigLayout
+      configContent={configSections}
+      previewUrl={previewUrl}
+      overlayTitle="Border Overlay"
+      urlGeneratorComponent={
         <URLGenerator
           overlayPath="/overlays/border"
           params={params}
           defaults={BORDER_DEFAULTS}
         />
-      </div>
-    </div>
+      }
+    />
   )
 }

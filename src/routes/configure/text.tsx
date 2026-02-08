@@ -5,6 +5,7 @@
 
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
+import { ConfigLayout } from '../../components/configure/ConfigLayout'
 import { URLGenerator } from '../../components/configure/URLGenerator'
 import { TEXT_DEFAULTS } from '../../types/text.types'
 import type { TextOverlayParams } from '../../types/text.types'
@@ -32,10 +33,8 @@ function TextConfigurator() {
     }, {} as Record<string, string>)
   ).toString()}`
 
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8 max-w-7xl mx-auto">
-      {/* Configuration Form - Left Column */}
-      <div className="space-y-6">
+  const configSections = (
+    <>
         {/* Section 1: Quick Presets */}
         <div className="config-section">
           <h2 className="text-2xl font-semibold mb-6">Quick Presets</h2>
@@ -332,25 +331,21 @@ function TextConfigurator() {
             </div>
           </div>
         </div>
-      </div>
+    </>
+  )
 
-      {/* Preview & URL Generator - Right Column */}
-      <div className="lg:sticky lg:top-8 space-y-6">
-        <div className="config-section">
-          <h3 className="text-xl font-semibold mb-6">Live Preview</h3>
-          <iframe
-            src={previewUrl}
-            className="w-full h-96 border border-dark-border rounded-xl bg-black"
-            title="Text Overlay Preview"
-          />
-        </div>
-
+  return (
+    <ConfigLayout
+      configContent={configSections}
+      previewUrl={previewUrl}
+      overlayTitle="Text Overlay"
+      urlGeneratorComponent={
         <URLGenerator
           overlayPath="/overlays/text"
           params={params}
           defaults={TEXT_DEFAULTS}
         />
-      </div>
-    </div>
+      }
+    />
   )
 }
