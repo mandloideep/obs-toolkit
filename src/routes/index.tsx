@@ -15,7 +15,6 @@ import {
   Palette,
   Zap,
 } from 'lucide-react'
-import type { CSSProperties, MouseEvent } from 'react'
 
 export const Route = createFileRoute('/')({ component: Dashboard })
 
@@ -24,7 +23,6 @@ interface OverlayCard {
   description: string
   icon: React.FC<any>
   configPath: string
-  previewPath: string
   color: string
   features: string[]
 }
@@ -35,7 +33,6 @@ const overlays: OverlayCard[] = [
     description: 'Animated borders with shapes, styles, and effects',
     icon: Square,
     configPath: '/configure/border',
-    previewPath: '/overlays/border',
     color: '#6366f1',
     features: ['5 Shapes', '5 Styles', '4 Animations', 'Multicolor'],
   },
@@ -44,7 +41,6 @@ const overlays: OverlayCard[] = [
     description: 'Name plates, lower thirds, and stream screens',
     icon: Type,
     configPath: '/configure/text',
-    previewPath: '/overlays/text',
     color: '#8b5cf6',
     features: ['6 Presets', 'Loop Mode', 'Typewriter', 'Signature Lines'],
   },
@@ -53,7 +49,6 @@ const overlays: OverlayCard[] = [
     description: 'Live counters with API polling and animations',
     icon: Hash,
     configPath: '/configure/counter',
-    previewPath: '/overlays/counter',
     color: '#ec4899',
     features: ['API Polling', 'Count-up', 'Trend Arrows', '8 Icons'],
   },
@@ -62,7 +57,6 @@ const overlays: OverlayCard[] = [
     description: 'Call-to-action overlays with animated icons',
     icon: Megaphone,
     configPath: '/configure/cta',
-    previewPath: '/overlays/cta',
     color: '#f59e0b',
     features: ['5 Presets', '7 Icon Anims', 'Loop Mode', 'Decorations'],
   },
@@ -71,159 +65,34 @@ const overlays: OverlayCard[] = [
     description: 'Social media links with flexible display modes',
     icon: Users,
     configPath: '/configure/socials',
-    previewPath: '/overlays/socials',
     color: '#10b981',
     features: ['9 Platforms', 'Stagger', 'One-by-One', '4 Color Modes'],
   },
 ]
 
 function Dashboard() {
-  const heroStyle: CSSProperties = {
-    padding: '4rem 2rem 2rem',
-    textAlign: 'center',
-    background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1))',
-    borderBottom: '1px solid rgba(99, 102, 241, 0.2)',
-  }
-
-  const titleStyle: CSSProperties = {
-    fontSize: '3rem',
-    fontWeight: 700,
-    margin: '0 0 1rem',
-    background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    backgroundClip: 'text',
-  }
-
-  const subtitleStyle: CSSProperties = {
-    fontSize: '1.25rem',
-    color: '#9ca3af',
-    maxWidth: '600px',
-    margin: '0 auto',
-    lineHeight: 1.6,
-  }
-
-  const featuresStyle: CSSProperties = {
-    display: 'flex',
-    justifyContent: 'center',
-    gap: '2rem',
-    marginTop: '2rem',
-    flexWrap: 'wrap',
-  }
-
-  const featureStyle: CSSProperties = {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.5rem',
-    fontSize: '0.9rem',
-    color: '#9ca3af',
-  }
-
-  const gridStyle: CSSProperties = {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-    gap: '1.5rem',
-    padding: '2rem',
-    maxWidth: '1400px',
-    margin: '0 auto',
-  }
-
-  const cardStyle: CSSProperties = {
-    background: 'rgba(30, 30, 40, 0.5)',
-    border: '1px solid rgba(99, 102, 241, 0.2)',
-    borderRadius: '12px',
-    padding: '1.5rem',
-    transition: 'all 0.3s ease',
-    cursor: 'pointer',
-    textDecoration: 'none',
-    color: 'inherit',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1rem',
-  }
-
-  const cardHeaderStyle: CSSProperties = {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  }
-
-  const iconWrapperStyle = (color: string): CSSProperties => ({
-    width: '48px',
-    height: '48px',
-    borderRadius: '12px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    background: `${color}22`,
-    border: `1px solid ${color}44`,
-  })
-
-  const cardTitleStyle: CSSProperties = {
-    fontSize: '1.5rem',
-    fontWeight: 600,
-    margin: 0,
-  }
-
-  const cardDescStyle: CSSProperties = {
-    fontSize: '0.95rem',
-    color: '#9ca3af',
-    lineHeight: 1.5,
-    margin: 0,
-  }
-
-  const featureListStyle: CSSProperties = {
-    display: 'flex',
-    flexWrap: 'wrap',
-    gap: '0.5rem',
-  }
-
-  const featureBadgeStyle: CSSProperties = {
-    fontSize: '0.75rem',
-    padding: '0.25rem 0.75rem',
-    borderRadius: '6px',
-    background: 'rgba(99, 102, 241, 0.1)',
-    border: '1px solid rgba(99, 102, 241, 0.2)',
-    color: '#a5b4fc',
-  }
-
-  const buttonStyle: CSSProperties = {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '0.5rem',
-    padding: '0.75rem 1rem',
-    background: 'rgba(99, 102, 241, 0.1)',
-    border: '1px solid rgba(99, 102, 241, 0.3)',
-    borderRadius: '8px',
-    color: '#a5b4fc',
-    fontSize: '0.9rem',
-    fontWeight: 500,
-    transition: 'all 0.2s ease',
-    cursor: 'pointer',
-    textDecoration: 'none',
-  }
-
   return (
-    <div>
+    <div className="min-h-screen">
       {/* Hero Section */}
-      <div style={heroStyle}>
-        <h1 style={titleStyle}>OBS Overlay Toolkit</h1>
-        <p style={subtitleStyle}>
+      <div className="text-center py-16 px-8 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border-b border-indigo-500/20">
+        <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent">
+          OBS Overlay Toolkit
+        </h1>
+        <p className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
           Professional stream overlays with React, TypeScript, and 140+ customizable parameters.
           Configure visually or copy URLs directly to OBS.
         </p>
 
-        <div style={featuresStyle}>
-          <div style={featureStyle}>
+        <div className="flex justify-center gap-8 mt-8 flex-wrap">
+          <div className="flex items-center gap-2 text-sm text-gray-400">
             <Palette size={16} />
             <span>21 Gradient Presets</span>
           </div>
-          <div style={featureStyle}>
+          <div className="flex items-center gap-2 text-sm text-gray-400">
             <Zap size={16} />
             <span>60fps Animations</span>
           </div>
-          <div style={featureStyle}>
+          <div className="flex items-center gap-2 text-sm text-gray-400">
             <Sparkles size={16} />
             <span>Type-Safe Configuration</span>
           </div>
@@ -231,44 +100,48 @@ function Dashboard() {
       </div>
 
       {/* Overlay Cards */}
-      <div style={gridStyle}>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-8 max-w-7xl mx-auto">
         {overlays.map((overlay) => (
           <Link
             key={overlay.name}
             to={overlay.configPath}
-            style={cardStyle}
-            onMouseEnter={(e: MouseEvent<HTMLAnchorElement>) => {
-              e.currentTarget.style.transform = 'translateY(-4px)'
-              e.currentTarget.style.borderColor = overlay.color
-              e.currentTarget.style.boxShadow = `0 8px 24px ${overlay.color}33`
-            }}
-            onMouseLeave={(e: MouseEvent<HTMLAnchorElement>) => {
-              e.currentTarget.style.transform = 'translateY(0)'
-              e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.2)'
-              e.currentTarget.style.boxShadow = 'none'
-            }}
+            className="overlay-card group"
+            style={{ borderColor: overlay.color + '33' }}
           >
-            <div style={cardHeaderStyle}>
-              <div style={iconWrapperStyle(overlay.color)}>
+            <div className="flex items-center justify-between mb-4">
+              <div
+                className="w-12 h-12 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110"
+                style={{
+                  backgroundColor: overlay.color + '22',
+                  borderColor: overlay.color + '44',
+                  borderWidth: '1px',
+                }}
+              >
                 <overlay.icon size={24} color={overlay.color} />
               </div>
-              <ArrowRight size={20} color="#9ca3af" />
+              <ArrowRight
+                size={20}
+                className="text-gray-400 transition-transform group-hover:translate-x-1"
+              />
             </div>
 
-            <div>
-              <h2 style={cardTitleStyle}>{overlay.name} Overlay</h2>
-              <p style={cardDescStyle}>{overlay.description}</p>
+            <div className="mb-4">
+              <h2 className="text-2xl font-semibold mb-2">{overlay.name} Overlay</h2>
+              <p className="text-gray-400 text-sm leading-relaxed">{overlay.description}</p>
             </div>
 
-            <div style={featureListStyle}>
+            <div className="flex flex-wrap gap-2 mb-4">
               {overlay.features.map((feature) => (
-                <span key={feature} style={featureBadgeStyle}>
+                <span
+                  key={feature}
+                  className="text-xs px-3 py-1 rounded-md bg-indigo-500/10 border border-indigo-500/20 text-indigo-300"
+                >
                   {feature}
                 </span>
               ))}
             </div>
 
-            <div style={buttonStyle}>
+            <div className="btn-primary">
               <span>Configure</span>
               <ArrowRight size={16} />
             </div>
