@@ -5,7 +5,7 @@
  */
 
 import { createFileRoute } from '@tanstack/react-router'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { ConfigLayout } from '../../components/configure/ConfigLayout'
 import { URLGenerator } from '../../components/configure/URLGenerator'
 import { CollapsibleSection } from '../../components/configure/form/CollapsibleSection'
@@ -184,14 +184,17 @@ function SocialsConfigurator() {
     })
   }
 
-  const previewUrl = `${window.location.origin}/overlays/socials?${new URLSearchParams(
-    Object.entries(params).reduce((acc, [key, value]) => {
-      if (value !== SOCIALS_DEFAULTS[key as keyof SocialsOverlayParams]) {
-        acc[key] = String(value)
-      }
-      return acc
-    }, {} as Record<string, string>)
-  ).toString()}`
+  const previewUrl = useMemo(() => {
+    const searchParams = new URLSearchParams(
+      Object.entries(params).reduce((acc, [key, value]) => {
+        if (value !== SOCIALS_DEFAULTS[key as keyof SocialsOverlayParams]) {
+          acc[key] = String(value)
+        }
+        return acc
+      }, {} as Record<string, string>)
+    )
+    return `${window.location.origin}/overlays/socials?${searchParams.toString()}`
+  }, [params])
 
   const configSections = (
     <>
@@ -690,6 +693,7 @@ function SocialsConfigurator() {
               <AnimationSelect
                 value={field.state.value}
                 onValueChange={(value) => field.handleChange(value as any)}
+                onBlur={field.handleBlur}
                 options={[
                   { value: 'none', label: 'None' },
                   { value: 'fade', label: 'Fade' },
@@ -751,6 +755,7 @@ function SocialsConfigurator() {
               <AnimationSelect
                 value={field.state.value}
                 onValueChange={(value) => field.handleChange(value as any)}
+                onBlur={field.handleBlur}
                 options={[
                   { value: 'none', label: 'None' },
                   { value: 'fade', label: 'Fade' },
@@ -918,6 +923,7 @@ function SocialsConfigurator() {
               <GradientGrid
                 value={field.state.value}
                 onValueChange={(value) => field.handleChange(value as any)}
+                onBlur={field.handleBlur}
               />
             )}
           </form.Field>

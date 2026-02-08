@@ -28,7 +28,7 @@ export function useHistory<T>(
   initialState: T,
   options: UseHistoryOptions = {}
 ): UseHistoryReturn<T> {
-  const { maxHistorySize = 50, debounceMs = 300 } = options
+  const { maxHistorySize = 50, debounceMs = 150 } = options
 
   // Current state
   const [state, setInternalState] = useState<T>(initialState)

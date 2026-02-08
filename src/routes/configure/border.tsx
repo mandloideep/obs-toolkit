@@ -4,6 +4,7 @@
  * Now with TanStack Form + Zod validation + ShadCN UI components
  */
 
+import { useMemo } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { ConfigLayout } from '../../components/configure/ConfigLayout'
 import { URLGenerator } from '../../components/configure/URLGenerator'
@@ -88,14 +89,17 @@ function BorderConfigurator() {
   }
 
   // Generate preview URL
-  const previewUrl = `${window.location.origin}/overlays/border?${new URLSearchParams(
-    Object.entries(params).reduce((acc, [key, value]) => {
-      if (value !== BORDER_DEFAULTS[key as keyof BorderOverlayParams]) {
-        acc[key] = String(value)
-      }
-      return acc
-    }, {} as Record<string, string>)
-  ).toString()}`
+  const previewUrl = useMemo(() => {
+    const searchParams = new URLSearchParams(
+      Object.entries(params).reduce((acc, [key, value]) => {
+        if (value !== BORDER_DEFAULTS[key as keyof BorderOverlayParams]) {
+          acc[key] = String(value)
+        }
+        return acc
+      }, {} as Record<string, string>)
+    )
+    return `${window.location.origin}/overlays/border?${searchParams.toString()}`
+  }, [params])
 
   const configSections = (
     <>
@@ -154,6 +158,7 @@ function BorderConfigurator() {
               <AnimationSelect
                 value={field.state.value}
                 onValueChange={(value) => field.handleChange(value as any)}
+                onBlur={field.handleBlur}
                 options={[
                   { value: 'none', label: 'None' },
                   { value: 'dash', label: 'Dash' },
@@ -250,6 +255,7 @@ function BorderConfigurator() {
               <GradientGrid
                 value={field.state.value}
                 onValueChange={(value) => field.handleChange(value as any)}
+                onBlur={field.handleBlur}
               />
             )}
           </form.Field>

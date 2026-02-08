@@ -5,7 +5,7 @@
  */
 
 import { createFileRoute } from '@tanstack/react-router'
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { ConfigLayout } from '../../components/configure/ConfigLayout'
 import { URLGenerator } from '../../components/configure/URLGenerator'
 import { CollapsibleSection } from '../../components/configure/form/CollapsibleSection'
@@ -143,16 +143,10 @@ function CounterConfigurator() {
     }
   }
 
-  // Helper to generate URL with optional param exclusions
-  const generateUrl = useCallback((excludeParams: string[] = []) => {
+  // Preview URL: Includes API key for live testing
+  const previewUrl = useMemo(() => {
     const searchParams = new URLSearchParams(
       Object.entries(params).reduce((acc, [key, value]) => {
-        // Skip excluded params
-        if (excludeParams.includes(key)) {
-          return acc
-        }
-
-        // Skip defaults
         if (value !== COUNTER_DEFAULTS[key as keyof CounterOverlayParams]) {
           acc[key] = String(value)
         }
@@ -162,11 +156,22 @@ function CounterConfigurator() {
     return `${window.location.origin}/overlays/counter?${searchParams.toString()}`
   }, [params])
 
-  // Preview URL: Includes API key for live testing
-  const previewUrl = useMemo(() => generateUrl([]), [generateUrl])
-
   // Fullscreen URL: Excludes API key for security
-  const fullscreenUrl = useMemo(() => generateUrl(['apikey']), [generateUrl])
+  const fullscreenUrl = useMemo(() => {
+    const searchParams = new URLSearchParams(
+      Object.entries(params).reduce((acc, [key, value]) => {
+        // Skip API key for security
+        if (key === 'apikey') {
+          return acc
+        }
+        if (value !== COUNTER_DEFAULTS[key as keyof CounterOverlayParams]) {
+          acc[key] = String(value)
+        }
+        return acc
+      }, {} as Record<string, string>)
+    )
+    return `${window.location.origin}/overlays/counter?${searchParams.toString()}`
+  }, [params])
 
   const configSections = (
     <>
@@ -768,6 +773,7 @@ function CounterConfigurator() {
               <GradientGrid
                 value={field.state.value}
                 onValueChange={(value) => field.handleChange(value as any)}
+                onBlur={field.handleBlur}
               />
             )}
           </form.Field>

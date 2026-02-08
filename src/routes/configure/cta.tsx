@@ -4,6 +4,7 @@
  * Now with TanStack Form + Zod validation + ShadCN UI components
  */
 
+import { useMemo } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { ConfigLayout } from '../../components/configure/ConfigLayout'
 import { URLGenerator } from '../../components/configure/URLGenerator'
@@ -86,14 +87,17 @@ function CTAConfigurator() {
     })
   }
 
-  const previewUrl = `${window.location.origin}/overlays/cta?${new URLSearchParams(
-    Object.entries(params).reduce((acc, [key, value]) => {
-      if (value !== CTA_DEFAULTS[key as keyof CTAOverlayParams]) {
-        acc[key] = String(value)
-      }
-      return acc
-    }, {} as Record<string, string>)
-  ).toString()}`
+  const previewUrl = useMemo(() => {
+    const searchParams = new URLSearchParams(
+      Object.entries(params).reduce((acc, [key, value]) => {
+        if (value !== CTA_DEFAULTS[key as keyof CTAOverlayParams]) {
+          acc[key] = String(value)
+        }
+        return acc
+      }, {} as Record<string, string>)
+    )
+    return `${window.location.origin}/overlays/cta?${searchParams.toString()}`
+  }, [params])
 
   const configSections = (
     <>
@@ -242,6 +246,7 @@ function CTAConfigurator() {
                   <AnimationSelect
                     value={field.state.value}
                     onValueChange={(value) => field.handleChange(value as any)}
+                    onBlur={field.handleBlur}
                     options={[
                       { value: 'none', label: 'None' },
                       { value: 'bounce', label: 'Bounce' },
@@ -619,6 +624,7 @@ function CTAConfigurator() {
               <GradientGrid
                 value={field.state.value}
                 onValueChange={(value) => field.handleChange(value as any)}
+                onBlur={field.handleBlur}
               />
             )}
           </form.Field>

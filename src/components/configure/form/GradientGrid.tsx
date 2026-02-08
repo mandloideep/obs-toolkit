@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 interface GradientGridProps {
   value: string
   onValueChange: (value: string) => void
+  onBlur?: () => void
   className?: string
 }
 
@@ -32,8 +33,16 @@ const getAllGradients = (): GradientName[] => {
   return Array.from(allFromCategories) as GradientName[]
 }
 
-export function GradientGrid({ value, onValueChange, className }: GradientGridProps) {
+export function GradientGrid({ value, onValueChange, onBlur, className }: GradientGridProps) {
   const allGradients = getAllGradients()
+
+  // Handler that calls both onChange and onBlur
+  const handleSelect = (gradientName: GradientName) => {
+    onValueChange(gradientName)
+    if (onBlur) {
+      onBlur()
+    }
+  }
 
   // Render a single gradient button
   const renderGradientButton = (gradientName: GradientName) => {
@@ -48,7 +57,7 @@ export function GradientGrid({ value, onValueChange, className }: GradientGridPr
     return (
       <button
         key={gradientName}
-        onClick={() => onValueChange(gradientName)}
+        onClick={() => handleSelect(gradientName)}
         className={cn(
           'relative rounded-lg overflow-hidden transition-all duration-200',
           'hover:scale-105 hover:shadow-lg',

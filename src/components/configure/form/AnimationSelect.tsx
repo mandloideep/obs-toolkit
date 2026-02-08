@@ -32,6 +32,7 @@ interface AnimationOption {
 interface AnimationSelectProps {
   value: string
   onValueChange: (value: string) => void
+  onBlur?: () => void
   options: AnimationOption[]
   className?: string
   placeholder?: string
@@ -63,6 +64,7 @@ const getAnimationIcon = (animationType: string) => {
 export function AnimationSelect({
   value,
   onValueChange,
+  onBlur,
   options,
   className,
   placeholder = 'Select animation...',
@@ -71,7 +73,16 @@ export function AnimationSelect({
   const SelectedIcon = selectedOption ? getAnimationIcon(selectedOption.value) : Eye
 
   return (
-    <Select value={value} onValueChange={onValueChange}>
+    <Select
+      value={value}
+      onValueChange={onValueChange}
+      onOpenChange={(open) => {
+        // Call onBlur when dropdown closes
+        if (!open && onBlur) {
+          onBlur()
+        }
+      }}
+    >
       <SelectTrigger className={cn('bg-black/30 focus:ring-brand-indigo/50', className)}>
         <div className="flex items-center gap-2 w-full">
           <SelectedIcon size={16} className="text-brand-indigo shrink-0" />
