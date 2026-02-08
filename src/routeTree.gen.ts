@@ -10,11 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as OverlaysTextRouteImport } from './routes/overlays/text'
 import { Route as OverlaysBorderRouteImport } from './routes/overlays/border'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OverlaysTextRoute = OverlaysTextRouteImport.update({
+  id: '/overlays/text',
+  path: '/overlays/text',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OverlaysBorderRoute = OverlaysBorderRouteImport.update({
@@ -26,27 +32,31 @@ const OverlaysBorderRoute = OverlaysBorderRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/overlays/border': typeof OverlaysBorderRoute
+  '/overlays/text': typeof OverlaysTextRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/overlays/border': typeof OverlaysBorderRoute
+  '/overlays/text': typeof OverlaysTextRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/overlays/border': typeof OverlaysBorderRoute
+  '/overlays/text': typeof OverlaysTextRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/overlays/border'
+  fullPaths: '/' | '/overlays/border' | '/overlays/text'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/overlays/border'
-  id: '__root__' | '/' | '/overlays/border'
+  to: '/' | '/overlays/border' | '/overlays/text'
+  id: '__root__' | '/' | '/overlays/border' | '/overlays/text'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   OverlaysBorderRoute: typeof OverlaysBorderRoute
+  OverlaysTextRoute: typeof OverlaysTextRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -56,6 +66,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/overlays/text': {
+      id: '/overlays/text'
+      path: '/overlays/text'
+      fullPath: '/overlays/text'
+      preLoaderRoute: typeof OverlaysTextRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/overlays/border': {
@@ -71,6 +88,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   OverlaysBorderRoute: OverlaysBorderRoute,
+  OverlaysTextRoute: OverlaysTextRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
