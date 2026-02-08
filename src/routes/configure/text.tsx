@@ -7,6 +7,9 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { ConfigLayout } from '../../components/configure/ConfigLayout'
 import { URLGenerator } from '../../components/configure/URLGenerator'
+import { CollapsibleSection } from '../../components/configure/form/CollapsibleSection'
+import { NumberSlider } from '../../components/configure/form/NumberSlider'
+import { ColorArrayInput } from '../../components/configure/form/ColorArrayInput'
 import { TEXT_DEFAULTS } from '../../types/text.types'
 import type { TextOverlayParams } from '../../types/text.types'
 
@@ -56,9 +59,7 @@ function TextConfigurator() {
         </div>
 
         {/* Section 2: Content */}
-        <div className="config-section">
-          <h2 className="text-2xl font-semibold mb-6">Content</h2>
-          <div className="space-y-5">
+        <CollapsibleSection title="Content" defaultOpen={true} storageKey="text-content">
             <div>
               <label className="config-label">Main Text</label>
               <input
@@ -103,13 +104,141 @@ function TextConfigurator() {
                 />
               </div>
             </div>
-          </div>
-        </div>
+        </CollapsibleSection>
 
-        {/* Section 3: Layout */}
-        <div className="config-section">
-          <h2 className="text-2xl font-semibold mb-6">Layout</h2>
-          <div className="space-y-5">
+        {/* Section 3: Typography (Hidden Parameters) */}
+        <CollapsibleSection title="Typography" defaultOpen={false} storageKey="text-typography">
+          <div>
+            <label className="config-label">Font Family</label>
+            <select
+              className="config-select"
+              value={params.font}
+              onChange={(e) => updateParam('font', e.target.value as any)}
+            >
+              <option value="display">Display</option>
+              <option value="body">Body</option>
+              <option value="mono">Mono</option>
+              <option value="custom1">Custom 1</option>
+              <option value="custom2">Custom 2</option>
+              <option value="custom3">Custom 3</option>
+              <option value="custom4">Custom 4</option>
+              <option value="custom5">Custom 5</option>
+            </select>
+          </div>
+
+          <NumberSlider
+            label="Font Weight"
+            value={params.weight}
+            onChange={(val) => updateParam('weight', val)}
+            min={100}
+            max={900}
+            step={100}
+            help="Controls the boldness of the text (100 = thin, 900 = black)"
+          />
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="config-label">Text Color</label>
+              <input
+                className="config-input"
+                type="text"
+                value={params.textcolor}
+                onChange={(e) => updateParam('textcolor', e.target.value)}
+                placeholder="Leave empty for gradient"
+              />
+            </div>
+            <div>
+              <label className="config-label">Subtitle Color</label>
+              <input
+                className="config-input"
+                type="text"
+                value={params.subcolor}
+                onChange={(e) => updateParam('subcolor', e.target.value)}
+                placeholder="Leave empty for gradient"
+              />
+            </div>
+          </div>
+        </CollapsibleSection>
+
+        {/* Section 4: Spacing & Position (Hidden Parameters) */}
+        <CollapsibleSection title="Spacing & Position" defaultOpen={false} storageKey="text-spacing">
+          <div className="grid grid-cols-2 gap-4">
+            <NumberSlider
+              label="Padding X"
+              value={params.padx || params.pad}
+              onChange={(val) => updateParam('padx', val)}
+              min={0}
+              max={100}
+              unit="px"
+              help="Horizontal padding around text"
+            />
+            <NumberSlider
+              label="Padding Y"
+              value={params.pady || params.pad}
+              onChange={(val) => updateParam('pady', val)}
+              min={0}
+              max={100}
+              unit="px"
+              help="Vertical padding around text"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <NumberSlider
+              label="Margin X"
+              value={params.marginx}
+              onChange={(val) => updateParam('marginx', val)}
+              min={0}
+              max={200}
+              unit="px"
+              help="Horizontal margin from edge"
+            />
+            <NumberSlider
+              label="Margin Y"
+              value={params.marginy}
+              onChange={(val) => updateParam('marginy', val)}
+              min={0}
+              max={200}
+              unit="px"
+              help="Vertical margin from edge"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <NumberSlider
+              label="Offset X"
+              value={params.offsetx}
+              onChange={(val) => updateParam('offsetx', val)}
+              min={-500}
+              max={500}
+              unit="px"
+              help="Fine-tune horizontal position"
+            />
+            <NumberSlider
+              label="Offset Y"
+              value={params.offsety}
+              onChange={(val) => updateParam('offsety', val)}
+              min={-500}
+              max={500}
+              unit="px"
+              help="Fine-tune vertical position"
+            />
+          </div>
+
+          <div>
+            <label className="config-label">Max Width</label>
+            <input
+              className="config-input"
+              type="text"
+              value={params.maxwidth}
+              onChange={(e) => updateParam('maxwidth', e.target.value)}
+              placeholder="auto, 500px, 80%, etc."
+            />
+          </div>
+        </CollapsibleSection>
+
+        {/* Section 5: Layout */}
+        <CollapsibleSection title="Layout" defaultOpen={true} storageKey="text-layout">
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="config-label">Horizontal Align</label>
@@ -148,13 +277,10 @@ function TextConfigurator() {
                 Show background panel
               </label>
             </div>
-          </div>
-        </div>
+        </CollapsibleSection>
 
-        {/* Section 4: Signature Line */}
-        <div className="config-section">
-          <h2 className="text-2xl font-semibold mb-6">Signature Line</h2>
-          <div className="space-y-5">
+        {/* Section 6: Signature Line */}
+        <CollapsibleSection title="Signature Line" defaultOpen={true} storageKey="text-line">
             <div className="flex items-center gap-3">
               <input
                 type="checkbox"
@@ -196,13 +322,10 @@ function TextConfigurator() {
                 </div>
               </>
             )}
-          </div>
-        </div>
+        </CollapsibleSection>
 
-        {/* Section 5: Animations */}
-        <div className="config-section">
-          <h2 className="text-2xl font-semibold mb-6">Animations</h2>
-          <div className="space-y-5">
+        {/* Section 7: Animations */}
+        <CollapsibleSection title="Animations" defaultOpen={true} storageKey="text-animations">
             <div>
               <label className="config-label">Entrance Animation</label>
               <select
@@ -248,13 +371,10 @@ function TextConfigurator() {
                 />
               </div>
             )}
-          </div>
-        </div>
+        </CollapsibleSection>
 
-        {/* Section 6: Loop Mode */}
-        <div className="config-section">
-          <h2 className="text-2xl font-semibold mb-6">Loop Mode</h2>
-          <div className="space-y-5">
+        {/* Section 8: Loop Mode */}
+        <CollapsibleSection title="Loop Mode" defaultOpen={false} storageKey="text-loop">
             <div className="flex items-center gap-3">
               <input
                 type="checkbox"
@@ -293,13 +413,10 @@ function TextConfigurator() {
                 </div>
               </div>
             )}
-          </div>
-        </div>
+        </CollapsibleSection>
 
-        {/* Section 7: Theme & Colors */}
-        <div className="config-section">
-          <h2 className="text-2xl font-semibold mb-6">Theme & Colors</h2>
-          <div className="space-y-5">
+        {/* Section 9: Theme & Colors */}
+        <CollapsibleSection title="Theme & Colors" defaultOpen={true} storageKey="text-theme">
             <div>
               <label className="config-label">Gradient Preset</label>
               <select
@@ -329,8 +446,7 @@ function TextConfigurator() {
                 Apply gradient to text
               </label>
             </div>
-          </div>
-        </div>
+        </CollapsibleSection>
     </>
   )
 
