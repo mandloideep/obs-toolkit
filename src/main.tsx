@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
+import { BrandProvider } from './contexts/BrandContext'
 
 // Import the generated route tree
 import { routeTree } from './routeTree.gen'
@@ -21,7 +22,9 @@ if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement)
   root.render(
     <React.StrictMode>
-      <RouterProvider router={router} />
+      <BrandProvider>
+        <RouterProvider router={router} />
+      </BrandProvider>
     </React.StrictMode>
   )
 }
