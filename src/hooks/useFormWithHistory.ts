@@ -67,13 +67,12 @@ export function useFormWithHistory<T extends Record<string, any>>({
         return
       }
 
-      // Only update history if form is valid
-      // Invalid states don't trigger history updates
-      if (formState.isValid) {
-        // useHistory's setState is debounced (300ms)
-        // This prevents excessive history entries during rapid input
-        history.setState(formState.values as T)
-      }
+      // Always update history with form values
+      // Validation errors are shown in the UI, but values still flow through
+      // This ensures preview updates immediately even before blur validation
+      // useHistory's setState is debounced (150ms)
+      // This prevents excessive history entries during rapid input
+      history.setState(formState.values as T)
     })
 
     return unsubscribe
