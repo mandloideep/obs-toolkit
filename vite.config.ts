@@ -7,7 +7,8 @@ import { fileURLToPath, URL } from 'url'
 
 const config = defineConfig({
   // GitHub Pages deployment configuration
-  base: '/obs-toolkit/',
+  // Use base path only in production
+  base: process.env.NODE_ENV === 'production' ? '/obs-toolkit/' : '/',
 
   build: {
     outDir: 'dist',
