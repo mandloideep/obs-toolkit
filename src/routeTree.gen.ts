@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OverlaysTextRouteImport } from './routes/overlays/text'
+import { Route as OverlaysSocialsRouteImport } from './routes/overlays/socials'
 import { Route as OverlaysCtaRouteImport } from './routes/overlays/cta'
 import { Route as OverlaysCounterRouteImport } from './routes/overlays/counter'
 import { Route as OverlaysBorderRouteImport } from './routes/overlays/border'
@@ -23,6 +24,11 @@ const IndexRoute = IndexRouteImport.update({
 const OverlaysTextRoute = OverlaysTextRouteImport.update({
   id: '/overlays/text',
   path: '/overlays/text',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OverlaysSocialsRoute = OverlaysSocialsRouteImport.update({
+  id: '/overlays/socials',
+  path: '/overlays/socials',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OverlaysCtaRoute = OverlaysCtaRouteImport.update({
@@ -46,6 +52,7 @@ export interface FileRoutesByFullPath {
   '/overlays/border': typeof OverlaysBorderRoute
   '/overlays/counter': typeof OverlaysCounterRoute
   '/overlays/cta': typeof OverlaysCtaRoute
+  '/overlays/socials': typeof OverlaysSocialsRoute
   '/overlays/text': typeof OverlaysTextRoute
 }
 export interface FileRoutesByTo {
@@ -53,6 +60,7 @@ export interface FileRoutesByTo {
   '/overlays/border': typeof OverlaysBorderRoute
   '/overlays/counter': typeof OverlaysCounterRoute
   '/overlays/cta': typeof OverlaysCtaRoute
+  '/overlays/socials': typeof OverlaysSocialsRoute
   '/overlays/text': typeof OverlaysTextRoute
 }
 export interface FileRoutesById {
@@ -61,6 +69,7 @@ export interface FileRoutesById {
   '/overlays/border': typeof OverlaysBorderRoute
   '/overlays/counter': typeof OverlaysCounterRoute
   '/overlays/cta': typeof OverlaysCtaRoute
+  '/overlays/socials': typeof OverlaysSocialsRoute
   '/overlays/text': typeof OverlaysTextRoute
 }
 export interface FileRouteTypes {
@@ -70,6 +79,7 @@ export interface FileRouteTypes {
     | '/overlays/border'
     | '/overlays/counter'
     | '/overlays/cta'
+    | '/overlays/socials'
     | '/overlays/text'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -77,6 +87,7 @@ export interface FileRouteTypes {
     | '/overlays/border'
     | '/overlays/counter'
     | '/overlays/cta'
+    | '/overlays/socials'
     | '/overlays/text'
   id:
     | '__root__'
@@ -84,6 +95,7 @@ export interface FileRouteTypes {
     | '/overlays/border'
     | '/overlays/counter'
     | '/overlays/cta'
+    | '/overlays/socials'
     | '/overlays/text'
   fileRoutesById: FileRoutesById
 }
@@ -92,6 +104,7 @@ export interface RootRouteChildren {
   OverlaysBorderRoute: typeof OverlaysBorderRoute
   OverlaysCounterRoute: typeof OverlaysCounterRoute
   OverlaysCtaRoute: typeof OverlaysCtaRoute
+  OverlaysSocialsRoute: typeof OverlaysSocialsRoute
   OverlaysTextRoute: typeof OverlaysTextRoute
 }
 
@@ -109,6 +122,13 @@ declare module '@tanstack/react-router' {
       path: '/overlays/text'
       fullPath: '/overlays/text'
       preLoaderRoute: typeof OverlaysTextRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/overlays/socials': {
+      id: '/overlays/socials'
+      path: '/overlays/socials'
+      fullPath: '/overlays/socials'
+      preLoaderRoute: typeof OverlaysSocialsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/overlays/cta': {
@@ -140,6 +160,7 @@ const rootRouteChildren: RootRouteChildren = {
   OverlaysBorderRoute: OverlaysBorderRoute,
   OverlaysCounterRoute: OverlaysCounterRoute,
   OverlaysCtaRoute: OverlaysCtaRoute,
+  OverlaysSocialsRoute: OverlaysSocialsRoute,
   OverlaysTextRoute: OverlaysTextRoute,
 }
 export const routeTree = rootRouteImport
