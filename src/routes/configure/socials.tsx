@@ -12,6 +12,7 @@ import { NumberSlider } from '../../components/configure/form/NumberSlider'
 import { ColorArrayInput } from '../../components/configure/form/ColorArrayInput'
 import { FormInput } from '../../components/configure/form/FormInput'
 import { FormSelect } from '../../components/configure/form/FormSelect'
+import { GradientSelect } from '../../components/configure/form/GradientSelect'
 import { Switch } from '../../components/ui/switch'
 import { Label } from '../../components/ui/label'
 import { SOCIALS_DEFAULTS } from '../../types/socials.types'
@@ -101,6 +102,30 @@ function SocialsConfigurator() {
     value: SocialsOverlayParams[K]
   ) => {
     setParams((prev) => ({ ...prev, [key]: value }))
+  }
+
+  const handleReset = () => {
+    setParams(SOCIALS_DEFAULTS)
+
+    // Reset platforms state to match defaults
+    const showList = SOCIALS_DEFAULTS.show.split(',').filter(Boolean)
+    const handlesMap = SOCIALS_DEFAULTS.handles.split(',').reduce((acc, pair) => {
+      const [platform, handle] = pair.split(':')
+      if (platform && handle) acc[platform] = handle
+      return acc
+    }, {} as Record<string, string>)
+
+    setPlatforms({
+      github: { enabled: showList.includes('github'), handle: handlesMap.github || '' },
+      twitter: { enabled: showList.includes('twitter'), handle: handlesMap.twitter || '' },
+      linkedin: { enabled: showList.includes('linkedin'), handle: handlesMap.linkedin || '' },
+      youtube: { enabled: showList.includes('youtube'), handle: handlesMap.youtube || '' },
+      instagram: { enabled: showList.includes('instagram'), handle: handlesMap.instagram || '' },
+      twitch: { enabled: showList.includes('twitch'), handle: handlesMap.twitch || '' },
+      kick: { enabled: showList.includes('kick'), handle: handlesMap.kick || '' },
+      discord: { enabled: showList.includes('discord'), handle: handlesMap.discord || '' },
+      website: { enabled: showList.includes('website'), handle: handlesMap.website || '' },
+    })
   }
 
   const previewUrl = `${window.location.origin}/overlays/socials?${new URLSearchParams(
@@ -677,19 +702,10 @@ function SocialsConfigurator() {
       <CollapsibleSection title="Theme & Colors" defaultOpen={false} storageKey="socials-theme">
         <div>
           <label className="config-label">Gradient Preset</label>
-          <FormSelect
+          <GradientSelect
             value={params.gradient}
             onValueChange={(value) => updateParam('gradient', value as any)}
-            options={[
-              { value: 'indigo', label: 'Indigo' },
-              { value: 'cyan', label: 'Cyan' },
-              { value: 'sunset', label: 'Sunset' },
-              { value: 'emerald', label: 'Emerald' },
-              { value: 'purple', label: 'Purple' },
-              { value: 'neon', label: 'Neon' },
-              { value: 'fire', label: 'Fire' },
-              { value: 'ocean', label: 'Ocean' },
-            ]}
+            showAll={true}
           />
         </div>
 
@@ -708,6 +724,7 @@ function SocialsConfigurator() {
       configContent={configSections}
       previewUrl={previewUrl}
       overlayTitle="Socials Overlay"
+      onReset={handleReset}
       urlGeneratorComponent={
         <URLGenerator
           overlayPath="/overlays/socials"

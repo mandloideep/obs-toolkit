@@ -12,6 +12,7 @@ import { NumberSlider } from '../../components/configure/form/NumberSlider'
 import { ColorArrayInput } from '../../components/configure/form/ColorArrayInput'
 import { FormInput } from '../../components/configure/form/FormInput'
 import { FormSelect } from '../../components/configure/form/FormSelect'
+import { GradientSelect } from '../../components/configure/form/GradientSelect'
 import { Switch } from '../../components/ui/switch'
 import { Label } from '../../components/ui/label'
 import { CTA_DEFAULTS } from '../../types/cta.types'
@@ -29,6 +30,10 @@ function CTAConfigurator() {
     value: CTAOverlayParams[K]
   ) => {
     setParams((prev) => ({ ...prev, [key]: value }))
+  }
+
+  const handleReset = () => {
+    setParams(CTA_DEFAULTS)
   }
 
   const previewUrl = `${window.location.origin}/overlays/cta?${new URLSearchParams(
@@ -417,19 +422,10 @@ function CTAConfigurator() {
       <CollapsibleSection title="Theme & Colors" defaultOpen={false} storageKey="cta-theme">
         <div>
           <label className="config-label">Gradient Preset</label>
-          <FormSelect
+          <GradientSelect
             value={params.gradient}
             onValueChange={(value) => updateParam('gradient', value as any)}
-            options={[
-              { value: 'indigo', label: 'Indigo' },
-              { value: 'cyan', label: 'Cyan' },
-              { value: 'sunset', label: 'Sunset' },
-              { value: 'emerald', label: 'Emerald' },
-              { value: 'purple', label: 'Purple' },
-              { value: 'neon', label: 'Neon' },
-              { value: 'fire', label: 'Fire' },
-              { value: 'ocean', label: 'Ocean' },
-            ]}
+            showAll={true}
           />
         </div>
 
@@ -448,6 +444,7 @@ function CTAConfigurator() {
       configContent={configSections}
       previewUrl={previewUrl}
       overlayTitle="CTA Overlay"
+      onReset={handleReset}
       urlGeneratorComponent={
         <URLGenerator
           overlayPath="/overlays/cta"

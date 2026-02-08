@@ -12,6 +12,7 @@ import { NumberSlider } from '../../components/configure/form/NumberSlider'
 import { ColorArrayInput } from '../../components/configure/form/ColorArrayInput'
 import { FormInput } from '../../components/configure/form/FormInput'
 import { FormSelect } from '../../components/configure/form/FormSelect'
+import { GradientSelect } from '../../components/configure/form/GradientSelect'
 import { Switch } from '../../components/ui/switch'
 import { Label } from '../../components/ui/label'
 import { COUNTER_DEFAULTS } from '../../types/counter.types'
@@ -29,6 +30,12 @@ function CounterConfigurator() {
     value: CounterOverlayParams[K]
   ) => {
     setParams((prev) => ({ ...prev, [key]: value }))
+  }
+
+  const handleReset = () => {
+    setParams(COUNTER_DEFAULTS)
+    // Note: persistApiKeys state and localStorage are NOT cleared
+    // API keys are user preference, independent of overlay config
   }
 
   // API key persistence state
@@ -721,19 +728,10 @@ function CounterConfigurator() {
 
         <div>
           <label className="config-label">Gradient Preset</label>
-          <FormSelect
+          <GradientSelect
             value={params.gradient}
             onValueChange={(value) => updateParam('gradient', value as any)}
-            options={[
-              { value: 'indigo', label: 'Indigo' },
-              { value: 'cyan', label: 'Cyan' },
-              { value: 'sunset', label: 'Sunset' },
-              { value: 'emerald', label: 'Emerald' },
-              { value: 'purple', label: 'Purple' },
-              { value: 'neon', label: 'Neon' },
-              { value: 'fire', label: 'Fire' },
-              { value: 'ocean', label: 'Ocean' },
-            ]}
+            showAll={true}
           />
         </div>
 
@@ -753,6 +751,7 @@ function CounterConfigurator() {
       previewUrl={previewUrl}
       fullscreenUrl={fullscreenUrl}
       overlayTitle="Counter Overlay"
+      onReset={handleReset}
       urlGeneratorComponent={
         <URLGenerator
           overlayPath="/overlays/counter"
