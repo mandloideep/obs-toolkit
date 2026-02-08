@@ -1,6 +1,6 @@
 /**
  * FormSwitch Component
- * Boolean toggle switch with ShadCN UI components
+ * Boolean toggle switch with ShadCN UI components and TanStack Form integration
  */
 
 import { Switch } from '@/components/ui/switch'
