@@ -6,7 +6,7 @@
 
 import React, { useMemo, useState, useCallback } from 'react'
 import { Copy, Check, ExternalLink } from 'lucide-react'
-import type { CSSProperties } from 'react'
+import { Button } from '../ui/button'
 
 interface URLGeneratorProps {
   overlayPath: string
@@ -95,150 +95,46 @@ export function URLGenerator({ overlayPath, params, defaults, baseUrl, sensitive
     window.open(displayUrl, '_blank', 'width=1920,height=1080')
   }
 
-  const containerStyle: CSSProperties = {
-    background: 'rgba(30, 30, 40, 0.5)',
-    border: '1px solid rgba(99, 102, 241, 0.2)',
-    borderRadius: '12px',
-    padding: '1.5rem',
-  }
-
-  const labelStyle: CSSProperties = {
-    fontSize: '0.875rem',
-    fontWeight: 600,
-    color: '#9ca3af',
-    marginBottom: '0.5rem',
-    display: 'block',
-  }
-
-  const urlBoxStyle: CSSProperties = {
-    background: 'rgba(0, 0, 0, 0.3)',
-    border: '1px solid rgba(99, 102, 241, 0.2)',
-    borderRadius: '8px',
-    padding: '0.75rem',
-    fontSize: '0.85rem',
-    color: '#a5b4fc',
-    wordBreak: 'break-all',
-    fontFamily: 'monospace',
-    marginBottom: '1rem',
-  }
-
-  const buttonGroupStyle: CSSProperties = {
-    display: 'flex',
-    gap: '0.75rem',
-  }
-
-  const buttonStyle: CSSProperties = {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.5rem',
-    padding: '0.625rem 1rem',
-    background: 'rgba(99, 102, 241, 0.1)',
-    border: '1px solid rgba(99, 102, 241, 0.3)',
-    borderRadius: '8px',
-    color: '#a5b4fc',
-    fontSize: '0.875rem',
-    fontWeight: 500,
-    cursor: 'pointer',
-    transition: 'all 0.2s ease',
-  }
-
-  const successButtonStyle: CSSProperties = {
-    ...buttonStyle,
-    background: 'rgba(16, 185, 129, 0.1)',
-    borderColor: 'rgba(16, 185, 129, 0.3)',
-    color: '#6ee7b7',
-  }
-
-  const helpTextStyle: CSSProperties = {
-    fontSize: '0.75rem',
-    color: '#6b7280',
-    marginTop: '0.75rem',
-    lineHeight: '1.5',
-  }
-
   return (
-    <div style={containerStyle}>
-      <label style={labelStyle}>OBS Browser Source URL</label>
-      <div style={urlBoxStyle}>{displayUrl}</div>
+    <div className="config-section">
+      <label className="config-label">OBS Browser Source URL</label>
+      <div className="bg-black/30 border border-dark-border rounded-lg p-3 text-sm text-indigo-200 break-all font-mono mb-4">
+        {displayUrl}
+      </div>
 
-      <div style={buttonGroupStyle}>
+      <div className="flex gap-3">
         {/* Copy URL (without sensitive params) */}
-        <button
+        <Button
+          variant={copied ? 'default' : 'indigo'}
           onClick={copyToClipboard}
-          style={copied ? successButtonStyle : buttonStyle}
-          onMouseEnter={(e) => {
-            if (!copied) {
-              e.currentTarget.style.background = 'rgba(99, 102, 241, 0.2)'
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (!copied) {
-              e.currentTarget.style.background = 'rgba(99, 102, 241, 0.1)'
-            }
-          }}
+          className={copied ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300' : ''}
         >
-          {copied ? (
-            <>
-              <Check size={16} />
-              <span>Copied!</span>
-            </>
-          ) : (
-            <>
-              <Copy size={16} />
-              <span>Copy URL</span>
-            </>
-          )}
-        </button>
+          {copied ? <Check size={16} /> : <Copy size={16} />}
+          {copied ? 'Copied!' : 'Copy URL'}
+        </Button>
 
         {/* Copy with API Key (includes sensitive params) - only show if there are sensitive params */}
         {sensitiveParams.length > 0 && (
-          <button
+          <Button
+            variant={copiedWithKey ? 'default' : 'indigo'}
             onClick={copyFullUrlToClipboard}
-            style={copiedWithKey ? successButtonStyle : buttonStyle}
-            onMouseEnter={(e) => {
-              if (!copiedWithKey) {
-                e.currentTarget.style.background = 'rgba(99, 102, 241, 0.2)'
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!copiedWithKey) {
-                e.currentTarget.style.background = 'rgba(99, 102, 241, 0.1)'
-              }
-            }}
+            className={copiedWithKey ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300' : ''}
           >
-            {copiedWithKey ? (
-              <>
-                <Check size={16} />
-                <span>Copied with Key!</span>
-              </>
-            ) : (
-              <>
-                <Copy size={16} />
-                <span>Copy with API Key</span>
-              </>
-            )}
-          </button>
+            {copiedWithKey ? <Check size={16} /> : <Copy size={16} />}
+            {copiedWithKey ? 'Copied with Key!' : 'Copy with API Key'}
+          </Button>
         )}
 
         {/* Preview (without sensitive params) */}
-        <button
-          onClick={openPreview}
-          style={buttonStyle}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'rgba(99, 102, 241, 0.2)'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'rgba(99, 102, 241, 0.1)'
-          }}
-        >
+        <Button variant="indigo" onClick={openPreview}>
           <ExternalLink size={16} />
-          <span>Preview</span>
-        </button>
+          Preview
+        </Button>
       </div>
 
       {/* Helper text */}
       {sensitiveParams.length > 0 && (
-        <p style={helpTextStyle}>
+        <p className="text-xs text-dark-muted mt-3 leading-relaxed">
           💡 Use <strong>Copy with API Key</strong> for OBS. Regular URL is for sharing configs.
         </p>
       )}

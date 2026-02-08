@@ -10,6 +10,7 @@ import { URLGenerator } from '../../components/configure/URLGenerator'
 import { CollapsibleSection } from '../../components/configure/form/CollapsibleSection'
 import { NumberSlider } from '../../components/configure/form/NumberSlider'
 import { ColorArrayInput } from '../../components/configure/form/ColorArrayInput'
+import { FormSelect } from '../../components/configure/form/FormSelect'
 import { Switch } from '../../components/ui/switch'
 import { Label } from '../../components/ui/label'
 import { BORDER_DEFAULTS } from '../../types/border.types'
@@ -45,44 +46,44 @@ function BorderConfigurator() {
       <CollapsibleSection title="Basic Configuration" defaultOpen={true} storageKey="border-basic">
         <div>
           <label className="config-label">Shape</label>
-          <select
-            className="config-select"
+          <FormSelect
             value={params.shape}
-            onChange={(e) => updateParam('shape', e.target.value as any)}
-          >
-            <option value="rect">Rectangle</option>
-            <option value="circle">Circle</option>
-          </select>
+            onValueChange={(value) => updateParam('shape', value as any)}
+            options={[
+              { value: 'rect', label: 'Rectangle' },
+              { value: 'circle', label: 'Circle' },
+            ]}
+          />
         </div>
 
         <div>
           <label className="config-label">Style</label>
-          <select
-            className="config-select"
+          <FormSelect
             value={params.style}
-            onChange={(e) => updateParam('style', e.target.value as any)}
-          >
-            <option value="solid">Solid</option>
-            <option value="dashed">Dashed</option>
-            <option value="dotted">Dotted</option>
-            <option value="double">Double</option>
-            <option value="neon">Neon</option>
-          </select>
+            onValueChange={(value) => updateParam('style', value as any)}
+            options={[
+              { value: 'solid', label: 'Solid' },
+              { value: 'dashed', label: 'Dashed' },
+              { value: 'dotted', label: 'Dotted' },
+              { value: 'double', label: 'Double' },
+              { value: 'neon', label: 'Neon' },
+            ]}
+          />
         </div>
 
         <div>
           <label className="config-label">Animation</label>
-          <select
-            className="config-select"
+          <FormSelect
             value={params.animation}
-            onChange={(e) => updateParam('animation', e.target.value as any)}
-          >
-            <option value="none">None</option>
-            <option value="dash">Dash</option>
-            <option value="rotate">Rotate</option>
-            <option value="pulse">Pulse</option>
-            <option value="breathe">Breathe</option>
-          </select>
+            onValueChange={(value) => updateParam('animation', value as any)}
+            options={[
+              { value: 'none', label: 'None' },
+              { value: 'dash', label: 'Dash' },
+              { value: 'rotate', label: 'Rotate' },
+              { value: 'pulse', label: 'Pulse' },
+              { value: 'breathe', label: 'Breathe' },
+            ]}
+          />
         </div>
 
         <NumberSlider
@@ -135,20 +136,20 @@ function BorderConfigurator() {
       <CollapsibleSection title="Colors & Gradient" defaultOpen={true} storageKey="border-colors">
         <div>
           <label className="config-label">Gradient Preset</label>
-          <select
-            className="config-select"
+          <FormSelect
             value={params.gradient}
-            onChange={(e) => updateParam('gradient', e.target.value as any)}
-          >
-            <option value="indigo">Indigo</option>
-            <option value="cyan">Cyan</option>
-            <option value="sunset">Sunset</option>
-            <option value="emerald">Emerald</option>
-            <option value="neon">Neon</option>
-            <option value="fire">Fire</option>
-            <option value="ocean">Ocean</option>
-            <option value="purple">Purple</option>
-          </select>
+            onValueChange={(value) => updateParam('gradient', value as any)}
+            options={[
+              { value: 'indigo', label: 'Indigo' },
+              { value: 'cyan', label: 'Cyan' },
+              { value: 'sunset', label: 'Sunset' },
+              { value: 'emerald', label: 'Emerald' },
+              { value: 'neon', label: 'Neon' },
+              { value: 'fire', label: 'Fire' },
+              { value: 'ocean', label: 'Ocean' },
+              { value: 'purple', label: 'Purple' },
+            ]}
+          />
         </div>
 
         <div className="flex items-center justify-between">

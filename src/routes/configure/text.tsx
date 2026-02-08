@@ -10,6 +10,10 @@ import { URLGenerator } from '../../components/configure/URLGenerator'
 import { CollapsibleSection } from '../../components/configure/form/CollapsibleSection'
 import { NumberSlider } from '../../components/configure/form/NumberSlider'
 import { ColorArrayInput } from '../../components/configure/form/ColorArrayInput'
+import { FormInput } from '../../components/configure/form/FormInput'
+import { FormSelect } from '../../components/configure/form/FormSelect'
+import { Switch } from '../../components/ui/switch'
+import { Label } from '../../components/ui/label'
 import { TEXT_DEFAULTS } from '../../types/text.types'
 import type { TextOverlayParams } from '../../types/text.types'
 
@@ -43,18 +47,18 @@ function TextConfigurator() {
           <h2 className="text-2xl font-semibold mb-6">Quick Presets</h2>
           <div>
             <label className="config-label">Preset</label>
-            <select
-              className="config-select"
+            <FormSelect
               value={params.preset}
-              onChange={(e) => updateParam('preset', e.target.value as any)}
-            >
-              <option value="custom">Custom</option>
-              <option value="brb">Be Right Back</option>
-              <option value="chatting">Just Chatting</option>
-              <option value="starting">Starting Soon</option>
-              <option value="ending">Thanks for Watching</option>
-              <option value="technical">Technical Difficulties</option>
-            </select>
+              onValueChange={(value) => updateParam('preset', value as any)}
+              options={[
+                { value: 'custom', label: 'Custom' },
+                { value: 'brb', label: 'Be Right Back' },
+                { value: 'chatting', label: 'Just Chatting' },
+                { value: 'starting', label: 'Starting Soon' },
+                { value: 'ending', label: 'Thanks for Watching' },
+                { value: 'technical', label: 'Technical Difficulties' },
+              ]}
+            />
           </div>
         </div>
 
@@ -62,8 +66,7 @@ function TextConfigurator() {
         <CollapsibleSection title="Content" defaultOpen={true} storageKey="text-content">
             <div>
               <label className="config-label">Main Text</label>
-              <input
-                className="config-input"
+              <FormInput
                 type="text"
                 value={params.text}
                 onChange={(e) => updateParam('text', e.target.value)}
@@ -72,8 +75,7 @@ function TextConfigurator() {
             </div>
             <div>
               <label className="config-label">Subtitle</label>
-              <input
-                className="config-input"
+              <FormInput
                 type="text"
                 value={params.sub}
                 onChange={(e) => updateParam('sub', e.target.value)}
@@ -83,8 +85,7 @@ function TextConfigurator() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="config-label">Text Size (px)</label>
-                <input
-                  className="config-input"
+                <FormInput
                   type="number"
                   value={params.size}
                   onChange={(e) => updateParam('size', Number(e.target.value))}
@@ -94,8 +95,7 @@ function TextConfigurator() {
               </div>
               <div>
                 <label className="config-label">Subtitle Size (px)</label>
-                <input
-                  className="config-input"
+                <FormInput
                   type="number"
                   value={params.subsize}
                   onChange={(e) => updateParam('subsize', Number(e.target.value))}
@@ -110,20 +110,20 @@ function TextConfigurator() {
         <CollapsibleSection title="Typography" defaultOpen={false} storageKey="text-typography">
           <div>
             <label className="config-label">Font Family</label>
-            <select
-              className="config-select"
+            <FormSelect
               value={params.font}
-              onChange={(e) => updateParam('font', e.target.value as any)}
-            >
-              <option value="display">Display</option>
-              <option value="body">Body</option>
-              <option value="mono">Mono</option>
-              <option value="custom1">Custom 1</option>
-              <option value="custom2">Custom 2</option>
-              <option value="custom3">Custom 3</option>
-              <option value="custom4">Custom 4</option>
-              <option value="custom5">Custom 5</option>
-            </select>
+              onValueChange={(value) => updateParam('font', value as any)}
+              options={[
+                { value: 'display', label: 'Display' },
+                { value: 'body', label: 'Body' },
+                { value: 'mono', label: 'Mono' },
+                { value: 'custom1', label: 'Custom 1' },
+                { value: 'custom2', label: 'Custom 2' },
+                { value: 'custom3', label: 'Custom 3' },
+                { value: 'custom4', label: 'Custom 4' },
+                { value: 'custom5', label: 'Custom 5' },
+              ]}
+            />
           </div>
 
           <NumberSlider
@@ -139,8 +139,7 @@ function TextConfigurator() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="config-label">Text Color</label>
-              <input
-                className="config-input"
+              <FormInput
                 type="text"
                 value={params.textcolor}
                 onChange={(e) => updateParam('textcolor', e.target.value)}
@@ -149,8 +148,7 @@ function TextConfigurator() {
             </div>
             <div>
               <label className="config-label">Subtitle Color</label>
-              <input
-                className="config-input"
+              <FormInput
                 type="text"
                 value={params.subcolor}
                 onChange={(e) => updateParam('subcolor', e.target.value)}
@@ -227,8 +225,7 @@ function TextConfigurator() {
 
           <div>
             <label className="config-label">Max Width</label>
-            <input
-              className="config-input"
+            <FormInput
               type="text"
               value={params.maxwidth}
               onChange={(e) => updateParam('maxwidth', e.target.value)}
@@ -242,36 +239,34 @@ function TextConfigurator() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="config-label">Horizontal Align</label>
-                <select
-                  className="config-select"
+                <FormSelect
                   value={params.align}
-                  onChange={(e) => updateParam('align', e.target.value as any)}
-                >
-                  <option value="left">Left</option>
-                  <option value="center">Center</option>
-                  <option value="right">Right</option>
-                </select>
+                  onValueChange={(value) => updateParam('align', value as any)}
+                  options={[
+                    { value: 'left', label: 'Left' },
+                    { value: 'center', label: 'Center' },
+                    { value: 'right', label: 'Right' },
+                  ]}
+                />
               </div>
               <div>
                 <label className="config-label">Vertical Align</label>
-                <select
-                  className="config-select"
+                <FormSelect
                   value={params.valign}
-                  onChange={(e) => updateParam('valign', e.target.value as any)}
-                >
-                  <option value="top">Top</option>
-                  <option value="center">Center</option>
-                  <option value="bottom">Bottom</option>
-                </select>
+                  onValueChange={(value) => updateParam('valign', value as any)}
+                  options={[
+                    { value: 'top', label: 'Top' },
+                    { value: 'center', label: 'Center' },
+                    { value: 'bottom', label: 'Bottom' },
+                  ]}
+                />
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <input
-                type="checkbox"
+              <Switch
                 id="bg"
-                className="w-4 h-4 rounded"
                 checked={params.bg}
-                onChange={(e) => updateParam('bg', e.target.checked)}
+                onCheckedChange={(checked) => updateParam('bg', checked)}
               />
               <label htmlFor="bg" className="text-sm text-dark-muted cursor-pointer">
                 Show background panel
@@ -282,12 +277,10 @@ function TextConfigurator() {
         {/* Section 6: Signature Line */}
         <CollapsibleSection title="Signature Line" defaultOpen={true} storageKey="text-line">
             <div className="flex items-center gap-3">
-              <input
-                type="checkbox"
+              <Switch
                 id="line"
-                className="w-4 h-4 rounded"
                 checked={params.line}
-                onChange={(e) => updateParam('line', e.target.checked)}
+                onCheckedChange={(checked) => updateParam('line', checked)}
               />
               <label htmlFor="line" className="text-sm text-dark-muted cursor-pointer">
                 Show signature line
@@ -297,47 +290,47 @@ function TextConfigurator() {
               <>
                 <div>
                   <label className="config-label">Line Style</label>
-                  <select
-                    className="config-select"
+                  <FormSelect
                     value={params.linestyle}
-                    onChange={(e) => updateParam('linestyle', e.target.value as any)}
-                  >
-                    <option value="solid">Solid</option>
-                    <option value="dashed">Dashed</option>
-                    <option value="dotted">Dotted</option>
-                    <option value="gradient">Gradient</option>
-                    <option value="slant">Slant</option>
-                    <option value="wave">Wave</option>
-                    <option value="swirl">Swirl</option>
-                    <option value="bracket">Bracket</option>
-                  </select>
+                    onValueChange={(value) => updateParam('linestyle', value as any)}
+                    options={[
+                      { value: 'solid', label: 'Solid' },
+                      { value: 'dashed', label: 'Dashed' },
+                      { value: 'dotted', label: 'Dotted' },
+                      { value: 'gradient', label: 'Gradient' },
+                      { value: 'slant', label: 'Slant' },
+                      { value: 'wave', label: 'Wave' },
+                      { value: 'swirl', label: 'Swirl' },
+                      { value: 'bracket', label: 'Bracket' },
+                    ]}
+                  />
                 </div>
 
                 <div>
                   <label className="config-label">Line Animation</label>
-                  <select
-                    className="config-select"
+                  <FormSelect
                     value={params.lineanim}
-                    onChange={(e) => updateParam('lineanim', e.target.value as any)}
-                  >
-                    <option value="none">None</option>
-                    <option value="slide">Slide</option>
-                    <option value="grow">Grow</option>
-                    <option value="pulse">Pulse</option>
-                  </select>
+                    onValueChange={(value) => updateParam('lineanim', value as any)}
+                    options={[
+                      { value: 'none', label: 'None' },
+                      { value: 'slide', label: 'Slide' },
+                      { value: 'grow', label: 'Grow' },
+                      { value: 'pulse', label: 'Pulse' },
+                    ]}
+                  />
                 </div>
 
                 <div>
                   <label className="config-label">Line Position</label>
-                  <select
-                    className="config-select"
+                  <FormSelect
                     value={params.linepos}
-                    onChange={(e) => updateParam('linepos', e.target.value as any)}
-                  >
-                    <option value="top">Top</option>
-                    <option value="bottom">Bottom</option>
-                    <option value="both">Both</option>
-                  </select>
+                    onValueChange={(value) => updateParam('linepos', value as any)}
+                    options={[
+                      { value: 'top', label: 'Top' },
+                      { value: 'bottom', label: 'Bottom' },
+                      { value: 'both', label: 'Both' },
+                    ]}
+                  />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -379,26 +372,26 @@ function TextConfigurator() {
         <CollapsibleSection title="Animations" defaultOpen={true} storageKey="text-animations">
             <div>
               <label className="config-label">Entrance Animation</label>
-              <select
-                className="config-select"
+              <FormSelect
                 value={params.entrance}
-                onChange={(e) => updateParam('entrance', e.target.value as any)}
-              >
-                <option value="none">None</option>
-                <option value="fade">Fade</option>
-                <option value="slideUp">Slide Up</option>
-                <option value="slideDown">Slide Down</option>
-                <option value="slideLeft">Slide Left</option>
-                <option value="slideRight">Slide Right</option>
-                <option value="scale">Scale</option>
-                <option value="bounce">Bounce</option>
-                <option value="typewriter">Typewriter</option>
-                <option value="flipIn">Flip In</option>
-                <option value="zoomBounce">Zoom Bounce</option>
-                <option value="rotateIn">Rotate In</option>
-                <option value="zoomIn">Zoom In</option>
-                <option value="stagger">Stagger</option>
-              </select>
+                onValueChange={(value) => updateParam('entrance', value as any)}
+                options={[
+                  { value: 'none', label: 'None' },
+                  { value: 'fade', label: 'Fade' },
+                  { value: 'slideUp', label: 'Slide Up' },
+                  { value: 'slideDown', label: 'Slide Down' },
+                  { value: 'slideLeft', label: 'Slide Left' },
+                  { value: 'slideRight', label: 'Slide Right' },
+                  { value: 'scale', label: 'Scale' },
+                  { value: 'bounce', label: 'Bounce' },
+                  { value: 'typewriter', label: 'Typewriter' },
+                  { value: 'flipIn', label: 'Flip In' },
+                  { value: 'zoomBounce', label: 'Zoom Bounce' },
+                  { value: 'rotateIn', label: 'Rotate In' },
+                  { value: 'zoomIn', label: 'Zoom In' },
+                  { value: 'stagger', label: 'Stagger' },
+                ]}
+              />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -426,23 +419,23 @@ function TextConfigurator() {
 
             <div>
               <label className="config-label">Exit Animation</label>
-              <select
-                className="config-select"
+              <FormSelect
                 value={params.exit}
-                onChange={(e) => updateParam('exit', e.target.value as any)}
-              >
-                <option value="none">None</option>
-                <option value="fade">Fade</option>
-                <option value="slideDown">Slide Down</option>
-                <option value="slideUp">Slide Up</option>
-                <option value="slideLeft">Slide Left</option>
-                <option value="slideRight">Slide Right</option>
-                <option value="scale">Scale</option>
-                <option value="fadeLeft">Fade Left</option>
-                <option value="zoomOut">Zoom Out</option>
-                <option value="rotateOut">Rotate Out</option>
-                <option value="flipOut">Flip Out</option>
-              </select>
+                onValueChange={(value) => updateParam('exit', value as any)}
+                options={[
+                  { value: 'none', label: 'None' },
+                  { value: 'fade', label: 'Fade' },
+                  { value: 'slideDown', label: 'Slide Down' },
+                  { value: 'slideUp', label: 'Slide Up' },
+                  { value: 'slideLeft', label: 'Slide Left' },
+                  { value: 'slideRight', label: 'Slide Right' },
+                  { value: 'scale', label: 'Scale' },
+                  { value: 'fadeLeft', label: 'Fade Left' },
+                  { value: 'zoomOut', label: 'Zoom Out' },
+                  { value: 'rotateOut', label: 'Rotate Out' },
+                  { value: 'flipOut', label: 'Flip Out' },
+                ]}
+              />
             </div>
 
             {params.exit !== 'none' && (
@@ -473,12 +466,10 @@ function TextConfigurator() {
         {/* Section 8: Loop Mode */}
         <CollapsibleSection title="Loop Mode" defaultOpen={false} storageKey="text-loop">
             <div className="flex items-center gap-3">
-              <input
-                type="checkbox"
+              <Switch
                 id="loop"
-                className="w-4 h-4 rounded"
                 checked={params.loop}
-                onChange={(e) => updateParam('loop', e.target.checked)}
+                onCheckedChange={(checked) => updateParam('loop', checked)}
               />
               <label htmlFor="loop" className="text-sm text-dark-muted cursor-pointer">
                 Enable loop mode (appear → hold → disappear → pause → repeat)
@@ -488,8 +479,7 @@ function TextConfigurator() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="config-label">Hold Visible (s)</label>
-                  <input
-                    className="config-input"
+                  <FormInput
                     type="number"
                     value={params.hold}
                     onChange={(e) => updateParam('hold', Number(e.target.value))}
@@ -499,8 +489,7 @@ function TextConfigurator() {
                 </div>
                 <div>
                   <label className="config-label">Pause Hidden (s)</label>
-                  <input
-                    className="config-input"
+                  <FormInput
                     type="number"
                     value={params.pause}
                     onChange={(e) => updateParam('pause', Number(e.target.value))}
@@ -516,28 +505,26 @@ function TextConfigurator() {
         <CollapsibleSection title="Theme & Colors" defaultOpen={true} storageKey="text-theme">
             <div>
               <label className="config-label">Gradient Preset</label>
-              <select
-                className="config-select"
+              <FormSelect
                 value={params.gradient}
-                onChange={(e) => updateParam('gradient', e.target.value as any)}
-              >
-                <option value="indigo">Indigo</option>
-                <option value="cyan">Cyan</option>
-                <option value="sunset">Sunset</option>
-                <option value="emerald">Emerald</option>
-                <option value="purple">Purple</option>
-                <option value="neon">Neon</option>
-                <option value="fire">Fire</option>
-                <option value="ocean">Ocean</option>
-              </select>
+                onValueChange={(value) => updateParam('gradient', value as any)}
+                options={[
+                  { value: 'indigo', label: 'Indigo' },
+                  { value: 'cyan', label: 'Cyan' },
+                  { value: 'sunset', label: 'Sunset' },
+                  { value: 'emerald', label: 'Emerald' },
+                  { value: 'purple', label: 'Purple' },
+                  { value: 'neon', label: 'Neon' },
+                  { value: 'fire', label: 'Fire' },
+                  { value: 'ocean', label: 'Ocean' },
+                ]}
+              />
             </div>
             <div className="flex items-center gap-3">
-              <input
-                type="checkbox"
+              <Switch
                 id="textgradient"
-                className="w-4 h-4 rounded"
                 checked={params.textgradient}
-                onChange={(e) => updateParam('textgradient', e.target.checked)}
+                onCheckedChange={(checked) => updateParam('textgradient', checked)}
               />
               <label htmlFor="textgradient" className="text-sm text-dark-muted cursor-pointer">
                 Apply gradient to text

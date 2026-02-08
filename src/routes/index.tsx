@@ -15,6 +15,7 @@ import {
   Palette,
   Zap,
 } from 'lucide-react'
+import { Button } from '../components/ui/button'
 
 export const Route = createFileRoute('/')({ component: Dashboard })
 
@@ -141,10 +142,10 @@ function Dashboard() {
               ))}
             </div>
 
-            <div className="btn-primary">
-              <span>Configure</span>
+            <Button variant="indigo">
+              Configure
               <ArrowRight size={16} />
-            </div>
+            </Button>
           </Link>
         ))}
       </div>

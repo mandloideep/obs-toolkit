@@ -10,6 +10,8 @@ import { URLGenerator } from '../../components/configure/URLGenerator'
 import { CollapsibleSection } from '../../components/configure/form/CollapsibleSection'
 import { NumberSlider } from '../../components/configure/form/NumberSlider'
 import { ColorArrayInput } from '../../components/configure/form/ColorArrayInput'
+import { FormInput } from '../../components/configure/form/FormInput'
+import { FormSelect } from '../../components/configure/form/FormSelect'
 import { Switch } from '../../components/ui/switch'
 import { Label } from '../../components/ui/label'
 import { SOCIALS_DEFAULTS } from '../../types/socials.types'
@@ -131,8 +133,8 @@ function SocialsConfigurator() {
                 GitHub
               </Label>
               {platforms.github.enabled && (
-                <input
-                  className="config-input h-8 text-sm"
+                <FormInput
+                  className="h-8 text-sm"
                   type="text"
                   value={platforms.github.handle}
                   onChange={(e) => updateHandle('github', e.target.value)}
@@ -154,8 +156,8 @@ function SocialsConfigurator() {
                 Twitter / X
               </Label>
               {platforms.twitter.enabled && (
-                <input
-                  className="config-input h-8 text-sm"
+                <FormInput
+                  className="h-8 text-sm"
                   type="text"
                   value={platforms.twitter.handle}
                   onChange={(e) => updateHandle('twitter', e.target.value)}
@@ -177,8 +179,8 @@ function SocialsConfigurator() {
                 LinkedIn
               </Label>
               {platforms.linkedin.enabled && (
-                <input
-                  className="config-input h-8 text-sm"
+                <FormInput
+                  className="h-8 text-sm"
                   type="text"
                   value={platforms.linkedin.handle}
                   onChange={(e) => updateHandle('linkedin', e.target.value)}
@@ -200,8 +202,8 @@ function SocialsConfigurator() {
                 YouTube
               </Label>
               {platforms.youtube.enabled && (
-                <input
-                  className="config-input h-8 text-sm"
+                <FormInput
+                  className="h-8 text-sm"
                   type="text"
                   value={platforms.youtube.handle}
                   onChange={(e) => updateHandle('youtube', e.target.value)}
@@ -223,8 +225,8 @@ function SocialsConfigurator() {
                 Instagram
               </Label>
               {platforms.instagram.enabled && (
-                <input
-                  className="config-input h-8 text-sm"
+                <FormInput
+                  className="h-8 text-sm"
                   type="text"
                   value={platforms.instagram.handle}
                   onChange={(e) => updateHandle('instagram', e.target.value)}
@@ -246,8 +248,8 @@ function SocialsConfigurator() {
                 Twitch
               </Label>
               {platforms.twitch.enabled && (
-                <input
-                  className="config-input h-8 text-sm"
+                <FormInput
+                  className="h-8 text-sm"
                   type="text"
                   value={platforms.twitch.handle}
                   onChange={(e) => updateHandle('twitch', e.target.value)}
@@ -269,8 +271,8 @@ function SocialsConfigurator() {
                 Kick
               </Label>
               {platforms.kick.enabled && (
-                <input
-                  className="config-input h-8 text-sm"
+                <FormInput
+                  className="h-8 text-sm"
                   type="text"
                   value={platforms.kick.handle}
                   onChange={(e) => updateHandle('kick', e.target.value)}
@@ -292,8 +294,8 @@ function SocialsConfigurator() {
                 Discord
               </Label>
               {platforms.discord.enabled && (
-                <input
-                  className="config-input h-8 text-sm"
+                <FormInput
+                  className="h-8 text-sm"
                   type="text"
                   value={platforms.discord.handle}
                   onChange={(e) => updateHandle('discord', e.target.value)}
@@ -315,8 +317,8 @@ function SocialsConfigurator() {
                 Website
               </Label>
               {platforms.website.enabled && (
-                <input
-                  className="config-input h-8 text-sm"
+                <FormInput
+                  className="h-8 text-sm"
                   type="text"
                   value={platforms.website.handle}
                   onChange={(e) => updateHandle('website', e.target.value)}
@@ -332,21 +334,20 @@ function SocialsConfigurator() {
       <CollapsibleSection title="Platform Ordering" defaultOpen={false} storageKey="socials-ordering">
         <div>
           <label className="config-label">Order Mode</label>
-          <select
-            className="config-select"
+          <FormSelect
             value={params.order}
-            onChange={(e) => updateParam('order', e.target.value as any)}
-          >
-            <option value="default">Default Order</option>
-            <option value="priority">Priority Order</option>
-          </select>
+            onValueChange={(value) => updateParam('order', value as any)}
+            options={[
+              { value: 'default', label: 'Default Order' },
+              { value: 'priority', label: 'Priority Order' },
+            ]}
+          />
         </div>
 
         {params.order === 'priority' && (
           <div>
             <label className="config-label">Platform Priority</label>
-            <input
-              className="config-input"
+            <FormInput
               type="text"
               value={params.priority}
               onChange={(e) => updateParam('priority', e.target.value)}
@@ -363,29 +364,29 @@ function SocialsConfigurator() {
       <CollapsibleSection title="Layout" defaultOpen={true} storageKey="socials-layout">
         <div>
           <label className="config-label">Layout Direction</label>
-          <select
-            className="config-select"
+          <FormSelect
             value={params.layout}
-            onChange={(e) => updateParam('layout', e.target.value as any)}
-          >
-            <option value="horizontal">Horizontal</option>
-            <option value="vertical">Vertical</option>
-            <option value="grid">Grid</option>
-          </select>
+            onValueChange={(value) => updateParam('layout', value as any)}
+            options={[
+              { value: 'horizontal', label: 'Horizontal' },
+              { value: 'vertical', label: 'Vertical' },
+              { value: 'grid', label: 'Grid' },
+            ]}
+          />
         </div>
 
         <div>
           <label className="config-label">Size Preset</label>
-          <select
-            className="config-select"
+          <FormSelect
             value={params.size}
-            onChange={(e) => updateParam('size', e.target.value as any)}
-          >
-            <option value="sm">Small (icon: 20px, text: 13px)</option>
-            <option value="md">Medium (icon: 24px, text: 15px)</option>
-            <option value="lg">Large (icon: 32px, text: 18px)</option>
-            <option value="xl">Extra Large (icon: 40px, text: 22px)</option>
-          </select>
+            onValueChange={(value) => updateParam('size', value as any)}
+            options={[
+              { value: 'sm', label: 'Small (icon: 20px, text: 13px)' },
+              { value: 'md', label: 'Medium (icon: 24px, text: 15px)' },
+              { value: 'lg', label: 'Large (icon: 32px, text: 18px)' },
+              { value: 'xl', label: 'Extra Large (icon: 40px, text: 22px)' },
+            ]}
+          />
         </div>
 
         <NumberSlider
@@ -433,16 +434,16 @@ function SocialsConfigurator() {
       <CollapsibleSection title="Icon Customization" defaultOpen={false} storageKey="socials-icons">
         <div>
           <label className="config-label">Icon Color Mode</label>
-          <select
-            className="config-select"
+          <FormSelect
             value={params.iconcolor}
-            onChange={(e) => updateParam('iconcolor', e.target.value as any)}
-          >
-            <option value="brand">Brand Colors (each platform's color)</option>
-            <option value="platform">Platform Colors</option>
-            <option value="gradient">Gradient</option>
-            <option value="white">White</option>
-          </select>
+            onValueChange={(value) => updateParam('iconcolor', value as any)}
+            options={[
+              { value: 'brand', label: "Brand Colors (each platform's color)" },
+              { value: 'platform', label: 'Platform Colors' },
+              { value: 'gradient', label: 'Gradient' },
+              { value: 'white', label: 'White' },
+            ]}
+          />
         </div>
 
         <NumberSlider
@@ -467,8 +468,7 @@ function SocialsConfigurator() {
 
         <div>
           <label className="config-label">Custom Icons</label>
-          <input
-            className="config-input"
+          <FormInput
             type="text"
             value={params.icons}
             onChange={(e) => updateParam('icons', e.target.value)}
@@ -518,20 +518,20 @@ function SocialsConfigurator() {
       <CollapsibleSection title="Entrance Animation" defaultOpen={false} storageKey="socials-entrance">
         <div>
           <label className="config-label">Animation Type</label>
-          <select
-            className="config-select"
+          <FormSelect
             value={params.entrance}
-            onChange={(e) => updateParam('entrance', e.target.value as any)}
-          >
-            <option value="none">None</option>
-            <option value="fade">Fade</option>
-            <option value="slideUp">Slide Up</option>
-            <option value="slideDown">Slide Down</option>
-            <option value="slideLeft">Slide Left</option>
-            <option value="slideRight">Slide Right</option>
-            <option value="scale">Scale</option>
-            <option value="stagger">Stagger (one by one)</option>
-          </select>
+            onValueChange={(value) => updateParam('entrance', value as any)}
+            options={[
+              { value: 'none', label: 'None' },
+              { value: 'fade', label: 'Fade' },
+              { value: 'slideUp', label: 'Slide Up' },
+              { value: 'slideDown', label: 'Slide Down' },
+              { value: 'slideLeft', label: 'Slide Left' },
+              { value: 'slideRight', label: 'Slide Right' },
+              { value: 'scale', label: 'Scale' },
+              { value: 'stagger', label: 'Stagger (one by one)' },
+            ]}
+          />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
@@ -562,17 +562,17 @@ function SocialsConfigurator() {
       <CollapsibleSection title="Exit Animation" defaultOpen={false} storageKey="socials-exit">
         <div>
           <label className="config-label">Exit Animation</label>
-          <select
-            className="config-select"
+          <FormSelect
             value={params.exit}
-            onChange={(e) => updateParam('exit', e.target.value as any)}
-          >
-            <option value="none">None</option>
-            <option value="fade">Fade</option>
-            <option value="slideDown">Slide Down</option>
-            <option value="slideUp">Slide Up</option>
-            <option value="scale">Scale</option>
-          </select>
+            onValueChange={(value) => updateParam('exit', value as any)}
+            options={[
+              { value: 'none', label: 'None' },
+              { value: 'fade', label: 'Fade' },
+              { value: 'slideDown', label: 'Slide Down' },
+              { value: 'slideUp', label: 'Slide Up' },
+              { value: 'scale', label: 'Scale' },
+            ]}
+          />
         </div>
 
         {params.exit !== 'none' && (
@@ -677,20 +677,20 @@ function SocialsConfigurator() {
       <CollapsibleSection title="Theme & Colors" defaultOpen={false} storageKey="socials-theme">
         <div>
           <label className="config-label">Gradient Preset</label>
-          <select
-            className="config-select"
+          <FormSelect
             value={params.gradient}
-            onChange={(e) => updateParam('gradient', e.target.value as any)}
-          >
-            <option value="indigo">Indigo</option>
-            <option value="cyan">Cyan</option>
-            <option value="sunset">Sunset</option>
-            <option value="emerald">Emerald</option>
-            <option value="purple">Purple</option>
-            <option value="neon">Neon</option>
-            <option value="fire">Fire</option>
-            <option value="ocean">Ocean</option>
-          </select>
+            onValueChange={(value) => updateParam('gradient', value as any)}
+            options={[
+              { value: 'indigo', label: 'Indigo' },
+              { value: 'cyan', label: 'Cyan' },
+              { value: 'sunset', label: 'Sunset' },
+              { value: 'emerald', label: 'Emerald' },
+              { value: 'purple', label: 'Purple' },
+              { value: 'neon', label: 'Neon' },
+              { value: 'fire', label: 'Fire' },
+              { value: 'ocean', label: 'Ocean' },
+            ]}
+          />
         </div>
 
         <ColorArrayInput

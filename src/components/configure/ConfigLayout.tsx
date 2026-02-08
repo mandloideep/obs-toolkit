@@ -4,6 +4,7 @@
  */
 
 import { useState } from 'react'
+import { Button } from '../ui/button'
 
 interface ConfigLayoutProps {
   configContent: React.ReactNode
@@ -52,13 +53,15 @@ export function ConfigLayout({
           <div className="config-section">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-semibold">Live Preview</h3>
-              <button
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={() => window.open(fullscreenUrl || previewUrl, '_blank')}
-                className="text-sm text-brand-indigo hover:text-brand-indigo/80 transition-colors"
+                className="text-brand-indigo hover:text-brand-indigo/80"
                 title="Open in new window"
               >
                 Fullscreen
-              </button>
+              </Button>
             </div>
 
             {/* Preview Controls */}
@@ -68,17 +71,17 @@ export function ConfigLayout({
                 <label className="text-xs text-dark-muted mb-1 block">Preview Size</label>
                 <div className="flex gap-2">
                   {(['640x360', '1280x720', '1920x1080'] as PreviewSize[]).map((size) => (
-                    <button
+                    <Button
                       key={size}
+                      variant={previewSize === size ? 'default' : 'outline'}
+                      size="sm"
                       onClick={() => setPreviewSize(size)}
-                      className={`flex-1 px-3 py-1.5 text-xs rounded-lg border transition-colors ${
-                        previewSize === size
-                          ? 'bg-brand-indigo border-brand-indigo text-white'
-                          : 'border-dark-border text-dark-muted hover:border-dark-muted'
-                      }`}
+                      className={
+                        previewSize === size ? 'bg-brand-indigo border-brand-indigo flex-1' : 'flex-1'
+                      }
                     >
                       {size}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>
@@ -88,17 +91,17 @@ export function ConfigLayout({
                 <label className="text-xs text-dark-muted mb-1 block">Background</label>
                 <div className="flex gap-2">
                   {(['black', 'green', 'transparent'] as PreviewBackground[]).map((bg) => (
-                    <button
+                    <Button
                       key={bg}
+                      variant={previewBg === bg ? 'default' : 'outline'}
+                      size="sm"
                       onClick={() => setPreviewBg(bg)}
-                      className={`flex-1 px-3 py-1.5 text-xs rounded-lg border transition-colors capitalize ${
-                        previewBg === bg
-                          ? 'bg-brand-indigo border-brand-indigo text-white'
-                          : 'border-dark-border text-dark-muted hover:border-dark-muted'
-                      }`}
+                      className={
+                        previewBg === bg ? 'bg-brand-indigo border-brand-indigo flex-1 capitalize' : 'flex-1 capitalize'
+                      }
                     >
                       {bg}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>

@@ -5,6 +5,7 @@
 
 import { Label } from '../../ui/label'
 import { Input } from '../../ui/input'
+import { Button } from '../../ui/button'
 
 interface ColorArrayInputProps {
   label: string
@@ -60,23 +61,27 @@ export function ColorArrayInput({
                 />
               </div>
             </div>
-            <button
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => handleRemoveColor(index)}
-              className="text-red-500 hover:text-red-600 px-2 py-1 text-sm transition-colors"
+              className="text-red-500 hover:text-red-600 h-8"
               type="button"
             >
               Remove
-            </button>
+            </Button>
           </div>
         ))}
         {colors.length < maxColors && (
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={handleAddColor}
-            className="text-brand-indigo hover:text-brand-indigo/80 text-sm transition-colors"
+            className="text-brand-indigo hover:text-brand-indigo/80 h-8"
             type="button"
           >
             + Add Color
-          </button>
+          </Button>
         )}
       </div>
       {colors.length === 0 && (

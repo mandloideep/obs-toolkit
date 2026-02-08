@@ -10,6 +10,8 @@ import { URLGenerator } from '../../components/configure/URLGenerator'
 import { CollapsibleSection } from '../../components/configure/form/CollapsibleSection'
 import { NumberSlider } from '../../components/configure/form/NumberSlider'
 import { ColorArrayInput } from '../../components/configure/form/ColorArrayInput'
+import { FormInput } from '../../components/configure/form/FormInput'
+import { FormSelect } from '../../components/configure/form/FormSelect'
 import { Switch } from '../../components/ui/switch'
 import { Label } from '../../components/ui/label'
 import { CTA_DEFAULTS } from '../../types/cta.types'
@@ -45,18 +47,18 @@ function CTAConfigurator() {
         <h2 className="text-2xl font-semibold mb-6">Quick Presets</h2>
         <div>
           <label className="config-label">Preset</label>
-          <select
-            className="config-select"
+          <FormSelect
             value={params.preset}
-            onChange={(e) => updateParam('preset', e.target.value as any)}
-          >
-            <option value="custom">Custom</option>
-            <option value="subscribe">Subscribe</option>
-            <option value="like">Like & Subscribe</option>
-            <option value="follow">Follow</option>
-            <option value="share">Share</option>
-            <option value="notify">Turn on Notifications</option>
-          </select>
+            onValueChange={(value) => updateParam('preset', value as any)}
+            options={[
+              { value: 'custom', label: 'Custom' },
+              { value: 'subscribe', label: 'Subscribe' },
+              { value: 'like', label: 'Like & Subscribe' },
+              { value: 'follow', label: 'Follow' },
+              { value: 'share', label: 'Share' },
+              { value: 'notify', label: 'Turn on Notifications' },
+            ]}
+          />
         </div>
       </div>
 
@@ -64,8 +66,7 @@ function CTAConfigurator() {
       <CollapsibleSection title="Content" defaultOpen={true} storageKey="cta-content">
         <div>
           <label className="config-label">Main Text</label>
-          <input
-            className="config-input"
+          <FormInput
             type="text"
             value={params.text}
             onChange={(e) => updateParam('text', e.target.value)}
@@ -75,8 +76,7 @@ function CTAConfigurator() {
 
         <div>
           <label className="config-label">Subtitle</label>
-          <input
-            className="config-input"
+          <FormInput
             type="text"
             value={params.sub}
             onChange={(e) => updateParam('sub', e.target.value)}
@@ -99,28 +99,27 @@ function CTAConfigurator() {
       <CollapsibleSection title="Icon Customization" defaultOpen={true} storageKey="cta-icon">
         <div>
           <label className="config-label">Icon Type</label>
-          <select
-            className="config-select"
+          <FormSelect
             value={params.icon}
-            onChange={(e) => updateParam('icon', e.target.value as any)}
-          >
-            <option value="none">None</option>
-            <option value="like">Thumbs Up (Like)</option>
-            <option value="sub">YouTube Subscribe</option>
-            <option value="bell">Bell (Notifications)</option>
-            <option value="share">Share</option>
-            <option value="heart">Heart</option>
-            <option value="star">Star</option>
-            <option value="follow">Follow</option>
-          </select>
+            onValueChange={(value) => updateParam('icon', value as any)}
+            options={[
+              { value: 'none', label: 'None' },
+              { value: 'like', label: 'Thumbs Up (Like)' },
+              { value: 'sub', label: 'YouTube Subscribe' },
+              { value: 'bell', label: 'Bell (Notifications)' },
+              { value: 'share', label: 'Share' },
+              { value: 'heart', label: 'Heart' },
+              { value: 'star', label: 'Star' },
+              { value: 'follow', label: 'Follow' },
+            ]}
+          />
         </div>
 
         {params.icon !== 'none' && (
           <>
             <div>
               <label className="config-label">Custom Icon (Lucide name)</label>
-              <input
-                className="config-input"
+              <FormInput
                 type="text"
                 value={params.customicon}
                 onChange={(e) => updateParam('customicon', e.target.value)}
@@ -133,34 +132,34 @@ function CTAConfigurator() {
 
             <div>
               <label className="config-label">Icon Position</label>
-              <select
-                className="config-select"
+              <FormSelect
                 value={params.iconpos}
-                onChange={(e) => updateParam('iconpos', e.target.value as any)}
-              >
-                <option value="left">Left</option>
-                <option value="right">Right</option>
-                <option value="top">Top</option>
-                <option value="bottom">Bottom</option>
-              </select>
+                onValueChange={(value) => updateParam('iconpos', value as any)}
+                options={[
+                  { value: 'left', label: 'Left' },
+                  { value: 'right', label: 'Right' },
+                  { value: 'top', label: 'Top' },
+                  { value: 'bottom', label: 'Bottom' },
+                ]}
+              />
             </div>
 
             <div>
               <label className="config-label">Icon Animation</label>
-              <select
-                className="config-select"
+              <FormSelect
                 value={params.iconanim}
-                onChange={(e) => updateParam('iconanim', e.target.value as any)}
-              >
-                <option value="none">None</option>
-                <option value="bounce">Bounce</option>
-                <option value="shake">Shake</option>
-                <option value="pulse">Pulse</option>
-                <option value="spin">Spin</option>
-                <option value="wiggle">Wiggle</option>
-                <option value="flip">Flip</option>
-                <option value="heartbeat">Heartbeat</option>
-              </select>
+                onValueChange={(value) => updateParam('iconanim', value as any)}
+                options={[
+                  { value: 'none', label: 'None' },
+                  { value: 'bounce', label: 'Bounce' },
+                  { value: 'shake', label: 'Shake' },
+                  { value: 'pulse', label: 'Pulse' },
+                  { value: 'spin', label: 'Spin' },
+                  { value: 'wiggle', label: 'Wiggle' },
+                  { value: 'flip', label: 'Flip' },
+                  { value: 'heartbeat', label: 'Heartbeat' },
+                ]}
+              />
             </div>
 
             <NumberSlider
@@ -175,8 +174,7 @@ function CTAConfigurator() {
 
             <div>
               <label className="config-label">Icon Color</label>
-              <input
-                className="config-input"
+              <FormInput
                 type="text"
                 value={params.iconcolor}
                 onChange={(e) => updateParam('iconcolor', e.target.value)}
@@ -239,23 +237,22 @@ function CTAConfigurator() {
       <CollapsibleSection title="Decoration" defaultOpen={false} storageKey="cta-decoration">
         <div>
           <label className="config-label">Decoration Style</label>
-          <select
-            className="config-select"
+          <FormSelect
             value={params.decoration}
-            onChange={(e) => updateParam('decoration', e.target.value as any)}
-          >
-            <option value="none">None</option>
-            <option value="line">Line</option>
-            <option value="slant">Slant</option>
-            <option value="swirl">Swirl</option>
-          </select>
+            onValueChange={(value) => updateParam('decoration', value as any)}
+            options={[
+              { value: 'none', label: 'None' },
+              { value: 'line', label: 'Line' },
+              { value: 'slant', label: 'Slant' },
+              { value: 'swirl', label: 'Swirl' },
+            ]}
+          />
         </div>
 
         {params.decoration !== 'none' && (
           <div>
             <label className="config-label">Decoration Color</label>
-            <input
-              className="config-input"
+            <FormInput
               type="text"
               value={params.decorationcolor}
               onChange={(e) => updateParam('decorationcolor', e.target.value)}
@@ -273,28 +270,28 @@ function CTAConfigurator() {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="config-label">Horizontal Align</label>
-            <select
-              className="config-select"
+            <FormSelect
               value={params.align}
-              onChange={(e) => updateParam('align', e.target.value as any)}
-            >
-              <option value="left">Left</option>
-              <option value="center">Center</option>
-              <option value="right">Right</option>
-            </select>
+              onValueChange={(value) => updateParam('align', value as any)}
+              options={[
+                { value: 'left', label: 'Left' },
+                { value: 'center', label: 'Center' },
+                { value: 'right', label: 'Right' },
+              ]}
+            />
           </div>
 
           <div>
             <label className="config-label">Vertical Align</label>
-            <select
-              className="config-select"
+            <FormSelect
               value={params.valign}
-              onChange={(e) => updateParam('valign', e.target.value as any)}
-            >
-              <option value="top">Top</option>
-              <option value="center">Center</option>
-              <option value="bottom">Bottom</option>
-            </select>
+              onValueChange={(value) => updateParam('valign', value as any)}
+              options={[
+                { value: 'top', label: 'Top' },
+                { value: 'center', label: 'Center' },
+                { value: 'bottom', label: 'Bottom' },
+              ]}
+            />
           </div>
         </div>
 
@@ -312,20 +309,20 @@ function CTAConfigurator() {
       <CollapsibleSection title="Animations" defaultOpen={false} storageKey="cta-animations">
         <div>
           <label className="config-label">Entrance Animation</label>
-          <select
-            className="config-select"
+          <FormSelect
             value={params.entrance}
-            onChange={(e) => updateParam('entrance', e.target.value as any)}
-          >
-            <option value="none">None</option>
-            <option value="fade">Fade</option>
-            <option value="slideUp">Slide Up</option>
-            <option value="slideDown">Slide Down</option>
-            <option value="slideLeft">Slide Left</option>
-            <option value="slideRight">Slide Right</option>
-            <option value="scale">Scale</option>
-            <option value="bounce">Bounce</option>
-          </select>
+            onValueChange={(value) => updateParam('entrance', value as any)}
+            options={[
+              { value: 'none', label: 'None' },
+              { value: 'fade', label: 'Fade' },
+              { value: 'slideUp', label: 'Slide Up' },
+              { value: 'slideDown', label: 'Slide Down' },
+              { value: 'slideLeft', label: 'Slide Left' },
+              { value: 'slideRight', label: 'Slide Right' },
+              { value: 'scale', label: 'Scale' },
+              { value: 'bounce', label: 'Bounce' },
+            ]}
+          />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
@@ -353,17 +350,17 @@ function CTAConfigurator() {
 
         <div>
           <label className="config-label">Exit Animation</label>
-          <select
-            className="config-select"
+          <FormSelect
             value={params.exit}
-            onChange={(e) => updateParam('exit', e.target.value as any)}
-          >
-            <option value="none">None</option>
-            <option value="fade">Fade</option>
-            <option value="slideDown">Slide Down</option>
-            <option value="slideUp">Slide Up</option>
-            <option value="scale">Scale</option>
-          </select>
+            onValueChange={(value) => updateParam('exit', value as any)}
+            options={[
+              { value: 'none', label: 'None' },
+              { value: 'fade', label: 'Fade' },
+              { value: 'slideDown', label: 'Slide Down' },
+              { value: 'slideUp', label: 'Slide Up' },
+              { value: 'scale', label: 'Scale' },
+            ]}
+          />
         </div>
 
         {params.exit !== 'none' && (
@@ -420,20 +417,20 @@ function CTAConfigurator() {
       <CollapsibleSection title="Theme & Colors" defaultOpen={false} storageKey="cta-theme">
         <div>
           <label className="config-label">Gradient Preset</label>
-          <select
-            className="config-select"
+          <FormSelect
             value={params.gradient}
-            onChange={(e) => updateParam('gradient', e.target.value as any)}
-          >
-            <option value="indigo">Indigo</option>
-            <option value="cyan">Cyan</option>
-            <option value="sunset">Sunset</option>
-            <option value="emerald">Emerald</option>
-            <option value="purple">Purple</option>
-            <option value="neon">Neon</option>
-            <option value="fire">Fire</option>
-            <option value="ocean">Ocean</option>
-          </select>
+            onValueChange={(value) => updateParam('gradient', value as any)}
+            options={[
+              { value: 'indigo', label: 'Indigo' },
+              { value: 'cyan', label: 'Cyan' },
+              { value: 'sunset', label: 'Sunset' },
+              { value: 'emerald', label: 'Emerald' },
+              { value: 'purple', label: 'Purple' },
+              { value: 'neon', label: 'Neon' },
+              { value: 'fire', label: 'Fire' },
+              { value: 'ocean', label: 'Ocean' },
+            ]}
+          />
         </div>
 
         <ColorArrayInput

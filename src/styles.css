@@ -78,22 +78,6 @@
     @apply block text-sm font-medium text-dark-muted mb-2;
   }
 
-  .config-input {
-    @apply w-full px-3 py-2 bg-black/30 border border-dark-border rounded-lg
-           text-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-indigo/50;
-  }
-
-  .config-select {
-    @apply config-input cursor-pointer;
-  }
-
-  .btn-primary {
-    @apply flex items-center justify-center gap-2 px-4 py-2
-           bg-brand-indigo/10 border border-brand-indigo/30 rounded-lg
-           text-indigo-300 text-sm font-medium transition-all
-           hover:bg-brand-indigo/20;
-  }
-
   .overlay-card {
     @apply bg-dark-surface/50 border border-dark-border rounded-xl p-6
            transition-all duration-300 cursor-pointer

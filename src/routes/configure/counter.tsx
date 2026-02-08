@@ -10,6 +10,8 @@ import { URLGenerator } from '../../components/configure/URLGenerator'
 import { CollapsibleSection } from '../../components/configure/form/CollapsibleSection'
 import { NumberSlider } from '../../components/configure/form/NumberSlider'
 import { ColorArrayInput } from '../../components/configure/form/ColorArrayInput'
+import { FormInput } from '../../components/configure/form/FormInput'
+import { FormSelect } from '../../components/configure/form/FormSelect'
 import { Switch } from '../../components/ui/switch'
 import { Label } from '../../components/ui/label'
 import { COUNTER_DEFAULTS } from '../../types/counter.types'
@@ -106,8 +108,7 @@ function CounterConfigurator() {
       <CollapsibleSection title="Display" defaultOpen={true} storageKey="counter-display">
         <div>
           <label className="config-label">Value</label>
-          <input
-            className="config-input"
+          <FormInput
             type="number"
             value={params.value}
             onChange={(e) => updateParam('value', Number(e.target.value))}
@@ -120,8 +121,7 @@ function CounterConfigurator() {
 
         <div>
           <label className="config-label">Label</label>
-          <input
-            className="config-input"
+          <FormInput
             type="text"
             value={params.label}
             onChange={(e) => updateParam('label', e.target.value)}
@@ -132,8 +132,7 @@ function CounterConfigurator() {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="config-label">Prefix</label>
-            <input
-              className="config-input"
+            <FormInput
               type="text"
               value={params.prefix}
               onChange={(e) => updateParam('prefix', e.target.value)}
@@ -142,8 +141,7 @@ function CounterConfigurator() {
           </div>
           <div>
             <label className="config-label">Suffix</label>
-            <input
-              className="config-input"
+            <FormInput
               type="text"
               value={params.suffix}
               onChange={(e) => updateParam('suffix', e.target.value)}
@@ -178,28 +176,27 @@ function CounterConfigurator() {
       <CollapsibleSection title="Icon Customization" defaultOpen={true} storageKey="counter-icon">
         <div>
           <label className="config-label">Icon Type</label>
-          <select
-            className="config-select"
+          <FormSelect
             value={params.icon}
-            onChange={(e) => updateParam('icon', e.target.value as any)}
-          >
-            <option value="none">None</option>
-            <option value="star">Star</option>
-            <option value="heart">Heart</option>
-            <option value="fire">Fire</option>
-            <option value="trophy">Trophy</option>
-            <option value="users">Users</option>
-            <option value="eye">Eye</option>
-            <option value="trending">Trending Up</option>
-            <option value="zap">Zap / Lightning</option>
-          </select>
+            onValueChange={(value) => updateParam('icon', value as any)}
+            options={[
+              { value: 'none', label: 'None' },
+              { value: 'star', label: 'Star' },
+              { value: 'heart', label: 'Heart' },
+              { value: 'fire', label: 'Fire' },
+              { value: 'trophy', label: 'Trophy' },
+              { value: 'users', label: 'Users' },
+              { value: 'eye', label: 'Eye' },
+              { value: 'trending', label: 'Trending Up' },
+              { value: 'zap', label: 'Zap / Lightning' },
+            ]}
+          />
         </div>
 
         {params.icon !== 'none' && (
           <div>
             <label className="config-label">Icon Color</label>
-            <input
-              className="config-input"
+            <FormInput
               type="text"
               value={params.iconcolor}
               onChange={(e) => updateParam('iconcolor', e.target.value)}
@@ -216,27 +213,27 @@ function CounterConfigurator() {
       <CollapsibleSection title="Layout" defaultOpen={false} storageKey="counter-layout">
         <div>
           <label className="config-label">Layout Style</label>
-          <select
-            className="config-select"
+          <FormSelect
             value={params.layout}
-            onChange={(e) => updateParam('layout', e.target.value as any)}
-          >
-            <option value="stack">Stack (vertical)</option>
-            <option value="inline">Inline (horizontal)</option>
-          </select>
+            onValueChange={(value) => updateParam('layout', value as any)}
+            options={[
+              { value: 'stack', label: 'Stack (vertical)' },
+              { value: 'inline', label: 'Inline (horizontal)' },
+            ]}
+          />
         </div>
 
         <div>
           <label className="config-label">Alignment</label>
-          <select
-            className="config-select"
+          <FormSelect
             value={params.align}
-            onChange={(e) => updateParam('align', e.target.value as any)}
-          >
-            <option value="left">Left</option>
-            <option value="center">Center</option>
-            <option value="right">Right</option>
-          </select>
+            onValueChange={(value) => updateParam('align', value as any)}
+            options={[
+              { value: 'left', label: 'Left' },
+              { value: 'center', label: 'Center' },
+              { value: 'right', label: 'Right' },
+            ]}
+          />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
@@ -263,8 +260,7 @@ function CounterConfigurator() {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="config-label">Width</label>
-            <input
-              className="config-input"
+            <FormInput
               type="text"
               value={params.width}
               onChange={(e) => updateParam('width', e.target.value)}
@@ -276,8 +272,7 @@ function CounterConfigurator() {
           </div>
           <div>
             <label className="config-label">Height</label>
-            <input
-              className="config-input"
+            <FormInput
               type="text"
               value={params.height}
               onChange={(e) => updateParam('height', e.target.value)}
@@ -303,26 +298,25 @@ function CounterConfigurator() {
       <CollapsibleSection title="Typography" defaultOpen={false} storageKey="counter-typography">
         <div>
           <label className="config-label">Font Family</label>
-          <select
-            className="config-select"
+          <FormSelect
             value={params.font}
-            onChange={(e) => updateParam('font', e.target.value as any)}
-          >
-            <option value="display">Display (Orbitron)</option>
-            <option value="body">Body (Inter)</option>
-            <option value="mono">Mono (JetBrains Mono)</option>
-            <option value="custom1">Custom Font 1</option>
-            <option value="custom2">Custom Font 2</option>
-            <option value="custom3">Custom Font 3</option>
-            <option value="custom4">Custom Font 4</option>
-            <option value="custom5">Custom Font 5</option>
-          </select>
+            onValueChange={(value) => updateParam('font', value as any)}
+            options={[
+              { value: 'display', label: 'Display (Orbitron)' },
+              { value: 'body', label: 'Body (Inter)' },
+              { value: 'mono', label: 'Mono (JetBrains Mono)' },
+              { value: 'custom1', label: 'Custom Font 1' },
+              { value: 'custom2', label: 'Custom Font 2' },
+              { value: 'custom3', label: 'Custom Font 3' },
+              { value: 'custom4', label: 'Custom Font 4' },
+              { value: 'custom5', label: 'Custom Font 5' },
+            ]}
+          />
         </div>
 
         <div>
           <label className="config-label">Number Color</label>
-          <input
-            className="config-input"
+          <FormInput
             type="text"
             value={params.numbercolor}
             onChange={(e) => updateParam('numbercolor', e.target.value)}
@@ -357,15 +351,15 @@ function CounterConfigurator() {
 
         <div>
           <label className="config-label">Notation Style</label>
-          <select
-            className="config-select"
+          <FormSelect
             value={params.notation}
-            onChange={(e) => updateParam('notation', e.target.value as any)}
-          >
-            <option value="standard">Standard (1,234,567)</option>
-            <option value="compact">Compact (1.2M)</option>
-            <option value="scientific">Scientific (1.23e6)</option>
-          </select>
+            onValueChange={(value) => updateParam('notation', value as any)}
+            options={[
+              { value: 'standard', label: 'Standard (1,234,567)' },
+              { value: 'compact', label: 'Compact (1.2M)' },
+              { value: 'scientific', label: 'Scientific (1.23e6)' },
+            ]}
+          />
         </div>
 
         <div className="flex items-center justify-between">
@@ -417,8 +411,7 @@ function CounterConfigurator() {
         {params.trend && (
           <div>
             <label className="config-label">Trend Arrow Color</label>
-            <input
-              className="config-input"
+            <FormInput
               type="text"
               value={params.trendcolor}
               onChange={(e) => updateParam('trendcolor', e.target.value)}
@@ -474,25 +467,24 @@ function CounterConfigurator() {
 
         <div>
           <label className="config-label">Service</label>
-          <select
-            className="config-select"
+          <FormSelect
             value={params.service}
-            onChange={(e) => updateParam('service', e.target.value as any)}
-          >
-            <option value="custom">Custom (manual value)</option>
-            <option value="youtube">YouTube</option>
-            <option value="twitch">Twitch</option>
-            <option value="github">GitHub</option>
-            <option value="poll">Custom API (polling)</option>
-          </select>
+            onValueChange={(value) => updateParam('service', value as any)}
+            options={[
+              { value: 'custom', label: 'Custom (manual value)' },
+              { value: 'youtube', label: 'YouTube' },
+              { value: 'twitch', label: 'Twitch' },
+              { value: 'github', label: 'GitHub' },
+              { value: 'poll', label: 'Custom API (polling)' },
+            ]}
+          />
         </div>
 
         {params.service !== 'custom' && (
           <>
             <div>
               <label className="config-label">User ID / Username</label>
-              <input
-                className="config-input"
+              <FormInput
                 type="text"
                 value={params.userid}
                 onChange={(e) => updateParam('userid', e.target.value)}
@@ -502,8 +494,7 @@ function CounterConfigurator() {
 
             <div>
               <label className="config-label">API Key</label>
-              <input
-                className="config-input"
+              <FormInput
                 type="password"
                 value={params.apikey}
                 onChange={(e) => updateParam('apikey', e.target.value)}
@@ -516,8 +507,7 @@ function CounterConfigurator() {
 
             <div>
               <label className="config-label">Metric</label>
-              <input
-                className="config-input"
+              <FormInput
                 type="text"
                 value={params.metric}
                 onChange={(e) => updateParam('metric', e.target.value)}
@@ -532,8 +522,7 @@ function CounterConfigurator() {
               <>
                 <div>
                   <label className="config-label">Custom API URL</label>
-                  <input
-                    className="config-input"
+                  <FormInput
                     type="text"
                     value={params.poll}
                     onChange={(e) => updateParam('poll', e.target.value)}
@@ -543,8 +532,7 @@ function CounterConfigurator() {
 
                 <div>
                   <label className="config-label">JSON Path</label>
-                  <input
-                    className="config-input"
+                  <FormInput
                     type="text"
                     value={params.pollkey}
                     onChange={(e) => updateParam('pollkey', e.target.value)}
@@ -721,32 +709,32 @@ function CounterConfigurator() {
       <CollapsibleSection title="Theme & Colors" defaultOpen={false} storageKey="counter-theme">
         <div>
           <label className="config-label">Theme</label>
-          <select
-            className="config-select"
+          <FormSelect
             value={params.theme}
-            onChange={(e) => updateParam('theme', e.target.value as any)}
-          >
-            <option value="dark">Dark</option>
-            <option value="light">Light</option>
-          </select>
+            onValueChange={(value) => updateParam('theme', value as any)}
+            options={[
+              { value: 'dark', label: 'Dark' },
+              { value: 'light', label: 'Light' },
+            ]}
+          />
         </div>
 
         <div>
           <label className="config-label">Gradient Preset</label>
-          <select
-            className="config-select"
+          <FormSelect
             value={params.gradient}
-            onChange={(e) => updateParam('gradient', e.target.value as any)}
-          >
-            <option value="indigo">Indigo</option>
-            <option value="cyan">Cyan</option>
-            <option value="sunset">Sunset</option>
-            <option value="emerald">Emerald</option>
-            <option value="purple">Purple</option>
-            <option value="neon">Neon</option>
-            <option value="fire">Fire</option>
-            <option value="ocean">Ocean</option>
-          </select>
+            onValueChange={(value) => updateParam('gradient', value as any)}
+            options={[
+              { value: 'indigo', label: 'Indigo' },
+              { value: 'cyan', label: 'Cyan' },
+              { value: 'sunset', label: 'Sunset' },
+              { value: 'emerald', label: 'Emerald' },
+              { value: 'purple', label: 'Purple' },
+              { value: 'neon', label: 'Neon' },
+              { value: 'fire', label: 'Fire' },
+              { value: 'ocean', label: 'Ocean' },
+            ]}
+          />
         </div>
 
         <ColorArrayInput
