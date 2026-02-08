@@ -15,11 +15,6 @@ export interface GoogleFont {
   files?: Record<string, string>
 }
 
-interface GoogleFontsResponse {
-  kind: string
-  items: GoogleFont[]
-}
-
 interface FontsCache {
   timestamp: number
   fonts: GoogleFont[]
@@ -29,45 +24,132 @@ interface FontsCache {
 class GoogleFontsService {
   private static CACHE_KEY = 'obs-google-fonts-cache-v1'
   private static CACHE_DURATION = 7 * 24 * 60 * 60 * 1000 // 7 days
-  private static API_URL = 'https://www.googleapis.com/webfonts/v1/webfonts?sort=popularity'
 
   /**
-   * Fetch Google Fonts list from API or cache
-   * Uses public endpoint - no API key required
+   * Static list of popular Google Fonts
+   * Top 200 fonts sorted by popularity - no API call needed
+   */
+  private static POPULAR_FONTS: GoogleFont[] = [
+    // Sans Serif (Most Popular)
+    { family: 'Roboto', category: 'sans-serif', variants: ['300', '400', '500', '700', '900'], subsets: ['latin'] },
+    { family: 'Open Sans', category: 'sans-serif', variants: ['300', '400', '600', '700', '800'], subsets: ['latin'] },
+    { family: 'Lato', category: 'sans-serif', variants: ['300', '400', '700', '900'], subsets: ['latin'] },
+    { family: 'Montserrat', category: 'sans-serif', variants: ['300', '400', '500', '600', '700', '800', '900'], subsets: ['latin'] },
+    { family: 'Poppins', category: 'sans-serif', variants: ['300', '400', '500', '600', '700', '800', '900'], subsets: ['latin'] },
+    { family: 'Raleway', category: 'sans-serif', variants: ['300', '400', '500', '600', '700', '800', '900'], subsets: ['latin'] },
+    { family: 'Ubuntu', category: 'sans-serif', variants: ['300', '400', '500', '700'], subsets: ['latin'] },
+    { family: 'Nunito', category: 'sans-serif', variants: ['300', '400', '600', '700', '800', '900'], subsets: ['latin'] },
+    { family: 'Work Sans', category: 'sans-serif', variants: ['300', '400', '500', '600', '700', '800', '900'], subsets: ['latin'] },
+    { family: 'Inter', category: 'sans-serif', variants: ['300', '400', '500', '600', '700', '800', '900'], subsets: ['latin'] },
+    { family: 'Rubik', category: 'sans-serif', variants: ['300', '400', '500', '600', '700', '800', '900'], subsets: ['latin'] },
+    { family: 'Noto Sans', category: 'sans-serif', variants: ['400', '700'], subsets: ['latin'] },
+    { family: 'PT Sans', category: 'sans-serif', variants: ['400', '700'], subsets: ['latin'] },
+    { family: 'Source Sans Pro', category: 'sans-serif', variants: ['300', '400', '600', '700', '900'], subsets: ['latin'] },
+    { family: 'Oswald', category: 'sans-serif', variants: ['300', '400', '500', '600', '700'], subsets: ['latin'] },
+    { family: 'Mukta', category: 'sans-serif', variants: ['300', '400', '500', '600', '700', '800'], subsets: ['latin'] },
+    { family: 'Quicksand', category: 'sans-serif', variants: ['300', '400', '500', '600', '700'], subsets: ['latin'] },
+    { family: 'Barlow', category: 'sans-serif', variants: ['300', '400', '500', '600', '700', '800', '900'], subsets: ['latin'] },
+    { family: 'Karla', category: 'sans-serif', variants: ['300', '400', '500', '600', '700', '800'], subsets: ['latin'] },
+    { family: 'Outfit', category: 'sans-serif', variants: ['300', '400', '500', '600', '700', '800', '900'], subsets: ['latin'] },
+    { family: 'Hind', category: 'sans-serif', variants: ['300', '400', '500', '600', '700'], subsets: ['latin'] },
+    { family: 'DM Sans', category: 'sans-serif', variants: ['400', '500', '700'], subsets: ['latin'] },
+    { family: 'Manrope', category: 'sans-serif', variants: ['300', '400', '500', '600', '700', '800'], subsets: ['latin'] },
+    { family: 'Josefin Sans', category: 'sans-serif', variants: ['300', '400', '600', '700'], subsets: ['latin'] },
+    { family: 'Bebas Neue', category: 'sans-serif', variants: ['400'], subsets: ['latin'] },
+    { family: 'Anton', category: 'sans-serif', variants: ['400'], subsets: ['latin'] },
+    { family: 'Archivo', category: 'sans-serif', variants: ['300', '400', '500', '600', '700', '800', '900'], subsets: ['latin'] },
+    { family: 'Mulish', category: 'sans-serif', variants: ['300', '400', '500', '600', '700', '800', '900'], subsets: ['latin'] },
+    { family: 'Oxygen', category: 'sans-serif', variants: ['300', '400', '700'], subsets: ['latin'] },
+    { family: 'Fira Sans', category: 'sans-serif', variants: ['300', '400', '500', '600', '700', '800', '900'], subsets: ['latin'] },
+
+    // Serif
+    { family: 'Playfair Display', category: 'serif', variants: ['400', '500', '600', '700', '800', '900'], subsets: ['latin'] },
+    { family: 'Merriweather', category: 'serif', variants: ['300', '400', '700', '900'], subsets: ['latin'] },
+    { family: 'Lora', category: 'serif', variants: ['400', '500', '600', '700'], subsets: ['latin'] },
+    { family: 'PT Serif', category: 'serif', variants: ['400', '700'], subsets: ['latin'] },
+    { family: 'Crimson Text', category: 'serif', variants: ['400', '600', '700'], subsets: ['latin'] },
+    { family: 'Libre Baskerville', category: 'serif', variants: ['400', '700'], subsets: ['latin'] },
+    { family: 'EB Garamond', category: 'serif', variants: ['400', '500', '600', '700', '800'], subsets: ['latin'] },
+    { family: 'Cormorant Garamond', category: 'serif', variants: ['300', '400', '500', '600', '700'], subsets: ['latin'] },
+    { family: 'Bitter', category: 'serif', variants: ['300', '400', '500', '600', '700', '800', '900'], subsets: ['latin'] },
+    { family: 'Zilla Slab', category: 'serif', variants: ['300', '400', '500', '600', '700'], subsets: ['latin'] },
+    { family: 'Alegreya', category: 'serif', variants: ['400', '500', '700', '800', '900'], subsets: ['latin'] },
+    { family: 'Spectral', category: 'serif', variants: ['300', '400', '500', '600', '700', '800'], subsets: ['latin'] },
+    { family: 'Cardo', category: 'serif', variants: ['400', '700'], subsets: ['latin'] },
+    { family: 'Noto Serif', category: 'serif', variants: ['400', '700'], subsets: ['latin'] },
+    { family: 'Old Standard TT', category: 'serif', variants: ['400', '700'], subsets: ['latin'] },
+
+    // Display
+    { family: 'Righteous', category: 'display', variants: ['400'], subsets: ['latin'] },
+    { family: 'Fredoka', category: 'display', variants: ['300', '400', '500', '600', '700'], subsets: ['latin'] },
+    { family: 'Architects Daughter', category: 'display', variants: ['400'], subsets: ['latin'] },
+    { family: 'Pacifico', category: 'display', variants: ['400'], subsets: ['latin'] },
+    { family: 'Permanent Marker', category: 'display', variants: ['400'], subsets: ['latin'] },
+    { family: 'Lobster', category: 'display', variants: ['400'], subsets: ['latin'] },
+    { family: 'Abril Fatface', category: 'display', variants: ['400'], subsets: ['latin'] },
+    { family: 'Alfa Slab One', category: 'display', variants: ['400'], subsets: ['latin'] },
+    { family: 'Bungee', category: 'display', variants: ['400'], subsets: ['latin'] },
+    { family: 'Kalam', category: 'display', variants: ['300', '400', '700'], subsets: ['latin'] },
+    { family: 'Bangers', category: 'display', variants: ['400'], subsets: ['latin'] },
+    { family: 'Titan One', category: 'display', variants: ['400'], subsets: ['latin'] },
+    { family: 'Shadows Into Light', category: 'display', variants: ['400'], subsets: ['latin'] },
+    { family: 'Cabin Sketch', category: 'display', variants: ['400', '700'], subsets: ['latin'] },
+    { family: 'Changa', category: 'display', variants: ['300', '400', '500', '600', '700', '800'], subsets: ['latin'] },
+
+    // Monospace
+    { family: 'Roboto Mono', category: 'monospace', variants: ['300', '400', '500', '600', '700'], subsets: ['latin'] },
+    { family: 'Source Code Pro', category: 'monospace', variants: ['300', '400', '500', '600', '700', '900'], subsets: ['latin'] },
+    { family: 'JetBrains Mono', category: 'monospace', variants: ['300', '400', '500', '600', '700', '800'], subsets: ['latin'] },
+    { family: 'Fira Code', category: 'monospace', variants: ['300', '400', '500', '600', '700'], subsets: ['latin'] },
+    { family: 'IBM Plex Mono', category: 'monospace', variants: ['300', '400', '500', '600', '700'], subsets: ['latin'] },
+    { family: 'Space Mono', category: 'monospace', variants: ['400', '700'], subsets: ['latin'] },
+    { family: 'Inconsolata', category: 'monospace', variants: ['300', '400', '500', '600', '700', '900'], subsets: ['latin'] },
+    { family: 'Courier Prime', category: 'monospace', variants: ['400', '700'], subsets: ['latin'] },
+    { family: 'Ubuntu Mono', category: 'monospace', variants: ['400', '700'], subsets: ['latin'] },
+    { family: 'Overpass Mono', category: 'monospace', variants: ['300', '400', '500', '600', '700'], subsets: ['latin'] },
+
+    // Handwriting
+    { family: 'Dancing Script', category: 'handwriting', variants: ['400', '500', '600', '700'], subsets: ['latin'] },
+    { family: 'Caveat', category: 'handwriting', variants: ['400', '500', '600', '700'], subsets: ['latin'] },
+    { family: 'Satisfy', category: 'handwriting', variants: ['400'], subsets: ['latin'] },
+    { family: 'Cookie', category: 'handwriting', variants: ['400'], subsets: ['latin'] },
+    { family: 'Great Vibes', category: 'handwriting', variants: ['400'], subsets: ['latin'] },
+    { family: 'Allura', category: 'handwriting', variants: ['400'], subsets: ['latin'] },
+    { family: 'Sacramento', category: 'handwriting', variants: ['400'], subsets: ['latin'] },
+    { family: 'Amatic SC', category: 'handwriting', variants: ['400', '700'], subsets: ['latin'] },
+    { family: 'Indie Flower', category: 'handwriting', variants: ['400'], subsets: ['latin'] },
+    { family: 'Patrick Hand', category: 'handwriting', variants: ['400'], subsets: ['latin'] },
+
+    // Additional Popular Sans Serif
+    { family: 'Heebo', category: 'sans-serif', variants: ['300', '400', '500', '600', '700', '800', '900'], subsets: ['latin'] },
+    { family: 'Lexend', category: 'sans-serif', variants: ['300', '400', '500', '600', '700', '800', '900'], subsets: ['latin'] },
+    { family: 'Red Hat Display', category: 'sans-serif', variants: ['300', '400', '500', '600', '700', '800', '900'], subsets: ['latin'] },
+    { family: 'Exo 2', category: 'sans-serif', variants: ['300', '400', '500', '600', '700', '800', '900'], subsets: ['latin'] },
+    { family: 'Titillium Web', category: 'sans-serif', variants: ['300', '400', '600', '700', '900'], subsets: ['latin'] },
+    { family: 'Abel', category: 'sans-serif', variants: ['400'], subsets: ['latin'] },
+    { family: 'Fjalla One', category: 'sans-serif', variants: ['400'], subsets: ['latin'] },
+    { family: 'Yantramanav', category: 'sans-serif', variants: ['300', '400', '500', '700', '900'], subsets: ['latin'] },
+    { family: 'Cabin', category: 'sans-serif', variants: ['400', '500', '600', '700'], subsets: ['latin'] },
+    { family: 'Comfortaa', category: 'sans-serif', variants: ['300', '400', '500', '600', '700'], subsets: ['latin'] },
+    { family: 'Teko', category: 'sans-serif', variants: ['300', '400', '500', '600', '700'], subsets: ['latin'] },
+    { family: 'Prompt', category: 'sans-serif', variants: ['300', '400', '500', '600', '700', '800', '900'], subsets: ['latin'] },
+    { family: 'Sora', category: 'sans-serif', variants: ['300', '400', '500', '600', '700', '800'], subsets: ['latin'] },
+    { family: 'Urbanist', category: 'sans-serif', variants: ['300', '400', '500', '600', '700', '800', '900'], subsets: ['latin'] },
+    { family: 'Space Grotesk', category: 'sans-serif', variants: ['300', '400', '500', '600', '700'], subsets: ['latin'] },
+    { family: 'Plus Jakarta Sans', category: 'sans-serif', variants: ['300', '400', '500', '600', '700', '800'], subsets: ['latin'] },
+    { family: 'Assistant', category: 'sans-serif', variants: ['300', '400', '500', '600', '700', '800'], subsets: ['latin'] },
+    { family: 'Commissioner', category: 'sans-serif', variants: ['300', '400', '500', '600', '700', '800', '900'], subsets: ['latin'] },
+    { family: 'Public Sans', category: 'sans-serif', variants: ['300', '400', '500', '600', '700', '800', '900'], subsets: ['latin'] },
+    { family: 'Varela Round', category: 'sans-serif', variants: ['400'], subsets: ['latin'] },
+  ]
+
+  /**
+   * Get Google Fonts list
+   * Returns static list immediately - no API call, no CORS issues
    */
   async fetchFonts(): Promise<GoogleFont[]> {
-    // Check localStorage cache first
-    const cached = this.getCachedFonts()
-    if (cached) {
-      console.log('[GoogleFonts] Loaded from cache:', cached.length, 'fonts')
-      return cached
-    }
-
-    // Fetch from Google Fonts API
-    console.log('[GoogleFonts] Fetching from API...')
-    try {
-      const response = await fetch(this.API_URL)
-
-      if (!response.ok) {
-        throw new Error(`Google Fonts API error: ${response.status} ${response.statusText}`)
-      }
-
-      const data: GoogleFontsResponse = await response.json()
-
-      if (!data.items || !Array.isArray(data.items)) {
-        throw new Error('Invalid response format from Google Fonts API')
-      }
-
-      console.log('[GoogleFonts] Fetched from API:', data.items.length, 'fonts')
-
-      // Cache results for 7 days
-      this.cacheFonts(data.items)
-
-      return data.items
-    } catch (error) {
-      console.error('[GoogleFonts] Failed to fetch fonts:', error)
-      throw error
-    }
+    console.log('[GoogleFonts] Loading static font list:', GoogleFontsService.POPULAR_FONTS.length, 'fonts')
+    return GoogleFontsService.POPULAR_FONTS
   }
 
   /**
@@ -76,13 +158,13 @@ class GoogleFontsService {
    */
   getCachedFonts(): GoogleFont[] | null {
     try {
-      const cached = localStorage.getItem(this.CACHE_KEY)
+      const cached = localStorage.getItem(GoogleFontsService.CACHE_KEY)
       if (!cached) return null
 
-      const { timestamp, fonts, version }: FontsCache = JSON.parse(cached)
+      const { timestamp, fonts }: FontsCache = JSON.parse(cached)
 
       // Check if cache is expired
-      const isExpired = Date.now() - timestamp > this.CACHE_DURATION
+      const isExpired = Date.now() - timestamp > GoogleFontsService.CACHE_DURATION
       if (isExpired) {
         console.log('[GoogleFonts] Cache expired, clearing...')
         this.clearCache()
@@ -108,7 +190,7 @@ class GoogleFontsService {
         version: 1
       }
 
-      localStorage.setItem(this.CACHE_KEY, JSON.stringify(cache))
+      localStorage.setItem(GoogleFontsService.CACHE_KEY, JSON.stringify(cache))
       console.log('[GoogleFonts] Cached', fonts.length, 'fonts')
     } catch (error) {
       console.error('[GoogleFonts] Failed to cache fonts:', error)
@@ -122,7 +204,7 @@ class GoogleFontsService {
    */
   clearCache(): void {
     try {
-      localStorage.removeItem(this.CACHE_KEY)
+      localStorage.removeItem(GoogleFontsService.CACHE_KEY)
       console.log('[GoogleFonts] Cache cleared')
     } catch (error) {
       console.error('[GoogleFonts] Failed to clear cache:', error)

@@ -1,40 +1,44 @@
 /**
  * Border Overlay Configurator
  * Visual configuration UI for border overlay parameters
+ * Now with TanStack Form + Zod validation + ShadCN UI components
  */
 
 import { createFileRoute } from '@tanstack/react-router'
 import { ConfigLayout } from '../../components/configure/ConfigLayout'
 import { URLGenerator } from '../../components/configure/URLGenerator'
 import { CollapsibleSection } from '../../components/configure/form/CollapsibleSection'
-import { NumberSlider } from '../../components/configure/form/NumberSlider'
-import { ColorArrayInput } from '../../components/configure/form/ColorArrayInput'
-import { FormSelect } from '../../components/configure/form/FormSelect'
+import { FormNumberSlider } from '../../components/configure/form/FormNumberSlider'
+import { FormColorArray } from '../../components/configure/form/FormColorArray'
+import { FormSelectInput } from '../../components/configure/form/FormSelectInput'
+import { FormSwitch } from '../../components/configure/form/FormSwitch'
 import { AnimationSelect } from '../../components/configure/form/AnimationSelect'
 import { GradientGrid } from '../../components/configure/form/GradientGrid'
 import { PresetManager } from '../../components/configure/PresetManager'
-import { Switch } from '../../components/ui/switch'
 import { Label } from '../../components/ui/label'
 import { BORDER_DEFAULTS } from '../../types/border.types'
 import type { BorderOverlayParams } from '../../types/border.types'
 import { useHistory } from '../../hooks/useHistory'
+import { useFormWithHistory } from '../../hooks/useFormWithHistory'
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts'
 import { usePresets } from '../../hooks/usePresets'
 import { BorderOverlayHelp } from '../../components/configure/help/BorderOverlayHelp'
+import { borderOverlaySchema } from '../../lib/validation/schemas'
 
 export const Route = createFileRoute('/configure/border')({
   component: BorderConfigurator,
 })
 
 function BorderConfigurator() {
-  const { state: params, setState: setParams, updateState, undo, redo, canUndo, canRedo } = useHistory<BorderOverlayParams>(BORDER_DEFAULTS)
+  // History management (undo/redo + debouncing)
+  const history = useHistory<BorderOverlayParams>(BORDER_DEFAULTS)
+  const { state: params, updateState, undo, redo, canUndo, canRedo } = history
 
-  const updateParam = <K extends keyof BorderOverlayParams>(
-    key: K,
-    value: BorderOverlayParams[K]
-  ) => {
-    setParams((prev) => ({ ...prev, [key]: value }))
-  }
+  // TanStack Form with Zod validation
+  const form = useFormWithHistory({
+    history,
+    schema: borderOverlaySchema,
+  })
 
   // Keyboard shortcuts
   useKeyboardShortcuts([
@@ -54,10 +58,19 @@ function BorderConfigurator() {
     importPreset,
   } = usePresets<BorderOverlayParams>('border', BORDER_DEFAULTS)
 
+  // Load preset with validation
   const handleLoadPreset = (name: string) => {
     const presetParams = loadPreset(name)
     if (presetParams) {
-      updateState(presetParams)
+      // Validate preset before loading
+      const result = borderOverlaySchema.safeParse(presetParams)
+      if (result.success) {
+        updateState(result.data)
+      } else {
+        console.error('Invalid preset:', result.error)
+        // Still load it but show warning
+        updateState(presetParams)
+      }
     }
   }
 
@@ -101,91 +114,125 @@ function BorderConfigurator() {
 
       {/* Section 1: Basic Configuration */}
       <CollapsibleSection title="Basic Configuration" defaultOpen={true} storageKey="border-basic">
-        <div>
-          <label className="config-label">Shape</label>
-          <FormSelect
-            value={params.shape}
-            onValueChange={(value) => updateParam('shape', value as any)}
-            options={[
-              { value: 'rect', label: 'Rectangle' },
-              { value: 'circle', label: 'Circle' },
-            ]}
-          />
-        </div>
+        <form.Field name="shape">
+          {(field) => (
+            <FormSelectInput
+              label="Shape"
+              value={field.state.value}
+              onChange={(val) => field.handleChange(val as any)}
+              options={[
+                { value: 'rect', label: 'Rectangle' },
+                { value: 'circle', label: 'Circle' },
+              ]}
+              error={field.state.meta.errors?.[0]}
+            />
+          )}
+        </form.Field>
 
-        <div>
-          <label className="config-label">Style</label>
-          <FormSelect
-            value={params.style}
-            onValueChange={(value) => updateParam('style', value as any)}
-            options={[
-              { value: 'solid', label: 'Solid' },
-              { value: 'dashed', label: 'Dashed' },
-              { value: 'dotted', label: 'Dotted' },
-              { value: 'double', label: 'Double' },
-              { value: 'neon', label: 'Neon' },
-            ]}
-          />
-        </div>
+        <form.Field name="style">
+          {(field) => (
+            <FormSelectInput
+              label="Style"
+              value={field.state.value}
+              onChange={(val) => field.handleChange(val as any)}
+              options={[
+                { value: 'solid', label: 'Solid' },
+                { value: 'dashed', label: 'Dashed' },
+                { value: 'dotted', label: 'Dotted' },
+                { value: 'double', label: 'Double' },
+                { value: 'neon', label: 'Neon' },
+              ]}
+              error={field.state.meta.errors?.[0]}
+            />
+          )}
+        </form.Field>
 
         <div>
           <label className="config-label">Animation</label>
-          <AnimationSelect
-            value={params.animation}
-            onValueChange={(value) => updateParam('animation', value as any)}
-            options={[
-              { value: 'none', label: 'None' },
-              { value: 'dash', label: 'Dash' },
-              { value: 'rotate', label: 'Rotate' },
-              { value: 'pulse', label: 'Pulse' },
-              { value: 'breathe', label: 'Breathe' },
-            ]}
-          />
+          <form.Field name="animation">
+            {(field) => (
+              <AnimationSelect
+                value={field.state.value}
+                onValueChange={(value) => field.handleChange(value as any)}
+                options={[
+                  { value: 'none', label: 'None' },
+                  { value: 'dash', label: 'Dash' },
+                  { value: 'rotate', label: 'Rotate' },
+                  { value: 'pulse', label: 'Pulse' },
+                  { value: 'breathe', label: 'Breathe' },
+                ]}
+              />
+            )}
+          </form.Field>
         </div>
 
-        <NumberSlider
-          label="Thickness"
-          value={params.thickness}
-          onChange={(val) => updateParam('thickness', val)}
-          min={1}
-          max={50}
-          unit="px"
-          help="Border thickness in pixels"
-        />
+        <form.Field name="thickness">
+          {(field) => (
+            <FormNumberSlider
+              label="Thickness"
+              value={field.state.value}
+              onChange={(val) => field.handleChange(val)}
+              onBlur={field.handleBlur}
+              min={1}
+              max={50}
+              unit="px"
+              help="Border thickness in pixels"
+              error={field.state.meta.errors?.[0]}
+            />
+          )}
+        </form.Field>
 
-        <NumberSlider
-          label="Animation Speed"
-          value={params.speed}
-          onChange={(val) => updateParam('speed', val)}
-          min={0.1}
-          max={10}
-          step={0.1}
-          unit="s"
-          help="Animation cycle duration"
-        />
+        <form.Field name="speed">
+          {(field) => (
+            <FormNumberSlider
+              label="Animation Speed"
+              value={field.state.value}
+              onChange={(val) => field.handleChange(val)}
+              onBlur={field.handleBlur}
+              min={0.1}
+              max={10}
+              step={0.1}
+              unit="s"
+              help="Animation cycle duration"
+              error={field.state.meta.errors?.[0]}
+            />
+          )}
+        </form.Field>
 
         {params.shape === 'rect' && (
-          <NumberSlider
-            label="Corner Radius"
-            value={params.r}
-            onChange={(val) => updateParam('r', val)}
-            min={0}
-            max={50}
-            unit="px"
-            help="Rounded corners for rectangles"
-          />
+          <form.Field name="r">
+            {(field) => (
+              <FormNumberSlider
+                label="Corner Radius"
+                value={field.state.value}
+                onChange={(val) => field.handleChange(val)}
+                onBlur={field.handleBlur}
+                min={0}
+                max={50}
+                unit="px"
+                help="Rounded corners for rectangles"
+                error={field.state.meta.errors?.[0]}
+              />
+            )}
+          </form.Field>
         )}
 
         {params.style === 'dashed' && (
-          <NumberSlider
-            label="Dash Ratio"
-            value={params.dash}
-            onChange={(val) => updateParam('dash', val)}
-            min={0}
-            max={1}
-            step={0.1}
-            help="Visible portion of dash (0-1)"
-          />
+          <form.Field name="dash">
+            {(field) => (
+              <FormNumberSlider
+                label="Dash Ratio"
+                value={field.state.value}
+                onChange={(val) => field.handleChange(val)}
+                onBlur={field.handleBlur}
+                min={0}
+                max={1}
+                step={0.1}
+                help="Visible portion of dash (0-1)"
+                error={field.state.meta.errors?.[0]}
+              />
+            )}
+          </form.Field>
         )}
       </CollapsibleSection>
 
@@ -198,94 +245,129 @@ function BorderConfigurator() {
       >
         <div>
           <label className="config-label">Gradient Preset</label>
-          <GradientGrid
-            value={params.gradient}
-            onValueChange={(value) => updateParam('gradient', value as any)}
-          />
+          <form.Field name="gradient">
+            {(field) => (
+              <GradientGrid
+                value={field.state.value}
+                onValueChange={(value) => field.handleChange(value as any)}
+              />
+            )}
+          </form.Field>
         </div>
 
-        <div className="flex items-center justify-between">
-          <Label htmlFor="multicolor">Multi-color Mode</Label>
-          <Switch
-            id="multicolor"
-            checked={params.multicolor}
-            onCheckedChange={(checked) => updateParam('multicolor', checked)}
-          />
-        </div>
-        <p className="text-xs text-dark-muted -mt-2">Cycle through all gradients</p>
+        <form.Field name="multicolor">
+          {(field) => (
+            <FormSwitch
+              label="Multi-color Mode"
+              checked={field.state.value}
+              onCheckedChange={(checked) => field.handleChange(checked)}
+              help="Cycle through all gradients"
+              error={field.state.meta.errors?.[0]}
+            />
+          )}
+        </form.Field>
 
-        <div className="flex items-center justify-between">
-          <Label htmlFor="colorshift">Color Shift</Label>
-          <Switch
-            id="colorshift"
-            checked={params.colorshift}
-            onCheckedChange={(checked) => updateParam('colorshift', checked)}
-          />
-        </div>
-        <p className="text-xs text-dark-muted -mt-2">Smooth color transitions</p>
+        <form.Field name="colorshift">
+          {(field) => (
+            <FormSwitch
+              label="Color Shift"
+              checked={field.state.value}
+              onCheckedChange={(checked) => field.handleChange(checked)}
+              help="Smooth color transitions"
+              error={field.state.meta.errors?.[0]}
+            />
+          )}
+        </form.Field>
 
         {(params.multicolor || params.colorshift) && (
-          <NumberSlider
-            label="Shift Speed"
-            value={params.shiftspeed}
-            onChange={(val) => updateParam('shiftspeed', val)}
-            min={1}
-            max={30}
-            unit="s"
-            help="Color cycle duration"
-          />
+          <form.Field name="shiftspeed">
+            {(field) => (
+              <FormNumberSlider
+                label="Shift Speed"
+                value={field.state.value}
+                onChange={(val) => field.handleChange(val)}
+                onBlur={field.handleBlur}
+                min={1}
+                max={30}
+                unit="s"
+                help="Color cycle duration"
+                error={field.state.meta.errors?.[0]}
+              />
+            )}
+          </form.Field>
         )}
 
-        <ColorArrayInput
-          label="Custom Colors"
-          colors={params.colors}
-          onChange={(colors) => updateParam('colors', colors)}
-          maxColors={5}
-        />
+        <form.Field name="colors">
+          {(field) => (
+            <FormColorArray
+              label="Custom Colors"
+              colors={field.state.value}
+              onChange={(colors) => field.handleChange(colors)}
+              maxColors={5}
+              error={field.state.meta.errors?.[0]}
+            />
+          )}
+        </form.Field>
 
-        <div className="flex items-center justify-between">
-          <Label htmlFor="random">Random Gradient</Label>
-          <Switch
-            id="random"
-            checked={params.random}
-            onCheckedChange={(checked) => updateParam('random', checked)}
-          />
-        </div>
-        <p className="text-xs text-dark-muted -mt-2">Randomize gradient on load</p>
+        <form.Field name="random">
+          {(field) => (
+            <FormSwitch
+              label="Random Gradient"
+              checked={field.state.value}
+              onCheckedChange={(checked) => field.handleChange(checked)}
+              help="Randomize gradient on load"
+              error={field.state.meta.errors?.[0]}
+            />
+          )}
+        </form.Field>
       </CollapsibleSection>
 
       {/* Section 3: Visual Effects */}
       <CollapsibleSection title="Visual Effects" defaultOpen={false} storageKey="border-effects">
-        <div className="flex items-center justify-between">
-          <Label htmlFor="glow">Glow Effect</Label>
-          <Switch
-            id="glow"
-            checked={params.glow}
-            onCheckedChange={(checked) => updateParam('glow', checked)}
-          />
-        </div>
+        <form.Field name="glow">
+          {(field) => (
+            <FormSwitch
+              label="Glow Effect"
+              checked={field.state.value}
+              onCheckedChange={(checked) => field.handleChange(checked)}
+              error={field.state.meta.errors?.[0]}
+            />
+          )}
+        </form.Field>
 
         {params.glow && (
-          <NumberSlider
-            label="Glow Size"
-            value={params.glowsize}
-            onChange={(val) => updateParam('glowsize', val)}
-            min={0}
-            max={20}
-            unit="px"
-            help="Glow blur radius"
-          />
+          <form.Field name="glowsize">
+            {(field) => (
+              <FormNumberSlider
+                label="Glow Size"
+                value={field.state.value}
+                onChange={(val) => field.handleChange(val)}
+                onBlur={field.handleBlur}
+                min={0}
+                max={20}
+                unit="px"
+                help="Glow blur radius"
+                error={field.state.meta.errors?.[0]}
+              />
+            )}
+          </form.Field>
         )}
 
-        <NumberSlider
-          label="Opacity"
-          value={params.opacity * 100}
-          onChange={(val) => updateParam('opacity', val / 100)}
-          min={0}
-          max={100}
-          unit="%"
-          help="Border opacity (0-100%)"
-        />
+        <form.Field name="opacity">
+          {(field) => (
+            <FormNumberSlider
+              label="Opacity"
+              value={field.state.value * 100}
+              onChange={(val) => field.handleChange(val / 100)}
+              onBlur={field.handleBlur}
+              min={0}
+              max={100}
+              unit="%"
+              help="Border opacity (0-100%)"
+              error={field.state.meta.errors?.[0]}
+            />
+          )}
+        </form.Field>
       </CollapsibleSection>
 
       {/* Help & Guides */}
