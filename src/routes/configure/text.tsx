@@ -12,12 +12,14 @@ import { ColorArrayInput } from '../../components/configure/form/ColorArrayInput
 import { FormInput } from '../../components/configure/form/FormInput'
 import { FormSelect } from '../../components/configure/form/FormSelect'
 import { GradientGrid } from '../../components/configure/form/GradientGrid'
+import { PresetManager } from '../../components/configure/PresetManager'
 import { Switch } from '../../components/ui/switch'
 import { Label } from '../../components/ui/label'
 import { TEXT_DEFAULTS } from '../../types/text.types'
 import type { TextOverlayParams } from '../../types/text.types'
 import { useHistory } from '../../hooks/useHistory'
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts'
+import { usePresets } from '../../hooks/usePresets'
 
 export const Route = createFileRoute('/configure/text')({
   component: TextConfigurator,
@@ -38,6 +40,25 @@ function TextConfigurator() {
     { key: 'z', ctrlOrCmd: true, shift: false, callback: undo },
     { key: 'z', ctrlOrCmd: true, shift: true, callback: redo },
   ])
+
+  // Presets management
+  const {
+    presets,
+    currentPresetName,
+    loadPreset,
+    savePreset,
+    deletePreset,
+    renamePreset,
+    exportPreset,
+    importPreset,
+  } = usePresets<TextOverlayParams>('text', TEXT_DEFAULTS)
+
+  const handleLoadPreset = (name: string) => {
+    const presetParams = loadPreset(name)
+    if (presetParams) {
+      updateState(presetParams)
+    }
+  }
 
   // Section-specific reset handlers (use updateState for immediate history entry)
   const resetThemeColors = () => {
@@ -82,6 +103,19 @@ function TextConfigurator() {
             />
           </div>
         </div>
+
+        {/* Custom Presets Manager */}
+        <PresetManager
+          presets={presets}
+          currentPresetName={currentPresetName}
+          currentParams={params}
+          onLoadPreset={handleLoadPreset}
+          onSavePreset={savePreset}
+          onDeletePreset={deletePreset}
+          onRenamePreset={renamePreset}
+          onExportPreset={exportPreset}
+          onImportPreset={importPreset}
+        />
 
         {/* Section 2: Content */}
         <CollapsibleSection title="Content" defaultOpen={true} storageKey="text-content">

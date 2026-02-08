@@ -11,12 +11,14 @@ import { NumberSlider } from '../../components/configure/form/NumberSlider'
 import { ColorArrayInput } from '../../components/configure/form/ColorArrayInput'
 import { FormSelect } from '../../components/configure/form/FormSelect'
 import { GradientGrid } from '../../components/configure/form/GradientGrid'
+import { PresetManager } from '../../components/configure/PresetManager'
 import { Switch } from '../../components/ui/switch'
 import { Label } from '../../components/ui/label'
 import { BORDER_DEFAULTS } from '../../types/border.types'
 import type { BorderOverlayParams } from '../../types/border.types'
 import { useHistory } from '../../hooks/useHistory'
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts'
+import { usePresets } from '../../hooks/usePresets'
 
 export const Route = createFileRoute('/configure/border')({
   component: BorderConfigurator,
@@ -37,6 +39,25 @@ function BorderConfigurator() {
     { key: 'z', ctrlOrCmd: true, shift: false, callback: undo },
     { key: 'z', ctrlOrCmd: true, shift: true, callback: redo },
   ])
+
+  // Presets management
+  const {
+    presets,
+    currentPresetName,
+    loadPreset,
+    savePreset,
+    deletePreset,
+    renamePreset,
+    exportPreset,
+    importPreset,
+  } = usePresets<BorderOverlayParams>('border', BORDER_DEFAULTS)
+
+  const handleLoadPreset = (name: string) => {
+    const presetParams = loadPreset(name)
+    if (presetParams) {
+      updateState(presetParams)
+    }
+  }
 
   // Section-specific reset handlers (use updateState for immediate history entry)
   const resetColorsGradient = () => {
@@ -63,6 +84,19 @@ function BorderConfigurator() {
 
   const configSections = (
     <>
+      {/* Custom Presets Manager */}
+      <PresetManager
+        presets={presets}
+        currentPresetName={currentPresetName}
+        currentParams={params}
+        onLoadPreset={handleLoadPreset}
+        onSavePreset={savePreset}
+        onDeletePreset={deletePreset}
+        onRenamePreset={renamePreset}
+        onExportPreset={exportPreset}
+        onImportPreset={importPreset}
+      />
+
       {/* Section 1: Basic Configuration */}
       <CollapsibleSection title="Basic Configuration" defaultOpen={true} storageKey="border-basic">
         <div>

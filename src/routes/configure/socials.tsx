@@ -13,12 +13,14 @@ import { ColorArrayInput } from '../../components/configure/form/ColorArrayInput
 import { FormInput } from '../../components/configure/form/FormInput'
 import { FormSelect } from '../../components/configure/form/FormSelect'
 import { GradientGrid } from '../../components/configure/form/GradientGrid'
+import { PresetManager } from '../../components/configure/PresetManager'
 import { Switch } from '../../components/ui/switch'
 import { Label } from '../../components/ui/label'
 import { SOCIALS_DEFAULTS } from '../../types/socials.types'
 import type { SocialsOverlayParams } from '../../types/socials.types'
 import { useHistory } from '../../hooks/useHistory'
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts'
+import { usePresets } from '../../hooks/usePresets'
 
 export const Route = createFileRoute('/configure/socials')({
   component: SocialsConfigurator,
@@ -94,6 +96,27 @@ function SocialsConfigurator() {
     { key: 'z', ctrlOrCmd: true, shift: true, callback: redo },
   ])
 
+  // Presets management
+  const {
+    presets,
+    currentPresetName,
+    loadPreset,
+    savePreset,
+    deletePreset,
+    renamePreset,
+    exportPreset,
+    importPreset,
+  } = usePresets<SocialsOverlayParams>('socials', SOCIALS_DEFAULTS)
+
+  const handleLoadPreset = (name: string) => {
+    const presetParams = loadPreset(name)
+    if (presetParams) {
+      // Use updateState for immediate history entry
+      // Platforms will sync via useEffect
+      updateState(presetParams)
+    }
+  }
+
   // Update params when platforms change
   const updatePlatforms = (newPlatforms: AllPlatforms) => {
     setPlatforms(newPlatforms)
@@ -155,6 +178,19 @@ function SocialsConfigurator() {
 
   const configSections = (
     <>
+      {/* Custom Presets Manager */}
+      <PresetManager
+        presets={presets}
+        currentPresetName={currentPresetName}
+        currentParams={params}
+        onLoadPreset={handleLoadPreset}
+        onSavePreset={savePreset}
+        onDeletePreset={deletePreset}
+        onRenamePreset={renamePreset}
+        onExportPreset={exportPreset}
+        onImportPreset={importPreset}
+      />
+
       {/* Section 1: Platforms */}
       <CollapsibleSection title="Platforms" defaultOpen={true} storageKey="socials-platforms">
         <p className="text-sm text-dark-muted mb-4">
