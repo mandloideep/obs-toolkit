@@ -100,14 +100,3 @@
            hover:-translate-y-1 hover:shadow-lg;
   }
 }
-
-
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-}
