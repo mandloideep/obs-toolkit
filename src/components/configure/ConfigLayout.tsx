@@ -5,6 +5,14 @@
 
 import { useState } from 'react'
 import { Button } from '../ui/button'
+import { Undo2, Redo2 } from 'lucide-react'
+
+interface UndoRedoControls {
+  undo: () => void
+  redo: () => void
+  canUndo: boolean
+  canRedo: boolean
+}
 
 interface ConfigLayoutProps {
   configContent: React.ReactNode
@@ -12,6 +20,7 @@ interface ConfigLayoutProps {
   fullscreenUrl?: string // Optional URL for fullscreen (defaults to previewUrl for backward compatibility)
   overlayTitle: string
   urlGeneratorComponent: React.ReactNode
+  undoRedoControls?: UndoRedoControls // Optional undo/redo controls
 }
 
 type PreviewSize = '640x360' | '1280x720' | '1920x1080'
@@ -29,6 +38,7 @@ export function ConfigLayout({
   fullscreenUrl,
   overlayTitle,
   urlGeneratorComponent,
+  undoRedoControls,
 }: ConfigLayoutProps) {
   const [previewSize, setPreviewSize] = useState<PreviewSize>('1280x720')
   const [previewBg, setPreviewBg] = useState<PreviewBackground>('black')
@@ -43,7 +53,39 @@ export function ConfigLayout({
     <div className="flex flex-col lg:flex-row h-screen overflow-hidden">
       {/* Left Column: Scrollable Configuration */}
       <div className="flex-1 overflow-y-auto p-8 lg:h-screen">
-        <div className="max-w-3xl space-y-6">{configContent}</div>
+        <div className="max-w-3xl space-y-6">
+          {/* Undo/Redo Header */}
+          {undoRedoControls && (
+            <div className="flex items-center gap-2 pb-4 border-b border-dark-border">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={undoRedoControls.undo}
+                disabled={!undoRedoControls.canUndo}
+                title="Undo (Cmd/Ctrl+Z)"
+                className="gap-2"
+              >
+                <Undo2 size={16} />
+                Undo
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={undoRedoControls.redo}
+                disabled={!undoRedoControls.canRedo}
+                title="Redo (Cmd/Ctrl+Shift+Z)"
+                className="gap-2"
+              >
+                <Redo2 size={16} />
+                Redo
+              </Button>
+              <span className="text-xs text-dark-muted ml-2">
+                {undoRedoControls.canUndo ? 'Cmd/Ctrl+Z to undo' : 'No undo history'}
+              </span>
+            </div>
+          )}
+          {configContent}
+        </div>
       </div>
 
       {/* Right Column: Fixed Preview & URL Generator */}

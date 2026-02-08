@@ -4,7 +4,6 @@
  */
 
 import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
 import { ConfigLayout } from '../../components/configure/ConfigLayout'
 import { URLGenerator } from '../../components/configure/URLGenerator'
 import { CollapsibleSection } from '../../components/configure/form/CollapsibleSection'
@@ -16,13 +15,15 @@ import { Switch } from '../../components/ui/switch'
 import { Label } from '../../components/ui/label'
 import { BORDER_DEFAULTS } from '../../types/border.types'
 import type { BorderOverlayParams } from '../../types/border.types'
+import { useHistory } from '../../hooks/useHistory'
+import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts'
 
 export const Route = createFileRoute('/configure/border')({
   component: BorderConfigurator,
 })
 
 function BorderConfigurator() {
-  const [params, setParams] = useState<BorderOverlayParams>(BORDER_DEFAULTS)
+  const { state: params, setState: setParams, updateState, undo, redo, canUndo, canRedo } = useHistory<BorderOverlayParams>(BORDER_DEFAULTS)
 
   const updateParam = <K extends keyof BorderOverlayParams>(
     key: K,
@@ -31,17 +32,23 @@ function BorderConfigurator() {
     setParams((prev) => ({ ...prev, [key]: value }))
   }
 
-  // Section-specific reset handlers
+  // Keyboard shortcuts
+  useKeyboardShortcuts([
+    { key: 'z', ctrlOrCmd: true, shift: false, callback: undo },
+    { key: 'z', ctrlOrCmd: true, shift: true, callback: redo },
+  ])
+
+  // Section-specific reset handlers (use updateState for immediate history entry)
   const resetColorsGradient = () => {
-    setParams((prev) => ({
-      ...prev,
+    updateState({
+      ...params,
       gradient: BORDER_DEFAULTS.gradient,
       colors: BORDER_DEFAULTS.colors,
       random: BORDER_DEFAULTS.random,
       multicolor: BORDER_DEFAULTS.multicolor,
       colorshift: BORDER_DEFAULTS.colorshift,
       shiftspeed: BORDER_DEFAULTS.shiftspeed,
-    }))
+    })
   }
 
   // Generate preview URL
@@ -257,8 +264,11 @@ function BorderConfigurator() {
           overlayPath="/overlays/border"
           params={params}
           defaults={BORDER_DEFAULTS}
+          overlayType="border"
+          onImportConfig={(importedParams) => updateState(importedParams as BorderOverlayParams)}
         />
       }
+      undoRedoControls={{ undo, redo, canUndo, canRedo }}
     />
   )
 }

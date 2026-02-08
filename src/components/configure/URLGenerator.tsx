@@ -4,9 +4,10 @@
  * Shows only non-default parameters for clean URLs
  */
 
-import React, { useMemo, useState, useCallback } from 'react'
-import { Copy, Check, ExternalLink } from 'lucide-react'
+import React, { useMemo, useState, useCallback, useRef } from 'react'
+import { Copy, Check, ExternalLink, Download, Upload } from 'lucide-react'
 import { Button } from '../ui/button'
+import { useConfigExport } from '@/hooks/useConfigExport'
 
 interface URLGeneratorProps {
   overlayPath: string
@@ -14,11 +15,18 @@ interface URLGeneratorProps {
   defaults: Record<string, any>
   baseUrl?: string
   sensitiveParams?: string[] // Parameters to exclude from displayed URL (e.g., ['apikey'])
+  overlayType: string // Type of overlay (text, border, counter, etc.)
+  onImportConfig: (params: Record<string, any>) => void // Callback when config is imported
 }
 
-export function URLGenerator({ overlayPath, params, defaults, baseUrl, sensitiveParams = [] }: URLGeneratorProps) {
+export function URLGenerator({ overlayPath, params, defaults, baseUrl, sensitiveParams = [], overlayType, onImportConfig }: URLGeneratorProps) {
   const [copied, setCopied] = useState(false)
   const [copiedWithKey, setCopiedWithKey] = useState(false)
+  const [importError, setImportError] = useState<string | null>(null)
+  const [importSuccess, setImportSuccess] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const { exportConfig, importConfig, validateConfig } = useConfigExport()
 
   // Helper function to generate URL with optional param exclusions
   const generateUrl = useCallback((excludeParams: string[] = []) => {
@@ -95,6 +103,49 @@ export function URLGenerator({ overlayPath, params, defaults, baseUrl, sensitive
     window.open(displayUrl, '_blank', 'width=1920,height=1080')
   }
 
+  const handleExport = () => {
+    // Create params without sensitive data for export
+    const exportParams = { ...params }
+    sensitiveParams.forEach(key => {
+      delete exportParams[key]
+    })
+    exportConfig(exportParams, overlayType)
+  }
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setImportError(null)
+    setImportSuccess(false)
+
+    try {
+      const json = await importConfig(file)
+      const validation = validateConfig(json, defaults, overlayType)
+
+      if (validation.valid && validation.params) {
+        onImportConfig(validation.params)
+        setImportSuccess(true)
+        setTimeout(() => setImportSuccess(false), 3000)
+      } else {
+        setImportError(validation.error || 'Invalid configuration file')
+        setTimeout(() => setImportError(null), 5000)
+      }
+    } catch (error) {
+      setImportError(error instanceof Error ? error.message : 'Failed to import configuration')
+      setTimeout(() => setImportError(null), 5000)
+    }
+
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
+  }
+
   return (
     <div className="config-section">
       <label className="config-label">OBS Browser Source URL</label>
@@ -138,6 +189,49 @@ export function URLGenerator({ overlayPath, params, defaults, baseUrl, sensitive
           💡 Use <strong>Copy with API Key</strong> for OBS. Regular URL is for sharing configs.
         </p>
       )}
+
+      {/* Divider */}
+      <div className="my-4 border-t border-dark-border" />
+
+      {/* Import/Export Section */}
+      <label className="config-label">Configuration Backup</label>
+      <div className="flex gap-3 mb-3">
+        <Button variant="outline" onClick={handleExport}>
+          <Download size={16} />
+          Export Config
+        </Button>
+        <Button variant="outline" onClick={handleImportClick}>
+          <Upload size={16} />
+          Import Config
+        </Button>
+      </div>
+
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".json"
+        onChange={handleFileChange}
+        className="hidden"
+      />
+
+      {/* Import feedback messages */}
+      {importSuccess && (
+        <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 rounded-lg p-3 text-sm">
+          ✓ Configuration imported successfully!
+        </div>
+      )}
+      {importError && (
+        <div className="bg-red-500/10 border border-red-500/30 text-red-300 rounded-lg p-3 text-sm">
+          ✗ {importError}
+        </div>
+      )}
+
+      {/* Helper text */}
+      <p className="text-xs text-dark-muted mt-3 leading-relaxed">
+        💾 Export saves your current configuration as a JSON file. Import loads a previously saved configuration.
+        {sensitiveParams.length > 0 && ' Sensitive data (API keys) are excluded from exports.'}
+      </p>
     </div>
   )
 }

@@ -17,13 +17,15 @@ import { Switch } from '../../components/ui/switch'
 import { Label } from '../../components/ui/label'
 import { COUNTER_DEFAULTS } from '../../types/counter.types'
 import type { CounterOverlayParams } from '../../types/counter.types'
+import { useHistory } from '../../hooks/useHistory'
+import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts'
 
 export const Route = createFileRoute('/configure/counter')({
   component: CounterConfigurator,
 })
 
 function CounterConfigurator() {
-  const [params, setParams] = useState<CounterOverlayParams>(COUNTER_DEFAULTS)
+  const { state: params, setState: setParams, updateState, undo, redo, canUndo, canRedo } = useHistory<CounterOverlayParams>(COUNTER_DEFAULTS)
 
   const updateParam = <K extends keyof CounterOverlayParams>(
     key: K,
@@ -32,14 +34,20 @@ function CounterConfigurator() {
     setParams((prev) => ({ ...prev, [key]: value }))
   }
 
-  // Section-specific reset handlers
+  // Keyboard shortcuts
+  useKeyboardShortcuts([
+    { key: 'z', ctrlOrCmd: true, shift: false, callback: undo },
+    { key: 'z', ctrlOrCmd: true, shift: true, callback: redo },
+  ])
+
+  // Section-specific reset handlers (use updateState for immediate history entry)
   const resetTheme = () => {
-    setParams((prev) => ({
-      ...prev,
+    updateState({
+      ...params,
       theme: COUNTER_DEFAULTS.theme,
       gradient: COUNTER_DEFAULTS.gradient,
       colors: COUNTER_DEFAULTS.colors,
-    }))
+    })
   }
 
   // API key persistence state
@@ -765,8 +773,21 @@ function CounterConfigurator() {
           params={params}
           defaults={COUNTER_DEFAULTS}
           sensitiveParams={['apikey']}
+          overlayType="counter"
+          onImportConfig={(importedParams) => {
+            // If persistApiKeys is enabled, preserve current API key
+            if (persistApiKeys) {
+              updateState({
+                ...(importedParams as CounterOverlayParams),
+                apikey: params.apikey, // Keep current API key
+              })
+            } else {
+              updateState(importedParams as CounterOverlayParams)
+            }
+          }}
         />
       }
+      undoRedoControls={{ undo, redo, canUndo, canRedo }}
     />
   )
 }

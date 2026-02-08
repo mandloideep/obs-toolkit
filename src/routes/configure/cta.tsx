@@ -4,7 +4,6 @@
  */
 
 import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
 import { ConfigLayout } from '../../components/configure/ConfigLayout'
 import { URLGenerator } from '../../components/configure/URLGenerator'
 import { CollapsibleSection } from '../../components/configure/form/CollapsibleSection'
@@ -17,13 +16,15 @@ import { Switch } from '../../components/ui/switch'
 import { Label } from '../../components/ui/label'
 import { CTA_DEFAULTS } from '../../types/cta.types'
 import type { CTAOverlayParams } from '../../types/cta.types'
+import { useHistory } from '../../hooks/useHistory'
+import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts'
 
 export const Route = createFileRoute('/configure/cta')({
   component: CTAConfigurator,
 })
 
 function CTAConfigurator() {
-  const [params, setParams] = useState<CTAOverlayParams>(CTA_DEFAULTS)
+  const { state: params, setState: setParams, updateState, undo, redo, canUndo, canRedo } = useHistory<CTAOverlayParams>(CTA_DEFAULTS)
 
   const updateParam = <K extends keyof CTAOverlayParams>(
     key: K,
@@ -32,14 +33,20 @@ function CTAConfigurator() {
     setParams((prev) => ({ ...prev, [key]: value }))
   }
 
-  // Section-specific reset handlers
+  // Keyboard shortcuts
+  useKeyboardShortcuts([
+    { key: 'z', ctrlOrCmd: true, shift: false, callback: undo },
+    { key: 'z', ctrlOrCmd: true, shift: true, callback: redo },
+  ])
+
+  // Section-specific reset handlers (use updateState for immediate history entry)
   const resetThemeColors = () => {
-    setParams((prev) => ({
-      ...prev,
+    updateState({
+      ...params,
       theme: CTA_DEFAULTS.theme,
       gradient: CTA_DEFAULTS.gradient,
       colors: CTA_DEFAULTS.colors,
-    }))
+    })
   }
 
   const previewUrl = `${window.location.origin}/overlays/cta?${new URLSearchParams(
@@ -459,8 +466,11 @@ function CTAConfigurator() {
           overlayPath="/overlays/cta"
           params={params}
           defaults={CTA_DEFAULTS}
+          overlayType="cta"
+          onImportConfig={(importedParams) => updateState(importedParams as CTAOverlayParams)}
         />
       }
+      undoRedoControls={{ undo, redo, canUndo, canRedo }}
     />
   )
 }

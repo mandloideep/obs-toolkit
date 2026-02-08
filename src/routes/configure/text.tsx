@@ -4,7 +4,6 @@
  */
 
 import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
 import { ConfigLayout } from '../../components/configure/ConfigLayout'
 import { URLGenerator } from '../../components/configure/URLGenerator'
 import { CollapsibleSection } from '../../components/configure/form/CollapsibleSection'
@@ -17,13 +16,15 @@ import { Switch } from '../../components/ui/switch'
 import { Label } from '../../components/ui/label'
 import { TEXT_DEFAULTS } from '../../types/text.types'
 import type { TextOverlayParams } from '../../types/text.types'
+import { useHistory } from '../../hooks/useHistory'
+import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts'
 
 export const Route = createFileRoute('/configure/text')({
   component: TextConfigurator,
 })
 
 function TextConfigurator() {
-  const [params, setParams] = useState<TextOverlayParams>(TEXT_DEFAULTS)
+  const { state: params, setState: setParams, updateState, undo, redo, canUndo, canRedo } = useHistory<TextOverlayParams>(TEXT_DEFAULTS)
 
   const updateParam = <K extends keyof TextOverlayParams>(
     key: K,
@@ -32,17 +33,23 @@ function TextConfigurator() {
     setParams((prev) => ({ ...prev, [key]: value }))
   }
 
-  // Section-specific reset handlers
+  // Keyboard shortcuts
+  useKeyboardShortcuts([
+    { key: 'z', ctrlOrCmd: true, shift: false, callback: undo },
+    { key: 'z', ctrlOrCmd: true, shift: true, callback: redo },
+  ])
+
+  // Section-specific reset handlers (use updateState for immediate history entry)
   const resetThemeColors = () => {
-    setParams((prev) => ({
-      ...prev,
+    updateState({
+      ...params,
       textcolor: TEXT_DEFAULTS.textcolor,
       subcolor: TEXT_DEFAULTS.subcolor,
       textgradient: TEXT_DEFAULTS.textgradient,
       theme: TEXT_DEFAULTS.theme,
       gradient: TEXT_DEFAULTS.gradient,
       colors: TEXT_DEFAULTS.colors,
-    }))
+    })
   }
 
   const previewUrl = `${window.location.origin}/overlays/text?${new URLSearchParams(
@@ -560,8 +567,11 @@ function TextConfigurator() {
           overlayPath="/overlays/text"
           params={params}
           defaults={TEXT_DEFAULTS}
+          overlayType="text"
+          onImportConfig={(importedParams) => updateState(importedParams as TextOverlayParams)}
         />
       }
+      undoRedoControls={{ undo, redo, canUndo, canRedo }}
     />
   )
 }

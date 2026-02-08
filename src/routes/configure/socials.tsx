@@ -4,7 +4,7 @@
  */
 
 import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ConfigLayout } from '../../components/configure/ConfigLayout'
 import { URLGenerator } from '../../components/configure/URLGenerator'
 import { CollapsibleSection } from '../../components/configure/form/CollapsibleSection'
@@ -17,6 +17,8 @@ import { Switch } from '../../components/ui/switch'
 import { Label } from '../../components/ui/label'
 import { SOCIALS_DEFAULTS } from '../../types/socials.types'
 import type { SocialsOverlayParams } from '../../types/socials.types'
+import { useHistory } from '../../hooks/useHistory'
+import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts'
 
 export const Route = createFileRoute('/configure/socials')({
   component: SocialsConfigurator,
@@ -40,7 +42,7 @@ type AllPlatforms = {
 }
 
 function SocialsConfigurator() {
-  const [params, setParams] = useState<SocialsOverlayParams>(SOCIALS_DEFAULTS)
+  const { state: params, setState: setParams, updateState, undo, redo, canUndo, canRedo } = useHistory<SocialsOverlayParams>(SOCIALS_DEFAULTS)
 
   // Parse show and handles into individual platform states
   const [platforms, setPlatforms] = useState<AllPlatforms>(() => {
@@ -63,6 +65,34 @@ function SocialsConfigurator() {
       website: { enabled: showList.includes('website'), handle: handlesMap.website || '' },
     }
   })
+
+  // Sync platforms state when params change (from undo/redo)
+  useEffect(() => {
+    const showList = params.show.split(',').filter(Boolean)
+    const handlesMap = params.handles.split(',').reduce((acc, pair) => {
+      const [platform, handle] = pair.split(':')
+      if (platform && handle) acc[platform] = handle
+      return acc
+    }, {} as Record<string, string>)
+
+    setPlatforms({
+      github: { enabled: showList.includes('github'), handle: handlesMap.github || '' },
+      twitter: { enabled: showList.includes('twitter'), handle: handlesMap.twitter || '' },
+      linkedin: { enabled: showList.includes('linkedin'), handle: handlesMap.linkedin || '' },
+      youtube: { enabled: showList.includes('youtube'), handle: handlesMap.youtube || '' },
+      instagram: { enabled: showList.includes('instagram'), handle: handlesMap.instagram || '' },
+      twitch: { enabled: showList.includes('twitch'), handle: handlesMap.twitch || '' },
+      kick: { enabled: showList.includes('kick'), handle: handlesMap.kick || '' },
+      discord: { enabled: showList.includes('discord'), handle: handlesMap.discord || '' },
+      website: { enabled: showList.includes('website'), handle: handlesMap.website || '' },
+    })
+  }, [params.show, params.handles])
+
+  // Keyboard shortcuts
+  useKeyboardShortcuts([
+    { key: 'z', ctrlOrCmd: true, shift: false, callback: undo },
+    { key: 'z', ctrlOrCmd: true, shift: true, callback: redo },
+  ])
 
   // Update params when platforms change
   const updatePlatforms = (newPlatforms: AllPlatforms) => {
@@ -104,14 +134,14 @@ function SocialsConfigurator() {
     setParams((prev) => ({ ...prev, [key]: value }))
   }
 
-  // Section-specific reset handlers
+  // Section-specific reset handlers (use updateState for immediate history entry)
   const resetThemeColors = () => {
-    setParams((prev) => ({
-      ...prev,
+    updateState({
+      ...params,
       theme: SOCIALS_DEFAULTS.theme,
       gradient: SOCIALS_DEFAULTS.gradient,
       colors: SOCIALS_DEFAULTS.colors,
-    }))
+    })
   }
 
   const previewUrl = `${window.location.origin}/overlays/socials?${new URLSearchParams(
@@ -719,8 +749,15 @@ function SocialsConfigurator() {
           overlayPath="/overlays/socials"
           params={params}
           defaults={SOCIALS_DEFAULTS}
+          overlayType="socials"
+          onImportConfig={(importedParams) => {
+            // Use updateState for immediate history entry
+            // Platforms will sync via useEffect
+            updateState(importedParams as SocialsOverlayParams)
+          }}
         />
       }
+      undoRedoControls={{ undo, redo, canUndo, canRedo }}
     />
   )
 }
