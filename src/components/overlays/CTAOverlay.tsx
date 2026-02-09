@@ -4,7 +4,7 @@
  * Supports presets, loop mode, and customizable styling
  */
 
-import React, { useState, useEffect, useMemo, type CSSProperties } from 'react'
+import { useState, useEffect, useMemo, type CSSProperties } from 'react'
 import { ThumbsUp, Bell, Share2, Heart, Star, UserPlus, Youtube } from 'lucide-react'
 import { useOverlayParams } from '../../hooks/useOverlayParams'
 import { useTheme, useGradient, useFontFamily, useLoadGoogleFont } from '../../hooks/useBrand'

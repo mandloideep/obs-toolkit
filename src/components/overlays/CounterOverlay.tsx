@@ -4,7 +4,7 @@
  * Supports various number formats, layouts, and live data updates
  */
 
-import React, { useState, useEffect, useMemo, type CSSProperties } from 'react'
+import { useState, useEffect, useMemo, type CSSProperties } from 'react'
 import {
   Heart,
   Star,

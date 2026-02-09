@@ -4,7 +4,7 @@
  * Supports standard display, loop mode, and one-by-one cycling
  */
 
-import React, { useState, useEffect, useMemo, type CSSProperties } from 'react'
+import { useState, useEffect, useMemo, type CSSProperties } from 'react'
 import { useOverlayParams } from '../../hooks/useOverlayParams'
 import { useTheme, useGradient, useBrand, useFontFamily, useLoadGoogleFont } from '../../hooks/useBrand'
 import { OverlayPanel } from './OverlayPanel'
