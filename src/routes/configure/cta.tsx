@@ -88,6 +88,11 @@ function CTAConfigurator() {
   }
 
   const previewUrl = useMemo(() => {
+    // Guard against undefined params during initialization
+    if (!params) {
+      return `${window.location.origin}/overlays/cta`
+    }
+
     const searchParams = new URLSearchParams(
       Object.entries(params).reduce((acc, [key, value]) => {
         if (value !== CTA_DEFAULTS[key as keyof CTAOverlayParams]) {

@@ -185,6 +185,11 @@ function SocialsConfigurator() {
   }
 
   const previewUrl = useMemo(() => {
+    // Guard against undefined params during initialization
+    if (!params) {
+      return `${window.location.origin}/overlays/socials`
+    }
+
     const searchParams = new URLSearchParams(
       Object.entries(params).reduce((acc, [key, value]) => {
         if (value !== SOCIALS_DEFAULTS[key as keyof SocialsOverlayParams]) {

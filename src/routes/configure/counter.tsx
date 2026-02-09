@@ -145,6 +145,11 @@ function CounterConfigurator() {
 
   // Preview URL: Includes API key for live testing
   const previewUrl = useMemo(() => {
+    // Guard against undefined params during initialization
+    if (!params) {
+      return `${window.location.origin}/overlays/counter`
+    }
+
     const searchParams = new URLSearchParams(
       Object.entries(params).reduce((acc, [key, value]) => {
         if (value !== COUNTER_DEFAULTS[key as keyof CounterOverlayParams]) {
@@ -158,6 +163,11 @@ function CounterConfigurator() {
 
   // Fullscreen URL: Excludes API key for security
   const fullscreenUrl = useMemo(() => {
+    // Guard against undefined params during initialization
+    if (!params) {
+      return `${window.location.origin}/overlays/counter`
+    }
+
     const searchParams = new URLSearchParams(
       Object.entries(params).reduce((acc, [key, value]) => {
         // Skip API key for security

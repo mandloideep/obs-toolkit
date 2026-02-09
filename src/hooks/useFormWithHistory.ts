@@ -67,6 +67,12 @@ export function useFormWithHistory<T extends Record<string, any>>({
         return
       }
 
+      // Guard against undefined values during form initialization
+      // TanStack Form's subscription can fire before values are hydrated
+      if (formState.values === undefined || formState.values === null) {
+        return
+      }
+
       // Always update history with form values
       // Validation errors are shown in the UI, but values still flow through
       // This ensures preview updates immediately even before blur validation

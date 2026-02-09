@@ -90,6 +90,11 @@ function BorderConfigurator() {
 
   // Generate preview URL
   const previewUrl = useMemo(() => {
+    // Guard against undefined params during initialization
+    if (!params) {
+      return `${window.location.origin}/overlays/border`
+    }
+
     const searchParams = new URLSearchParams(
       Object.entries(params).reduce((acc, [key, value]) => {
         if (value !== BORDER_DEFAULTS[key as keyof BorderOverlayParams]) {
@@ -122,8 +127,11 @@ function BorderConfigurator() {
           {(field) => (
             <FormSelectInput
               label="Shape"
-              value={field.state.value}
-              onChange={(val) => field.handleChange(val as any)}
+              value={params.shape}
+              onChange={(val) => {
+                field.handleChange(val as any)
+                updateState({ ...params, shape: val as any })
+              }}
               options={[
                 { value: 'rect', label: 'Rectangle' },
                 { value: 'circle', label: 'Circle' },
@@ -137,8 +145,11 @@ function BorderConfigurator() {
           {(field) => (
             <FormSelectInput
               label="Style"
-              value={field.state.value}
-              onChange={(val) => field.handleChange(val as any)}
+              value={params.style}
+              onChange={(val) => {
+                field.handleChange(val as any)
+                updateState({ ...params, style: val as any })
+              }}
               options={[
                 { value: 'solid', label: 'Solid' },
                 { value: 'dashed', label: 'Dashed' },
@@ -156,8 +167,11 @@ function BorderConfigurator() {
           <form.Field name="animation">
             {(field) => (
               <AnimationSelect
-                value={field.state.value}
-                onValueChange={(value) => field.handleChange(value as any)}
+                value={params.animation}
+                onValueChange={(value) => {
+                  field.handleChange(value as any)
+                  updateState({ ...params, animation: value as any })
+                }}
                 onBlur={field.handleBlur}
                 options={[
                   { value: 'none', label: 'None' },
@@ -175,8 +189,11 @@ function BorderConfigurator() {
           {(field) => (
             <FormNumberSlider
               label="Thickness"
-              value={field.state.value}
-              onChange={(val) => field.handleChange(val)}
+              value={params.thickness}
+              onChange={(val) => {
+                field.handleChange(val)
+                updateState({ ...params, thickness: val })
+              }}
               onBlur={field.handleBlur}
               min={1}
               max={50}
@@ -191,8 +208,11 @@ function BorderConfigurator() {
           {(field) => (
             <FormNumberSlider
               label="Animation Speed"
-              value={field.state.value}
-              onChange={(val) => field.handleChange(val)}
+              value={params.speed}
+              onChange={(val) => {
+                field.handleChange(val)
+                updateState({ ...params, speed: val })
+              }}
               onBlur={field.handleBlur}
               min={0.1}
               max={10}
@@ -209,8 +229,11 @@ function BorderConfigurator() {
             {(field) => (
               <FormNumberSlider
                 label="Corner Radius"
-                value={field.state.value}
-                onChange={(val) => field.handleChange(val)}
+                value={params.r}
+                onChange={(val) => {
+                  field.handleChange(val)
+                  updateState({ ...params, r: val })
+                }}
                 onBlur={field.handleBlur}
                 min={0}
                 max={50}
@@ -227,8 +250,11 @@ function BorderConfigurator() {
             {(field) => (
               <FormNumberSlider
                 label="Dash Ratio"
-                value={field.state.value}
-                onChange={(val) => field.handleChange(val)}
+                value={params.dash}
+                onChange={(val) => {
+                  field.handleChange(val)
+                  updateState({ ...params, dash: val })
+                }}
                 onBlur={field.handleBlur}
                 min={0}
                 max={1}
@@ -253,8 +279,11 @@ function BorderConfigurator() {
           <form.Field name="gradient">
             {(field) => (
               <GradientGrid
-                value={field.state.value}
-                onValueChange={(value) => field.handleChange(value as any)}
+                value={params.gradient}
+                onValueChange={(value) => {
+                  field.handleChange(value as any)
+                  updateState({ ...params, gradient: value })
+                }}
                 onBlur={field.handleBlur}
               />
             )}
@@ -265,8 +294,11 @@ function BorderConfigurator() {
           {(field) => (
             <FormSwitch
               label="Multi-color Mode"
-              checked={field.state.value}
-              onCheckedChange={(checked) => field.handleChange(checked)}
+              checked={params.multicolor}
+              onCheckedChange={(checked) => {
+                field.handleChange(checked)
+                updateState({ ...params, multicolor: checked })
+              }}
               help="Cycle through all gradients"
               error={field.state.meta.errors?.[0]}
             />
@@ -277,8 +309,11 @@ function BorderConfigurator() {
           {(field) => (
             <FormSwitch
               label="Color Shift"
-              checked={field.state.value}
-              onCheckedChange={(checked) => field.handleChange(checked)}
+              checked={params.colorshift}
+              onCheckedChange={(checked) => {
+                field.handleChange(checked)
+                updateState({ ...params, colorshift: checked })
+              }}
               help="Smooth color transitions"
               error={field.state.meta.errors?.[0]}
             />
@@ -290,8 +325,11 @@ function BorderConfigurator() {
             {(field) => (
               <FormNumberSlider
                 label="Shift Speed"
-                value={field.state.value}
-                onChange={(val) => field.handleChange(val)}
+                value={params.shiftspeed}
+                onChange={(val) => {
+                  field.handleChange(val)
+                  updateState({ ...params, shiftspeed: val })
+                }}
                 onBlur={field.handleBlur}
                 min={1}
                 max={30}
@@ -307,8 +345,11 @@ function BorderConfigurator() {
           {(field) => (
             <FormColorArray
               label="Custom Colors"
-              colors={field.state.value}
-              onChange={(colors) => field.handleChange(colors)}
+              colors={params.colors}
+              onChange={(colors) => {
+                field.handleChange(colors)
+                updateState({ ...params, colors })
+              }}
               maxColors={5}
               error={field.state.meta.errors?.[0]}
             />
@@ -319,8 +360,11 @@ function BorderConfigurator() {
           {(field) => (
             <FormSwitch
               label="Random Gradient"
-              checked={field.state.value}
-              onCheckedChange={(checked) => field.handleChange(checked)}
+              checked={params.random}
+              onCheckedChange={(checked) => {
+                field.handleChange(checked)
+                updateState({ ...params, random: checked })
+              }}
               help="Randomize gradient on load"
               error={field.state.meta.errors?.[0]}
             />
@@ -334,8 +378,11 @@ function BorderConfigurator() {
           {(field) => (
             <FormSwitch
               label="Glow Effect"
-              checked={field.state.value}
-              onCheckedChange={(checked) => field.handleChange(checked)}
+              checked={params.glow}
+              onCheckedChange={(checked) => {
+                field.handleChange(checked)
+                updateState({ ...params, glow: checked })
+              }}
               error={field.state.meta.errors?.[0]}
             />
           )}
@@ -346,8 +393,11 @@ function BorderConfigurator() {
             {(field) => (
               <FormNumberSlider
                 label="Glow Size"
-                value={field.state.value}
-                onChange={(val) => field.handleChange(val)}
+                value={params.glowsize}
+                onChange={(val) => {
+                  field.handleChange(val)
+                  updateState({ ...params, glowsize: val })
+                }}
                 onBlur={field.handleBlur}
                 min={0}
                 max={20}
@@ -363,8 +413,11 @@ function BorderConfigurator() {
           {(field) => (
             <FormNumberSlider
               label="Opacity"
-              value={field.state.value * 100}
-              onChange={(val) => field.handleChange(val / 100)}
+              value={params.opacity * 100}
+              onChange={(val) => {
+                field.handleChange(val / 100)
+                updateState({ ...params, opacity: val / 100 })
+              }}
               onBlur={field.handleBlur}
               min={0}
               max={100}
