@@ -94,7 +94,7 @@ export function TextOverlay() {
 
   // Determine if component should be visible
   const isVisible = params.loop
-    ? loopState === 'entering' || loopState === 'visible'
+    ? loopState === 'entering' || loopState === 'visible' || loopState === 'exiting'
     : true
 
   // Determine if exit animation should trigger

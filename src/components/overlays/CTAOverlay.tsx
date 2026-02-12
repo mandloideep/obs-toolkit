@@ -188,7 +188,7 @@ export function CTAOverlay() {
   }, [loopState, params.loop, params.delay, params.entrancespeed, params.hold, params.exitspeed, params.pause])
 
   // Determine if component should be visible
-  const isVisible = params.loop ? loopState === 'entering' || loopState === 'visible' : true
+  const isVisible = params.loop ? loopState === 'entering' || loopState === 'visible' || loopState === 'exiting' : true
 
   // Determine if exit animation should trigger
   const triggerExit = params.loop ? loopState === 'exiting' : shouldExit && params.exit !== 'none'
