@@ -4,72 +4,11 @@
  */
 
 import { createFileRoute, Link } from '@tanstack/react-router'
-import {
-  Square,
-  Type,
-  Hash,
-  Megaphone,
-  Users,
-  ArrowRight,
-  Sparkles,
-  Palette,
-  Zap,
-} from 'lucide-react'
+import { ArrowRight, Sparkles, Palette, Zap } from 'lucide-react'
 import { Button } from '../components/ui/button'
+import { OVERLAYS } from '../lib/constants'
 
 export const Route = createFileRoute('/')({ component: Dashboard })
-
-interface OverlayCard {
-  name: string
-  description: string
-  icon: React.FC<any>
-  configPath: string
-  color: string
-  features: string[]
-}
-
-const overlays: OverlayCard[] = [
-  {
-    name: 'Border',
-    description: 'Animated borders with shapes, styles, and effects',
-    icon: Square,
-    configPath: '/configure/border',
-    color: '#6366f1',
-    features: ['27 Parameters', '5 Animations', 'Color Shift', 'Glow Effects'],
-  },
-  {
-    name: 'Text',
-    description: 'Name plates, lower thirds, and stream screens',
-    icon: Type,
-    configPath: '/configure/text',
-    color: '#8b5cf6',
-    features: ['52 Parameters', '25 Animations', '8 Line Styles', 'Custom Fonts'],
-  },
-  {
-    name: 'Counter',
-    description: 'Live counters with API polling and animations',
-    icon: Hash,
-    configPath: '/configure/counter',
-    color: '#ec4899',
-    features: ['35 Parameters', 'API Integration', 'Trend Arrows', '3 Notations'],
-  },
-  {
-    name: 'CTA',
-    description: 'Call-to-action overlays with animated icons',
-    icon: Megaphone,
-    configPath: '/configure/cta',
-    color: '#f59e0b',
-    features: ['30 Parameters', '7 Icon Anims', '4 Positions', 'Decorations'],
-  },
-  {
-    name: 'Socials',
-    description: 'Social media links with flexible display modes',
-    icon: Users,
-    configPath: '/configure/socials',
-    color: '#10b981',
-    features: ['35 Parameters', '9 Platforms', 'One-by-One', 'Brand Colors'],
-  },
-]
 
 function Dashboard() {
   return (
@@ -102,10 +41,10 @@ function Dashboard() {
 
       {/* Overlay Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-8 max-w-7xl mx-auto">
-        {overlays.map((overlay) => (
+        {OVERLAYS.map((overlay) => (
           <Link
             key={overlay.name}
-            to={overlay.configPath}
+            to={overlay.configurePath}
             className="overlay-card group"
             style={{ borderColor: overlay.color + '33' }}
           >

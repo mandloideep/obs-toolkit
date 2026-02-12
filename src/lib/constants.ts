@@ -4,8 +4,65 @@
  * Types (brand.types.ts), schemas (schemas.ts), and UI option arrays all derive from these.
  */
 
+import { Square, Type, Hash, Megaphone, Users } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
+
 // === HELPER TYPE ===
 type Option<T extends string> = { readonly value: T; readonly label: string }
+
+// === OVERLAY NAVIGATION ===
+
+export interface OverlayMeta {
+  name: string
+  description: string
+  icon: LucideIcon
+  configurePath: string
+  color: string
+  features: string[]
+}
+
+export const OVERLAYS: OverlayMeta[] = [
+  {
+    name: 'Border',
+    description: 'Animated borders with shapes, styles, and effects',
+    icon: Square,
+    configurePath: '/configure/border',
+    color: '#6366f1',
+    features: ['27 Parameters', '5 Animations', 'Color Shift', 'Glow Effects'],
+  },
+  {
+    name: 'Text',
+    description: 'Name plates, lower thirds, and stream screens',
+    icon: Type,
+    configurePath: '/configure/text',
+    color: '#8b5cf6',
+    features: ['52 Parameters', '25 Animations', '8 Line Styles', 'Custom Fonts'],
+  },
+  {
+    name: 'Counter',
+    description: 'Live counters with API polling and animations',
+    icon: Hash,
+    configurePath: '/configure/counter',
+    color: '#ec4899',
+    features: ['35 Parameters', 'API Integration', 'Trend Arrows', '3 Notations'],
+  },
+  {
+    name: 'CTA',
+    description: 'Call-to-action overlays with animated icons',
+    icon: Megaphone,
+    configurePath: '/configure/cta',
+    color: '#f59e0b',
+    features: ['30 Parameters', '7 Icon Anims', '4 Positions', 'Decorations'],
+  },
+  {
+    name: 'Socials',
+    description: 'Social media links with flexible display modes',
+    icon: Users,
+    configurePath: '/configure/socials',
+    color: '#10b981',
+    features: ['35 Parameters', '9 Platforms', 'One-by-One', 'Brand Colors'],
+  },
+]
 
 // === ANIMATION CONSTANTS ===
 

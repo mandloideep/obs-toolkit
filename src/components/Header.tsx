@@ -1,7 +1,10 @@
-import { Link } from '@tanstack/react-router'
-import { Home, Github, ExternalLink } from 'lucide-react'
+import { Link, useLocation } from '@tanstack/react-router'
+import { Github, ExternalLink } from 'lucide-react'
+import { OVERLAYS } from '../lib/constants'
 
 export default function Header() {
+  const location = useLocation()
+
   return (
     <header className="sticky top-0 z-50 bg-dark-surface/80 backdrop-blur-md border-b border-dark-border">
       <nav className="max-w-7xl mx-auto px-6 py-4">
@@ -17,35 +20,43 @@ export default function Header() {
             OBS Toolkit
           </Link>
 
-          {/* Navigation Links */}
-          <div className="flex items-center gap-6">
-            <Link
-              to="/"
-              className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
-            >
-              <Home size={16} />
-              <span>Home</span>
-            </Link>
-
-            <a
-              href="https://github.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
-            >
-              <Github size={16} />
-              <span>GitHub</span>
-              <ExternalLink size={12} />
-            </a>
-
-            <Link
-              to="/overlays/border"
-              className="flex items-center gap-2 px-4 py-2 text-sm bg-indigo-500/10 border border-indigo-500/30 rounded-lg text-indigo-300 hover:bg-indigo-500/20 transition-all"
-            >
-              <ExternalLink size={14} />
-              <span>View Demo</span>
-            </Link>
+          {/* Overlay Navigation Links */}
+          <div className="flex items-center gap-1">
+            {OVERLAYS.map((overlay) => {
+              const isActive = location.pathname.startsWith(overlay.configurePath)
+              return (
+                <Link
+                  key={overlay.name}
+                  to={overlay.configurePath}
+                  className={`flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg transition-all ${
+                    isActive
+                      ? 'text-white'
+                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  }`}
+                  style={
+                    isActive
+                      ? { backgroundColor: overlay.color + '20', color: overlay.color }
+                      : undefined
+                  }
+                >
+                  <overlay.icon size={16} />
+                  <span>{overlay.name}</span>
+                </Link>
+              )
+            })}
           </div>
+
+          {/* External Links */}
+          <a
+            href="https://github.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
+          >
+            <Github size={16} />
+            <span>GitHub</span>
+            <ExternalLink size={12} />
+          </a>
         </div>
       </nav>
     </header>
