@@ -12,11 +12,13 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OverlaysTextRouteImport } from './routes/overlays/text'
 import { Route as OverlaysSocialsRouteImport } from './routes/overlays/socials'
+import { Route as OverlaysMeshRouteImport } from './routes/overlays/mesh'
 import { Route as OverlaysCtaRouteImport } from './routes/overlays/cta'
 import { Route as OverlaysCounterRouteImport } from './routes/overlays/counter'
 import { Route as OverlaysBorderRouteImport } from './routes/overlays/border'
 import { Route as ConfigureTextRouteImport } from './routes/configure/text'
 import { Route as ConfigureSocialsRouteImport } from './routes/configure/socials'
+import { Route as ConfigureMeshRouteImport } from './routes/configure/mesh'
 import { Route as ConfigureCtaRouteImport } from './routes/configure/cta'
 import { Route as ConfigureCounterRouteImport } from './routes/configure/counter'
 import { Route as ConfigureBorderRouteImport } from './routes/configure/border'
@@ -34,6 +36,11 @@ const OverlaysTextRoute = OverlaysTextRouteImport.update({
 const OverlaysSocialsRoute = OverlaysSocialsRouteImport.update({
   id: '/overlays/socials',
   path: '/overlays/socials',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OverlaysMeshRoute = OverlaysMeshRouteImport.update({
+  id: '/overlays/mesh',
+  path: '/overlays/mesh',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OverlaysCtaRoute = OverlaysCtaRouteImport.update({
@@ -61,6 +68,11 @@ const ConfigureSocialsRoute = ConfigureSocialsRouteImport.update({
   path: '/configure/socials',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConfigureMeshRoute = ConfigureMeshRouteImport.update({
+  id: '/configure/mesh',
+  path: '/configure/mesh',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ConfigureCtaRoute = ConfigureCtaRouteImport.update({
   id: '/configure/cta',
   path: '/configure/cta',
@@ -82,11 +94,13 @@ export interface FileRoutesByFullPath {
   '/configure/border': typeof ConfigureBorderRoute
   '/configure/counter': typeof ConfigureCounterRoute
   '/configure/cta': typeof ConfigureCtaRoute
+  '/configure/mesh': typeof ConfigureMeshRoute
   '/configure/socials': typeof ConfigureSocialsRoute
   '/configure/text': typeof ConfigureTextRoute
   '/overlays/border': typeof OverlaysBorderRoute
   '/overlays/counter': typeof OverlaysCounterRoute
   '/overlays/cta': typeof OverlaysCtaRoute
+  '/overlays/mesh': typeof OverlaysMeshRoute
   '/overlays/socials': typeof OverlaysSocialsRoute
   '/overlays/text': typeof OverlaysTextRoute
 }
@@ -95,11 +109,13 @@ export interface FileRoutesByTo {
   '/configure/border': typeof ConfigureBorderRoute
   '/configure/counter': typeof ConfigureCounterRoute
   '/configure/cta': typeof ConfigureCtaRoute
+  '/configure/mesh': typeof ConfigureMeshRoute
   '/configure/socials': typeof ConfigureSocialsRoute
   '/configure/text': typeof ConfigureTextRoute
   '/overlays/border': typeof OverlaysBorderRoute
   '/overlays/counter': typeof OverlaysCounterRoute
   '/overlays/cta': typeof OverlaysCtaRoute
+  '/overlays/mesh': typeof OverlaysMeshRoute
   '/overlays/socials': typeof OverlaysSocialsRoute
   '/overlays/text': typeof OverlaysTextRoute
 }
@@ -109,11 +125,13 @@ export interface FileRoutesById {
   '/configure/border': typeof ConfigureBorderRoute
   '/configure/counter': typeof ConfigureCounterRoute
   '/configure/cta': typeof ConfigureCtaRoute
+  '/configure/mesh': typeof ConfigureMeshRoute
   '/configure/socials': typeof ConfigureSocialsRoute
   '/configure/text': typeof ConfigureTextRoute
   '/overlays/border': typeof OverlaysBorderRoute
   '/overlays/counter': typeof OverlaysCounterRoute
   '/overlays/cta': typeof OverlaysCtaRoute
+  '/overlays/mesh': typeof OverlaysMeshRoute
   '/overlays/socials': typeof OverlaysSocialsRoute
   '/overlays/text': typeof OverlaysTextRoute
 }
@@ -124,11 +142,13 @@ export interface FileRouteTypes {
     | '/configure/border'
     | '/configure/counter'
     | '/configure/cta'
+    | '/configure/mesh'
     | '/configure/socials'
     | '/configure/text'
     | '/overlays/border'
     | '/overlays/counter'
     | '/overlays/cta'
+    | '/overlays/mesh'
     | '/overlays/socials'
     | '/overlays/text'
   fileRoutesByTo: FileRoutesByTo
@@ -137,11 +157,13 @@ export interface FileRouteTypes {
     | '/configure/border'
     | '/configure/counter'
     | '/configure/cta'
+    | '/configure/mesh'
     | '/configure/socials'
     | '/configure/text'
     | '/overlays/border'
     | '/overlays/counter'
     | '/overlays/cta'
+    | '/overlays/mesh'
     | '/overlays/socials'
     | '/overlays/text'
   id:
@@ -150,11 +172,13 @@ export interface FileRouteTypes {
     | '/configure/border'
     | '/configure/counter'
     | '/configure/cta'
+    | '/configure/mesh'
     | '/configure/socials'
     | '/configure/text'
     | '/overlays/border'
     | '/overlays/counter'
     | '/overlays/cta'
+    | '/overlays/mesh'
     | '/overlays/socials'
     | '/overlays/text'
   fileRoutesById: FileRoutesById
@@ -164,11 +188,13 @@ export interface RootRouteChildren {
   ConfigureBorderRoute: typeof ConfigureBorderRoute
   ConfigureCounterRoute: typeof ConfigureCounterRoute
   ConfigureCtaRoute: typeof ConfigureCtaRoute
+  ConfigureMeshRoute: typeof ConfigureMeshRoute
   ConfigureSocialsRoute: typeof ConfigureSocialsRoute
   ConfigureTextRoute: typeof ConfigureTextRoute
   OverlaysBorderRoute: typeof OverlaysBorderRoute
   OverlaysCounterRoute: typeof OverlaysCounterRoute
   OverlaysCtaRoute: typeof OverlaysCtaRoute
+  OverlaysMeshRoute: typeof OverlaysMeshRoute
   OverlaysSocialsRoute: typeof OverlaysSocialsRoute
   OverlaysTextRoute: typeof OverlaysTextRoute
 }
@@ -194,6 +220,13 @@ declare module '@tanstack/react-router' {
       path: '/overlays/socials'
       fullPath: '/overlays/socials'
       preLoaderRoute: typeof OverlaysSocialsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/overlays/mesh': {
+      id: '/overlays/mesh'
+      path: '/overlays/mesh'
+      fullPath: '/overlays/mesh'
+      preLoaderRoute: typeof OverlaysMeshRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/overlays/cta': {
@@ -231,6 +264,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConfigureSocialsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/configure/mesh': {
+      id: '/configure/mesh'
+      path: '/configure/mesh'
+      fullPath: '/configure/mesh'
+      preLoaderRoute: typeof ConfigureMeshRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/configure/cta': {
       id: '/configure/cta'
       path: '/configure/cta'
@@ -260,11 +300,13 @@ const rootRouteChildren: RootRouteChildren = {
   ConfigureBorderRoute: ConfigureBorderRoute,
   ConfigureCounterRoute: ConfigureCounterRoute,
   ConfigureCtaRoute: ConfigureCtaRoute,
+  ConfigureMeshRoute: ConfigureMeshRoute,
   ConfigureSocialsRoute: ConfigureSocialsRoute,
   ConfigureTextRoute: ConfigureTextRoute,
   OverlaysBorderRoute: OverlaysBorderRoute,
   OverlaysCounterRoute: OverlaysCounterRoute,
   OverlaysCtaRoute: OverlaysCtaRoute,
+  OverlaysMeshRoute: OverlaysMeshRoute,
   OverlaysSocialsRoute: OverlaysSocialsRoute,
   OverlaysTextRoute: OverlaysTextRoute,
 }

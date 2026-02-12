@@ -4,7 +4,7 @@
  * Types (brand.types.ts), schemas (schemas.ts), and UI option arrays all derive from these.
  */
 
-import { Square, Type, Hash, Megaphone, Users } from 'lucide-react'
+import { Square, Type, Hash, Megaphone, Users, Layers } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
 // === HELPER TYPE ===
@@ -61,6 +61,14 @@ export const OVERLAYS: OverlayMeta[] = [
     configurePath: '/configure/socials',
     color: '#10b981',
     features: ['35 Parameters', '9 Platforms', 'One-by-One', 'Brand Colors'],
+  },
+  {
+    name: 'Mesh',
+    description: 'Animated mesh gradient backgrounds with color palettes',
+    icon: Layers,
+    configurePath: '/configure/mesh',
+    color: '#a855f7',
+    features: ['10 Parameters', '5 Animations', '12 Palettes', 'Seeded RNG'],
   },
 ]
 
@@ -377,4 +385,54 @@ export const PLATFORM_ORDERS = ['default', 'priority'] as const
 export const PLATFORM_ORDER_OPTIONS: Option<typeof PLATFORM_ORDERS[number]>[] = [
   { value: 'default', label: 'Default Order' },
   { value: 'priority', label: 'Priority Order' },
+]
+
+// === MESH BACKGROUND CONSTANTS ===
+
+export const MESH_ANIMATIONS = ['drift', 'orbit', 'breathe', 'wave', 'none'] as const
+
+export const MESH_ANIMATION_OPTIONS: Option<typeof MESH_ANIMATIONS[number]>[] = [
+  { value: 'drift', label: 'Drift' },
+  { value: 'orbit', label: 'Orbit' },
+  { value: 'breathe', label: 'Breathe' },
+  { value: 'wave', label: 'Wave' },
+  { value: 'none', label: 'None (Static)' },
+]
+
+export const MESH_PALETTES = [
+  'pastel', 'vibrant', 'earth', 'ocean', 'neon',
+  'warm', 'cool', 'monochrome', 'sunset', 'forest',
+  'candy', 'aurora',
+] as const
+
+export const MESH_PALETTE_OPTIONS: Option<typeof MESH_PALETTES[number]>[] = [
+  { value: 'pastel', label: 'Pastel' },
+  { value: 'vibrant', label: 'Vibrant' },
+  { value: 'earth', label: 'Earth Tones' },
+  { value: 'ocean', label: 'Ocean' },
+  { value: 'neon', label: 'Neon' },
+  { value: 'warm', label: 'Warm' },
+  { value: 'cool', label: 'Cool' },
+  { value: 'monochrome', label: 'Monochrome' },
+  { value: 'sunset', label: 'Sunset' },
+  { value: 'forest', label: 'Forest' },
+  { value: 'candy', label: 'Candy' },
+  { value: 'aurora', label: 'Aurora' },
+]
+
+export const MESH_POINTS = [2, 3, 4] as const
+
+export const MESH_POINT_OPTIONS: Option<string>[] = [
+  { value: '2', label: '2 Blobs' },
+  { value: '3', label: '3 Blobs' },
+  { value: '4', label: '4 Blobs' },
+]
+
+export const MESH_BLEND_MODES = ['normal', 'screen', 'multiply', 'overlay'] as const
+
+export const MESH_BLEND_MODE_OPTIONS: Option<typeof MESH_BLEND_MODES[number]>[] = [
+  { value: 'normal', label: 'Normal' },
+  { value: 'screen', label: 'Screen (Lighter)' },
+  { value: 'multiply', label: 'Multiply (Darker)' },
+  { value: 'overlay', label: 'Overlay (Contrast)' },
 ]

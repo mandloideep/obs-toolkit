@@ -19,7 +19,7 @@ function Dashboard() {
           OBS Overlay Toolkit
         </h1>
         <p className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
-          Professional stream overlays with React, TypeScript, and 179 customizable parameters.
+          Professional stream overlays with React, TypeScript, and 189 customizable parameters.
           Configure visually with live preview or copy URLs directly to OBS.
         </p>
 

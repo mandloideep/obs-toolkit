@@ -10,6 +10,7 @@ import type { TextOverlayParams } from '@/types/text.types'
 import type { CounterOverlayParams } from '@/types/counter.types'
 import type { CTAOverlayParams } from '@/types/cta.types'
 import type { SocialsOverlayParams } from '@/types/socials.types'
+import type { MeshOverlayParams } from '@/types/mesh.types'
 import {
   hexColorValidator,
   cssValueValidator,
@@ -44,6 +45,9 @@ import {
   TEXT_PRESETS,
   CTA_PRESETS,
   PLATFORM_ORDERS,
+  MESH_ANIMATIONS,
+  MESH_PALETTES,
+  MESH_BLEND_MODES,
 } from '../constants'
 
 // ===== BORDER OVERLAY SCHEMA =====
@@ -349,6 +353,21 @@ export const socialsOverlaySchema = z.object({
   colors: colorArrayValidator(5),
 }) satisfies z.ZodType<SocialsOverlayParams>
 
+// ===== MESH OVERLAY SCHEMA =====
+
+export const meshOverlaySchema = z.object({
+  seed: rangeValidator(1, 999999),
+  points: z.union([z.literal(2), z.literal(3), z.literal(4)]),
+  palette: z.enum(MESH_PALETTES),
+  animation: z.enum(MESH_ANIMATIONS),
+  speed: rangeValidator(0.1, 3),
+  blur: rangeValidator(20, 200, 'px'),
+  scale: rangeValidator(0.5, 2),
+  opacity: opacityValidator,
+  blend: z.enum(MESH_BLEND_MODES),
+  bg: hexColorValidator,
+}) satisfies z.ZodType<MeshOverlayParams>
+
 // ===== SCHEMA EXPORT MAP =====
 
 export const overlaySchemas = {
@@ -357,6 +376,7 @@ export const overlaySchemas = {
   counter: counterOverlaySchema,
   cta: ctaOverlaySchema,
   socials: socialsOverlaySchema,
+  mesh: meshOverlaySchema,
 } as const
 
 export type OverlayType = keyof typeof overlaySchemas

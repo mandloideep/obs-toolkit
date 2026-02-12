@@ -34,6 +34,9 @@ import {
   PLATFORM_ORDERS,
   STANDARD_FONT_NAMES,
   LOOP_STATES,
+  MESH_ANIMATIONS,
+  MESH_PALETTES,
+  MESH_BLEND_MODES,
 } from '../lib/constants'
 
 // ===== CORE BRAND TYPES =====
@@ -173,6 +176,14 @@ export type TextPresetName = typeof TEXT_PRESETS[number]
 export type CTAPresetName = typeof CTA_PRESETS[number]
 
 export type PlatformOrder = typeof PLATFORM_ORDERS[number]
+
+// ===== MESH BACKGROUND TYPES =====
+
+export type MeshAnimation = typeof MESH_ANIMATIONS[number]
+
+export type MeshPalette = typeof MESH_PALETTES[number]
+
+export type MeshBlendMode = typeof MESH_BLEND_MODES[number]
 
 // ===== UTILITY TYPES =====
 
