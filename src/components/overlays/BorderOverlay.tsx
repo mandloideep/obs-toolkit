@@ -23,7 +23,8 @@ export function BorderOverlay() {
   const baseGradient = useGradient(
     params.gradient,
     params.colors.length > 0 ? params.colors : undefined,
-    params.random
+    params.random,
+    params.colormode
   )
 
   // State for dynamic gradient colors (for multicolor/colorshift)

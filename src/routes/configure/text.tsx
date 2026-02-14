@@ -13,10 +13,12 @@ import { CollapsibleSection } from '../../components/configure/form/CollapsibleS
 import { FormNumberSlider } from '../../components/configure/form/FormNumberSlider'
 import { FormColorArray } from '../../components/configure/form/FormColorArray'
 import { FormTextInput } from '../../components/configure/form/FormTextInput'
+import { FormColorPicker } from '../../components/configure/form/FormColorPicker'
 import { FormSelectInput } from '../../components/configure/form/FormSelectInput'
 import { FormSwitch } from '../../components/configure/form/FormSwitch'
 import { FontSelect } from '../../components/configure/form/FontSelect'
 import { AnimationSelect } from '../../components/configure/form/AnimationSelect'
+import { AnimationTimeline } from '../../components/configure/form/AnimationTimeline'
 import { GradientGrid } from '../../components/configure/form/GradientGrid'
 import { PresetManager } from '../../components/configure/PresetManager'
 import {
@@ -28,6 +30,9 @@ import {
   VERTICAL_ALIGN_OPTIONS,
   ENTRANCE_ANIMATION_OPTIONS,
   EXIT_ANIMATION_OPTIONS,
+  BG_SHADOW_OPTIONS,
+  COLOR_MODE_OPTIONS,
+  BG_PANEL_DEFAULTS,
 } from '../../lib/constants'
 import { TEXT_DEFAULTS } from '../../types/text.types'
 import type { TextOverlayParams } from '../../types/text.types'
@@ -264,7 +269,7 @@ function TextConfigurator() {
           <div className="grid grid-cols-2 gap-4">
             <form.Field name="textcolor">
               {(field) => (
-                <FormTextInput
+                <FormColorPicker
                   label="Text Color"
                   value={params.textcolor}
                   onChange={(val) => {
@@ -273,6 +278,7 @@ function TextConfigurator() {
                   }}
                   onBlur={field.handleBlur}
                   placeholder="Leave empty for gradient"
+                  help="Text color or leave empty for gradient"
                   error={field.state.meta.errors?.[0]}
                 />
               )}
@@ -280,7 +286,7 @@ function TextConfigurator() {
 
             <form.Field name="subcolor">
               {(field) => (
-                <FormTextInput
+                <FormColorPicker
                   label="Subtitle Color"
                   value={params.subcolor}
                   onChange={(val) => {
@@ -289,6 +295,7 @@ function TextConfigurator() {
                   }}
                   onBlur={field.handleBlur}
                   placeholder="Leave empty for gradient"
+                  help="Subtitle color or leave empty for gradient"
                   error={field.state.meta.errors?.[0]}
                 />
               )}
@@ -483,6 +490,103 @@ function TextConfigurator() {
               )}
             </form.Field>
         </CollapsibleSection>
+
+        {/* Background Panel */}
+        {params.bg && (
+          <CollapsibleSection title="Background Panel" defaultOpen={false} storageKey="text-bgpanel">
+            <form.Field name="bgcolor">
+              {(field) => (
+                <FormColorPicker
+                  label="Background Color"
+                  value={params.bgcolor}
+                  onChange={(val) => {
+                    field.handleChange(val)
+                    updateState({ ...params, bgcolor: val })
+                  }}
+                  onBlur={field.handleBlur}
+                  placeholder="Leave empty for theme color"
+                  help="Custom background color (empty = theme default)"
+                  error={field.state.meta.errors?.[0]}
+                />
+              )}
+            </form.Field>
+
+            <form.Field name="bgopacity">
+              {(field) => (
+                <FormNumberSlider
+                  label="Background Opacity"
+                  value={Math.round(params.bgopacity * 100)}
+                  onChange={(val) => {
+                    const opacity = val / 100
+                    field.handleChange(opacity)
+                    updateState({ ...params, bgopacity: opacity })
+                  }}
+                  onBlur={field.handleBlur}
+                  min={0}
+                  max={100}
+                  unit="%"
+                  help="Panel background transparency"
+                  error={field.state.meta.errors?.[0]}
+                />
+              )}
+            </form.Field>
+
+            <form.Field name="bgshadow">
+              {(field) => (
+                <FormSelectInput
+                  label="Shadow"
+                  value={params.bgshadow}
+                  onChange={(val) => {
+                    field.handleChange(val as any)
+                    updateState({ ...params, bgshadow: val as any })
+                  }}
+                  options={BG_SHADOW_OPTIONS}
+                  error={field.state.meta.errors?.[0]}
+                />
+              )}
+            </form.Field>
+
+            <div className="grid grid-cols-2 gap-4">
+              <form.Field name="bgblur">
+                {(field) => (
+                  <FormNumberSlider
+                    label="Backdrop Blur"
+                    value={params.bgblur}
+                    onChange={(val) => {
+                      field.handleChange(val)
+                      updateState({ ...params, bgblur: val })
+                    }}
+                    onBlur={field.handleBlur}
+                    min={0}
+                    max={50}
+                    unit="px"
+                    help="Glassmorphism blur"
+                    error={field.state.meta.errors?.[0]}
+                  />
+                )}
+              </form.Field>
+
+              <form.Field name="bgradius">
+                {(field) => (
+                  <FormNumberSlider
+                    label="Border Radius"
+                    value={params.bgradius}
+                    onChange={(val) => {
+                      field.handleChange(val)
+                      updateState({ ...params, bgradius: val })
+                    }}
+                    onBlur={field.handleBlur}
+                    min={0}
+                    max={50}
+                    unit="px"
+                    help="Corner rounding"
+                    error={field.state.meta.errors?.[0]}
+                  />
+                )}
+              </form.Field>
+            </div>
+          </CollapsibleSection>
+        )}
 
         {/* Section 6: Signature Line */}
         <CollapsibleSection title="Signature Line" defaultOpen={true} storageKey="text-line">
@@ -789,6 +893,19 @@ function TextConfigurator() {
             )}
         </CollapsibleSection>
 
+        {/* Animation Timeline */}
+        <AnimationTimeline
+          delay={params.delay}
+          entrancespeed={params.entrancespeed}
+          hold={params.hold}
+          exitspeed={params.exitspeed}
+          pause={params.pause}
+          loop={params.loop}
+          entrance={params.entrance}
+          exit={params.exit}
+          exitafter={params.exitafter}
+        />
+
         {/* Section 9: Theme & Colors */}
         <CollapsibleSection
           title="Theme & Colors"
@@ -796,6 +913,22 @@ function TextConfigurator() {
           storageKey="text-theme"
           onReset={resetThemeColors}
         >
+            <form.Field name="colormode">
+              {(field) => (
+                <FormSelectInput
+                  label="Color Mode"
+                  value={params.colormode}
+                  onChange={(val) => {
+                    field.handleChange(val as any)
+                    updateState({ ...params, colormode: val as any })
+                  }}
+                  options={COLOR_MODE_OPTIONS}
+                  help="Adjust gradient lightness to match your background"
+                  error={field.state.meta.errors?.[0]}
+                />
+              )}
+            </form.Field>
+
             <div>
               <label className="config-label">Gradient Preset</label>
               <form.Field name="gradient">

@@ -38,6 +38,8 @@ import {
   MESH_PALETTES,
   MESH_BLEND_MODES,
   MESH_MODES,
+  BG_SHADOWS,
+  COLOR_MODES,
 } from '../lib/constants'
 
 // ===== CORE BRAND TYPES =====
@@ -187,6 +189,14 @@ export type MeshPalette = typeof MESH_PALETTES[number]
 export type MeshBlendMode = typeof MESH_BLEND_MODES[number]
 
 export type MeshMode = typeof MESH_MODES[number]
+
+// ===== BACKGROUND PANEL TYPES =====
+
+export type BgShadow = typeof BG_SHADOWS[number]
+
+// ===== COLOR MODE TYPES =====
+
+export type ColorMode = typeof COLOR_MODES[number]
 
 // ===== UTILITY TYPES =====
 

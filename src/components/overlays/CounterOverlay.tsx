@@ -28,6 +28,7 @@ import { COUNTER_DEFAULTS, API_SERVICE_CONFIGS } from '../../types/counter.types
 import type { CounterOverlayParams } from '../../types/counter.types'
 import type { CounterIcon, NumberNotation } from '../../types/brand.types'
 import { createLinearGradient } from '../../utils/css.utils'
+import { hexToCssColor } from '../../utils/color.utils'
 
 /**
  * Icon mapping from parameter to Lucide icon component
@@ -95,7 +96,7 @@ export function CounterOverlay() {
   const params = useOverlayParams<CounterOverlayParams>(COUNTER_DEFAULTS)
 
   const theme = useTheme(params.theme)
-  const gradient = useGradient(params.gradient, params.colors)
+  const gradient = useGradient(params.gradient, params.colors, undefined, params.colormode)
   const fontFamily = useFontFamily(params.font)
 
   // Load Google Font if needed
@@ -137,11 +138,11 @@ export function CounterOverlay() {
   const IconComponent = ICON_MAP[params.icon]
 
   // Icon color (custom or theme default)
-  const iconColor = params.iconcolor || gradient[0]
-  const numberColor = params.numbercolor || theme.text
+  const iconColor = params.iconcolor ? hexToCssColor(params.iconcolor) : gradient[0]
+  const numberColor = params.numbercolor ? hexToCssColor(params.numbercolor) : theme.text
 
   // Trend indicator color
-  const trendColor = params.trendcolor
+  const trendColor = params.trendcolor ? hexToCssColor(params.trendcolor) : '#10b981'
 
   // Layout styles
   const containerStyle: CSSProperties = {
@@ -217,7 +218,7 @@ export function CounterOverlay() {
 
   return (
     <OverlayContainer align={params.align} valign="center" showBg={false}>
-      {params.bg ? <OverlayPanel>{content}</OverlayPanel> : content}
+      {params.bg ? <OverlayPanel bgcolor={params.bgcolor} bgopacity={params.bgopacity} bgshadow={params.bgshadow} blur={params.bgblur} borderRadius={params.bgradius}>{content}</OverlayPanel> : content}
     </OverlayContainer>
   )
 }

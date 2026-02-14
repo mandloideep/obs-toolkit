@@ -9,6 +9,7 @@ import type {
   BorderAnimation,
   GradientName,
   ThemeName,
+  ColorMode,
 } from './brand.types'
 
 /**
@@ -46,6 +47,7 @@ export interface BorderOverlayParams {
 
   // Global
   theme: ThemeName
+  colormode: ColorMode
 }
 
 /**
@@ -69,4 +71,5 @@ export const BORDER_DEFAULTS: BorderOverlayParams = {
   colorshift: false,
   shiftspeed: 10,
   theme: 'dark',
+  colormode: 'normal',
 }

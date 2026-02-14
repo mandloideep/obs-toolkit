@@ -16,7 +16,10 @@ import type {
   GradientName,
   IconPosition,
   DecorationStyle,
+  BgShadow,
+  ColorMode,
 } from './brand.types'
+import { BG_PANEL_DEFAULTS } from '../lib/constants'
 
 /**
  * CTA Overlay Parameters
@@ -55,6 +58,13 @@ export interface CTAOverlayParams {
   valign: VerticalAlign
   bg: boolean
 
+  // Background Panel
+  bgcolor: string
+  bgopacity: number
+  bgshadow: BgShadow
+  bgblur: number
+  bgradius: number
+
   // Animation
   entrance: EntranceAnimation
   exit: ExitAnimation
@@ -71,6 +81,7 @@ export interface CTAOverlayParams {
   theme: ThemeName
   gradient: GradientName
   colors: string[]
+  colormode: ColorMode
 }
 
 /**
@@ -108,6 +119,7 @@ export const CTA_DEFAULTS: CTAOverlayParams = {
   align: 'center',
   valign: 'bottom',
   bg: true,
+  ...BG_PANEL_DEFAULTS,
   entrance: 'bounce',
   exit: 'fade',
   delay: 0.5,
@@ -119,4 +131,5 @@ export const CTA_DEFAULTS: CTAOverlayParams = {
   theme: 'dark',
   gradient: 'indigo',
   colors: [],
+  colormode: 'normal',
 }

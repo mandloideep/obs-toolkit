@@ -11,7 +11,7 @@ import { z } from 'zod'
  */
 export const hexColorValidator = z
   .string()
-  .regex(/^[0-9A-Fa-f]{6}$/, 'Invalid hex color (e.g., FF0000)')
+  .regex(/^([0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/, 'Invalid hex color (e.g., FF0000 or FF000080)')
   .or(z.literal(''))
 
 /**
@@ -58,7 +58,7 @@ export const percentageValidator = rangeValidator(0, 100, '%')
  */
 export function colorArrayValidator(maxColors: number = 5) {
   return z
-    .array(z.string().regex(/^[0-9A-Fa-f]{6}$/, 'Invalid hex color'))
+    .array(z.string().regex(/^([0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/, 'Invalid hex color'))
     .max(maxColors, `Maximum ${maxColors} colors allowed`)
 }
 

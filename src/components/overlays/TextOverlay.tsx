@@ -17,6 +17,7 @@ import { TEXT_DEFAULTS } from '../../types/text.types'
 import type { TextOverlayParams } from '../../types/text.types'
 import type { LoopState } from '../../types/brand.types'
 import { createLinearGradient } from '../../utils/css.utils'
+import { hexToCssColor } from '../../utils/color.utils'
 
 export function TextOverlay() {
   // Parse URL parameters
@@ -36,7 +37,7 @@ export function TextOverlay() {
   }, [urlParams])
 
   const theme = useTheme(params.theme)
-  const gradient = useGradient(params.gradient, params.colors)
+  const gradient = useGradient(params.gradient, params.colors, undefined, params.colormode)
   const fontFamily = useFontFamily(params.font)
 
   // Load Google Font if needed
@@ -107,8 +108,8 @@ export function TextOverlay() {
   const paddingY = params.pady > 0 ? params.pady : params.pad
 
   // Text color (use custom or theme default)
-  const textColor = params.textcolor || theme.text
-  const subColor = params.subcolor || theme.textMuted
+  const textColor = params.textcolor ? hexToCssColor(params.textcolor) : theme.text
+  const subColor = params.subcolor ? hexToCssColor(params.subcolor) : theme.textMuted
 
   // Get text style (gradient or solid)
   const getTextStyle = (): CSSProperties => {
@@ -176,7 +177,7 @@ export function TextOverlay() {
   const content = (
     <div style={contentStyle}>
       {params.bg ? (
-        <OverlayPanel>
+        <OverlayPanel bgcolor={params.bgcolor} bgopacity={params.bgopacity} bgshadow={params.bgshadow} blur={params.bgblur} borderRadius={params.bgradius}>
           {renderLine('top')}
           <h1 style={getTextStyle()}>{params.text}</h1>
           {params.sub && <p style={getSubStyle()}>{params.sub}</p>}

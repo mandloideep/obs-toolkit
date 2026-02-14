@@ -17,6 +17,7 @@ import { CTA_DEFAULTS } from '../../types/cta.types'
 import type { CTAOverlayParams } from '../../types/cta.types'
 import type { IconAnimation, LoopState } from '../../types/brand.types'
 import { createLinearGradient } from '../../utils/css.utils'
+import { hexToCssColor } from '../../utils/color.utils'
 
 /**
  * Icon mapping from parameter to Lucide icon component
@@ -134,7 +135,7 @@ export function CTAOverlay() {
   }, [urlParams])
 
   const theme = useTheme(params.theme)
-  const gradient = useGradient(params.gradient, params.colors)
+  const gradient = useGradient(params.gradient, params.colors, undefined, params.colormode)
   const fontFamily = useFontFamily(params.font)
 
   // Load Google Font if needed
@@ -197,11 +198,11 @@ export function CTAOverlay() {
   const IconComponent = CTA_ICON_MAP[params.icon] || null
 
   // Icon color (custom or gradient primary)
-  const iconColor = params.iconcolor || gradient[0]
+  const iconColor = params.iconcolor ? hexToCssColor(params.iconcolor) : gradient[0]
   const iconSize = params.iconsize || Math.round(params.size * 1.1)
 
   // Decoration color
-  const decoColor = params.decorationcolor || gradient[0]
+  const decoColor = params.decorationcolor ? hexToCssColor(params.decorationcolor) : gradient[0]
 
   // Container flex direction based on icon position
   const getFlexDirection = (): CSSProperties['flexDirection'] => {
@@ -346,7 +347,7 @@ export function CTAOverlay() {
             // Force re-mount on loop cycle to retrigger exit animation
             key={`exit-${loopCycle}`}
           >
-            {params.bg ? <OverlayPanel>{content}</OverlayPanel> : content}
+            {params.bg ? <OverlayPanel bgcolor={params.bgcolor} bgopacity={params.bgopacity} bgshadow={params.bgshadow} blur={params.bgblur} borderRadius={params.bgradius}>{content}</OverlayPanel> : content}
           </ExitAnimation>
         </EntranceAnimation>
       )}

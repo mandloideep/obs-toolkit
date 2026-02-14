@@ -49,6 +49,8 @@ import {
   MESH_PALETTES,
   MESH_BLEND_MODES,
   MESH_MODES,
+  BG_SHADOWS,
+  COLOR_MODES,
 } from '../constants'
 
 // ===== BORDER OVERLAY SCHEMA =====
@@ -84,6 +86,7 @@ export const borderOverlaySchema = z.object({
 
   // Global
   theme: z.enum(THEMES),
+  colormode: z.enum(COLOR_MODES),
 }) satisfies z.ZodType<BorderOverlayParams>
 
 // ===== TEXT OVERLAY SCHEMA =====
@@ -142,10 +145,18 @@ export const textOverlaySchema = z.object({
   hold: rangeValidator(0, 60, 's'),
   pause: rangeValidator(0, 60, 's'),
 
+  // Background Panel
+  bgcolor: hexColorValidator,
+  bgopacity: opacityValidator,
+  bgshadow: z.enum(BG_SHADOWS),
+  bgblur: rangeValidator(0, 50, 'px'),
+  bgradius: rangeValidator(0, 50, 'px'),
+
   // Global
   theme: z.enum(THEMES),
   gradient: z.enum(GRADIENT_NAMES),
   colors: colorArrayValidator(5),
+  colormode: z.enum(COLOR_MODES),
 }).refine(
   (data) => {
     // Exit speed only relevant if exit animation is not 'none'
@@ -204,9 +215,19 @@ export const counterOverlaySchema = z
 
     // Style
     bg: z.boolean(),
+
+    // Background Panel
+    bgcolor: hexColorValidator,
+    bgopacity: opacityValidator,
+    bgshadow: z.enum(BG_SHADOWS),
+    bgblur: rangeValidator(0, 50, 'px'),
+    bgradius: rangeValidator(0, 50, 'px'),
+
+    // Global
     theme: z.enum(THEMES),
     gradient: z.enum(GRADIENT_NAMES),
     colors: colorArrayValidator(5),
+    colormode: z.enum(COLOR_MODES),
   })
   .refine(
     (data) => {
@@ -276,6 +297,13 @@ export const ctaOverlaySchema = z.object({
   valign: z.enum(VERTICAL_ALIGNS),
   bg: z.boolean(),
 
+  // Background Panel
+  bgcolor: hexColorValidator,
+  bgopacity: opacityValidator,
+  bgshadow: z.enum(BG_SHADOWS),
+  bgblur: rangeValidator(0, 50, 'px'),
+  bgradius: rangeValidator(0, 50, 'px'),
+
   // Animation
   entrance: z.enum(ENTRANCE_ANIMATIONS),
   exit: z.enum(EXIT_ANIMATIONS),
@@ -292,6 +320,7 @@ export const ctaOverlaySchema = z.object({
   theme: z.enum(THEMES),
   gradient: z.enum(GRADIENT_NAMES),
   colors: colorArrayValidator(5),
+  colormode: z.enum(COLOR_MODES),
 }) satisfies z.ZodType<CTAOverlayParams>
 
 // ===== SOCIALS OVERLAY SCHEMA =====
@@ -348,10 +377,18 @@ export const socialsOverlaySchema = z.object({
   // Icon Customization
   icons: z.string(), // 'github:github,youtube:video,twitch:zap'
 
+  // Background Panel
+  bgcolor: hexColorValidator,
+  bgopacity: opacityValidator,
+  bgshadow: z.enum(BG_SHADOWS),
+  bgblur: rangeValidator(0, 50, 'px'),
+  bgradius: rangeValidator(0, 50, 'px'),
+
   // Global Theme
   theme: z.enum(THEMES),
   gradient: z.enum(GRADIENT_NAMES),
   colors: colorArrayValidator(5),
+  colormode: z.enum(COLOR_MODES),
 }) satisfies z.ZodType<SocialsOverlayParams>
 
 // ===== MESH OVERLAY SCHEMA =====

@@ -455,3 +455,43 @@ export const MESH_MODE_OPTIONS: Option<typeof MESH_MODES[number]>[] = [
   { value: 'light', label: 'Light' },
   { value: 'dark', label: 'Dark' },
 ]
+
+// === BACKGROUND PANEL CONSTANTS ===
+
+export const BG_SHADOWS = ['none', 'sm', 'md', 'lg', 'xl'] as const
+
+export const BG_SHADOW_OPTIONS: Option<typeof BG_SHADOWS[number]>[] = [
+  { value: 'none', label: 'None' },
+  { value: 'sm', label: 'Small' },
+  { value: 'md', label: 'Medium' },
+  { value: 'lg', label: 'Large' },
+  { value: 'xl', label: 'Extra Large' },
+]
+
+export const BG_SHADOW_CSS: Record<typeof BG_SHADOWS[number], string> = {
+  none: 'none',
+  sm: '0 1px 2px rgba(0,0,0,0.05)',
+  md: '0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06)',
+  lg: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05)',
+  xl: '0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04)',
+}
+
+export const BG_PANEL_DEFAULTS = {
+  bgcolor: '',
+  bgopacity: 0.9,
+  bgshadow: 'md' as const,
+  bgblur: 12,
+  bgradius: 14,
+}
+
+// === COLOR MODE CONSTANTS ===
+
+export const COLOR_MODES = ['darker', 'dark', 'normal', 'light', 'lighter'] as const
+
+export const COLOR_MODE_OPTIONS: Option<typeof COLOR_MODES[number]>[] = [
+  { value: 'darker', label: 'Darker' },
+  { value: 'dark', label: 'Dark' },
+  { value: 'normal', label: 'Normal' },
+  { value: 'light', label: 'Light' },
+  { value: 'lighter', label: 'Lighter' },
+]

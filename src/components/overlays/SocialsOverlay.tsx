@@ -27,7 +27,7 @@ export function SocialsOverlay() {
 
   const brand = useBrand()
   const theme = useTheme(params.theme)
-  const gradient = useGradient(params.gradient, params.colors)
+  const gradient = useGradient(params.gradient, params.colors, undefined, params.colormode)
   const fontFamily = useFontFamily(params.font)
 
   // Load Google Font if needed
@@ -303,7 +303,7 @@ export function SocialsOverlay() {
         pointerEvents: 'none',
       }}
     >
-      {params.bg ? <OverlayPanel>{content}</OverlayPanel> : content}
+      {params.bg ? <OverlayPanel bgcolor={params.bgcolor} bgopacity={params.bgopacity} bgshadow={params.bgshadow} blur={params.bgblur} borderRadius={params.bgradius}>{content}</OverlayPanel> : content}
     </div>
   )
 }

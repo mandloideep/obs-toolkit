@@ -12,7 +12,10 @@ import type {
   APIService,
   GradientName,
   ThemeName,
+  BgShadow,
+  ColorMode,
 } from './brand.types'
+import { BG_PANEL_DEFAULTS } from '../lib/constants'
 
 /**
  * Counter Overlay Parameters
@@ -62,9 +65,19 @@ export interface CounterOverlayParams {
 
   // Style
   bg: boolean
+
+  // Background Panel
+  bgcolor: string
+  bgopacity: number
+  bgshadow: BgShadow
+  bgblur: number
+  bgradius: number
+
+  // Global
   theme: ThemeName
   gradient: GradientName
   colors: string[]
+  colormode: ColorMode
 }
 
 /**
@@ -136,7 +149,9 @@ export const COUNTER_DEFAULTS: CounterOverlayParams = {
   iconcolor: '',
   numbercolor: '',
   bg: false,
+  ...BG_PANEL_DEFAULTS,
   theme: 'dark',
   gradient: 'indigo',
   colors: [],
+  colormode: 'normal',
 }

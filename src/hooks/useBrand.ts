@@ -13,7 +13,9 @@ import type {
   ContrastAccents,
   FontFamily,
   StandardFontName,
+  ColorMode,
 } from '../types/brand.types'
+import { applyColorModeShift } from '../utils/color.utils'
 import { STANDARD_FONT_NAMES } from '../lib/constants'
 
 /**
@@ -49,27 +51,35 @@ export function useTheme(themeName?: ThemeName): ThemeColors {
 export function useGradient(
   gradientName?: GradientName,
   customColors?: string[],
-  random?: boolean
+  random?: boolean,
+  colorMode?: ColorMode
 ): string[] {
   const { brand } = useBrandContext()
 
   return useMemo(() => {
+    let colors: string[]
+
     // Custom colors take precedence
     if (customColors && customColors.length > 0) {
-      return customColors.map((c) => (c.startsWith('#') ? c : `#${c}`))
-    }
-
-    // Random gradient selection
-    if (random) {
+      colors = customColors.map((c) => (c.startsWith('#') ? c : `#${c}`))
+    } else if (random) {
+      // Random gradient selection
       const keys = Object.keys(brand.gradients) as GradientName[]
       const randomKey = keys[Math.floor(Math.random() * keys.length)]
-      return brand.gradients[randomKey]
+      colors = brand.gradients[randomKey]
+    } else {
+      // Named gradient or default to indigo
+      const name = gradientName || 'indigo'
+      colors = brand.gradients[name] || brand.gradients.indigo
     }
 
-    // Named gradient or default to indigo
-    const name = gradientName || 'indigo'
-    return brand.gradients[name] || brand.gradients.indigo
-  }, [brand, gradientName, customColors, random])
+    // Apply color mode shift
+    if (colorMode && colorMode !== 'normal') {
+      colors = applyColorModeShift(colors, colorMode)
+    }
+
+    return colors
+  }, [brand, gradientName, customColors, random, colorMode])
 }
 
 /**

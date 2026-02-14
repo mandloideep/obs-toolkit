@@ -15,7 +15,10 @@ import type {
   GradientName,
   ThemeName,
   TextPresetName,
+  BgShadow,
+  ColorMode,
 } from './brand.types'
+import { BG_PANEL_DEFAULTS } from '../lib/constants'
 
 /**
  * Text Overlay Parameters
@@ -75,10 +78,18 @@ export interface TextOverlayParams {
   hold: number
   pause: number
 
+  // Background Panel
+  bgcolor: string
+  bgopacity: number
+  bgshadow: BgShadow
+  bgblur: number
+  bgradius: number
+
   // Global
   theme: ThemeName
   gradient: GradientName
   colors: string[]
+  colormode: ColorMode
 }
 
 /**
@@ -146,7 +157,9 @@ export const TEXT_DEFAULTS: TextOverlayParams = {
   loop: false,
   hold: 4,
   pause: 2,
+  ...BG_PANEL_DEFAULTS,
   theme: 'dark',
   gradient: 'indigo',
   colors: [],
+  colormode: 'normal',
 }

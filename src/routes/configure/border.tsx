@@ -22,6 +22,7 @@ import {
   SHAPE_OPTIONS,
   BORDER_STYLE_OPTIONS,
   BORDER_ANIMATION_OPTIONS,
+  COLOR_MODE_OPTIONS,
 } from '../../lib/constants'
 import { BORDER_DEFAULTS } from '../../types/border.types'
 import type { BorderOverlayParams } from '../../types/border.types'
@@ -265,6 +266,22 @@ function BorderConfigurator() {
         storageKey="border-colors"
         onReset={resetColorsGradient}
       >
+        <form.Field name="colormode">
+          {(field) => (
+            <FormSelectInput
+              label="Color Mode"
+              value={params.colormode}
+              onChange={(val) => {
+                field.handleChange(val as any)
+                updateState({ ...params, colormode: val as any })
+              }}
+              options={COLOR_MODE_OPTIONS}
+              help="Adjust gradient lightness to match your background"
+              error={field.state.meta.errors?.[0]}
+            />
+          )}
+        </form.Field>
+
         <div>
           <label className="config-label">Gradient Preset</label>
           <form.Field name="gradient">

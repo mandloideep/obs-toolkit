@@ -13,6 +13,7 @@ import { CollapsibleSection } from '../../components/configure/form/CollapsibleS
 import { FormNumberSlider } from '../../components/configure/form/FormNumberSlider'
 import { FormColorArray } from '../../components/configure/form/FormColorArray'
 import { FormTextInput } from '../../components/configure/form/FormTextInput'
+import { FormColorPicker } from '../../components/configure/form/FormColorPicker'
 import { FormSelectInput } from '../../components/configure/form/FormSelectInput'
 import { FormSwitch } from '../../components/configure/form/FormSwitch'
 import { IconSelect } from '../../components/configure/form/IconSelect'
@@ -26,6 +27,9 @@ import {
   NUMBER_NOTATION_OPTIONS,
   API_SERVICE_OPTIONS,
   THEME_OPTIONS,
+  BG_SHADOW_OPTIONS,
+  COLOR_MODE_OPTIONS,
+  BG_PANEL_DEFAULTS,
 } from '../../lib/constants'
 import { Switch } from '../../components/ui/switch'
 import { Label } from '../../components/ui/label'
@@ -340,7 +344,7 @@ function CounterConfigurator() {
         {params.icon !== 'none' && (
           <form.Field name="iconcolor">
             {(field) => (
-              <FormTextInput
+              <FormColorPicker
                 label="Icon Color"
                 value={params.iconcolor}
                 onChange={(val) => {
@@ -349,7 +353,7 @@ function CounterConfigurator() {
                 }}
                 onBlur={field.handleBlur}
                 placeholder="Leave empty for gradient color"
-                help="Hex color (e.g., FF0000) or leave empty for gradient color"
+                help="Leave empty for gradient color"
                 error={field.state.meta.errors?.[0]}
               />
             )}
@@ -480,6 +484,103 @@ function CounterConfigurator() {
         </form.Field>
       </CollapsibleSection>
 
+      {/* Background Panel */}
+      {params.bg && (
+        <CollapsibleSection title="Background Panel" defaultOpen={false} storageKey="counter-bgpanel">
+          <form.Field name="bgcolor">
+            {(field) => (
+              <FormColorPicker
+                label="Background Color"
+                value={params.bgcolor}
+                onChange={(val) => {
+                  field.handleChange(val)
+                  updateState({ ...params, bgcolor: val })
+                }}
+                onBlur={field.handleBlur}
+                placeholder="Leave empty for theme color"
+                help="Custom background color (empty = theme default)"
+                error={field.state.meta.errors?.[0]}
+              />
+            )}
+          </form.Field>
+
+          <form.Field name="bgopacity">
+            {(field) => (
+              <FormNumberSlider
+                label="Background Opacity"
+                value={Math.round(params.bgopacity * 100)}
+                onChange={(val) => {
+                  const opacity = val / 100
+                  field.handleChange(opacity)
+                  updateState({ ...params, bgopacity: opacity })
+                }}
+                onBlur={field.handleBlur}
+                min={0}
+                max={100}
+                unit="%"
+                help="Panel background transparency"
+                error={field.state.meta.errors?.[0]}
+              />
+            )}
+          </form.Field>
+
+          <form.Field name="bgshadow">
+            {(field) => (
+              <FormSelectInput
+                label="Shadow"
+                value={params.bgshadow}
+                onChange={(val) => {
+                  field.handleChange(val as any)
+                  updateState({ ...params, bgshadow: val as any })
+                }}
+                options={BG_SHADOW_OPTIONS}
+                error={field.state.meta.errors?.[0]}
+              />
+            )}
+          </form.Field>
+
+          <div className="grid grid-cols-2 gap-4">
+            <form.Field name="bgblur">
+              {(field) => (
+                <FormNumberSlider
+                  label="Backdrop Blur"
+                  value={params.bgblur}
+                  onChange={(val) => {
+                    field.handleChange(val)
+                    updateState({ ...params, bgblur: val })
+                  }}
+                  onBlur={field.handleBlur}
+                  min={0}
+                  max={50}
+                  unit="px"
+                  help="Glassmorphism blur"
+                  error={field.state.meta.errors?.[0]}
+                />
+              )}
+            </form.Field>
+
+            <form.Field name="bgradius">
+              {(field) => (
+                <FormNumberSlider
+                  label="Border Radius"
+                  value={params.bgradius}
+                  onChange={(val) => {
+                    field.handleChange(val)
+                    updateState({ ...params, bgradius: val })
+                  }}
+                  onBlur={field.handleBlur}
+                  min={0}
+                  max={50}
+                  unit="px"
+                  help="Corner rounding"
+                  error={field.state.meta.errors?.[0]}
+                />
+              )}
+            </form.Field>
+          </div>
+        </CollapsibleSection>
+      )}
+
       {/* Section 4: Typography */}
       <CollapsibleSection title="Typography" defaultOpen={false} storageKey="counter-typography">
         <div>
@@ -500,7 +601,7 @@ function CounterConfigurator() {
 
         <form.Field name="numbercolor">
           {(field) => (
-            <FormTextInput
+            <FormColorPicker
               label="Number Color"
               value={params.numbercolor}
               onChange={(val) => {
@@ -509,7 +610,7 @@ function CounterConfigurator() {
               }}
               onBlur={field.handleBlur}
               placeholder="Leave empty for gradient color"
-              help="Hex color (e.g., FF0000) or leave empty for gradient color"
+              help="Leave empty for gradient color"
               error={field.state.meta.errors?.[0]}
             />
           )}
@@ -639,7 +740,7 @@ function CounterConfigurator() {
         {params.trend && (
           <form.Field name="trendcolor">
             {(field) => (
-              <FormTextInput
+              <FormColorPicker
                 label="Trend Arrow Color"
                 value={params.trendcolor}
                 onChange={(val) => {
@@ -648,7 +749,7 @@ function CounterConfigurator() {
                 }}
                 onBlur={field.handleBlur}
                 placeholder="10b981"
-                help="Hex color for trend arrow (e.g., 10b981 for green)"
+                help="Color for trend arrow indicator"
                 error={field.state.meta.errors?.[0]}
               />
             )}
@@ -850,6 +951,22 @@ function CounterConfigurator() {
                 updateState({ ...params, theme: val as any })
               }}
               options={THEME_OPTIONS}
+              error={field.state.meta.errors?.[0]}
+            />
+          )}
+        </form.Field>
+
+        <form.Field name="colormode">
+          {(field) => (
+            <FormSelectInput
+              label="Color Mode"
+              value={params.colormode}
+              onChange={(val) => {
+                field.handleChange(val as any)
+                updateState({ ...params, colormode: val as any })
+              }}
+              options={COLOR_MODE_OPTIONS}
+              help="Adjust gradient lightness to match your background"
               error={field.state.meta.errors?.[0]}
             />
           )}

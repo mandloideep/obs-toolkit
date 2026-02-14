@@ -14,7 +14,10 @@ import type {
   GradientName,
   FontFamily,
   PlatformOrder,
+  BgShadow,
+  ColorMode,
 } from './brand.types'
+import { BG_PANEL_DEFAULTS } from '../lib/constants'
 
 /**
  * Socials Overlay Parameters
@@ -72,10 +75,18 @@ export interface SocialsOverlayParams {
   // Icon Customization
   icons: string // 'github:github,youtube:video,twitch:zap'
 
+  // Background Panel
+  bgcolor: string
+  bgopacity: number
+  bgshadow: BgShadow
+  bgblur: number
+  bgradius: number
+
   // Global Theme
   theme: ThemeName
   gradient: GradientName
   colors: string[]
+  colormode: ColorMode
 }
 
 /**
@@ -124,9 +135,11 @@ export const SOCIALS_DEFAULTS: SocialsOverlayParams = {
   order: 'default',
   priority: '',
   icons: '',
+  ...BG_PANEL_DEFAULTS,
   theme: 'dark',
   gradient: 'indigo',
   colors: [],
+  colormode: 'normal',
 }
 
 /**
