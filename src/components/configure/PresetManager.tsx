@@ -5,13 +5,8 @@
 
 import { useState, useRef } from 'react'
 import { Button } from '../ui/button'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../ui/select'
+import { Input } from '../ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import { Save, Upload, Download, Trash2, Edit2 } from 'lucide-react'
 
 interface PresetManagerProps<T> {
@@ -214,24 +209,14 @@ export function PresetManager<T extends Record<string, unknown>>({
 
           {/* Export */}
           {selectedPreset && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleExport}
-              className="gap-2"
-            >
+            <Button variant="outline" size="sm" onClick={handleExport} className="gap-2">
               <Download size={16} />
               Export
             </Button>
           )}
 
           {/* Import */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleImportClick}
-            className="gap-2"
-          >
+          <Button variant="outline" size="sm" onClick={handleImportClick} className="gap-2">
             <Upload size={16} />
             Import
           </Button>
@@ -250,12 +235,12 @@ export function PresetManager<T extends Record<string, unknown>>({
         {showSaveDialog && (
           <div className="bg-dark-surface border border-dark-border rounded-lg p-4 space-y-3">
             <label className="config-label">Preset Name</label>
-            <input
+            <Input
               type="text"
               value={newPresetName}
               onChange={(e) => setNewPresetName(e.target.value)}
               placeholder="Enter preset name..."
-              className="config-input w-full"
+              className="w-full"
               autoFocus
               onKeyDown={(e) => {
                 if (e.key === 'Enter') handleSave()
@@ -277,12 +262,12 @@ export function PresetManager<T extends Record<string, unknown>>({
         {showRenameDialog && (
           <div className="bg-dark-surface border border-dark-border rounded-lg p-4 space-y-3">
             <label className="config-label">New Name</label>
-            <input
+            <Input
               type="text"
               value={newPresetName}
               onChange={(e) => setNewPresetName(e.target.value)}
               placeholder="Enter new name..."
-              className="config-input w-full"
+              className="w-full"
               autoFocus
               onKeyDown={(e) => {
                 if (e.key === 'Enter') handleRename()

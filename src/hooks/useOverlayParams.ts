@@ -27,9 +27,7 @@ import type { ParamValue } from '../types/brand.types'
  * // params.colors: string[]
  * ```
  */
-export function useOverlayParams<T extends Record<string, any>>(
-  defaults: T
-): T {
+export function useOverlayParams<T extends Record<string, any>>(defaults: T): T {
   const params = useMemo(() => {
     const urlParams = new URLSearchParams(window.location.search)
     const result: Record<string, ParamValue> = {}
@@ -54,9 +52,7 @@ export function useOverlayParams<T extends Record<string, any>>(
         result[key] = urlValue !== 'false' && urlValue !== '0'
       } else if (Array.isArray(defaultValue)) {
         // Array: split by comma
-        result[key] = urlValue
-          ? urlValue.split(',').map((s) => s.trim())
-          : defaultValue
+        result[key] = urlValue ? urlValue.split(',').map((s) => s.trim()) : defaultValue
       } else {
         // String: decode URI component
         result[key] = decodeURIComponent(urlValue)
@@ -107,10 +103,7 @@ export function useNumberParam(name: string, fallback: number = 0): number {
  * @param name - Parameter name
  * @param fallback - Fallback value if param not found
  */
-export function useBooleanParam(
-  name: string,
-  fallback: boolean = false
-): boolean {
+export function useBooleanParam(name: string, fallback: boolean = false): boolean {
   return useMemo(() => {
     const params = new URLSearchParams(window.location.search)
     const value = params.get(name)
@@ -128,10 +121,7 @@ export function useBooleanParam(
  * @param name - Parameter name
  * @param fallback - Fallback value if param not found
  */
-export function useArrayParam(
-  name: string,
-  fallback: string[] = []
-): string[] {
+export function useArrayParam(name: string, fallback: string[] = []): string[] {
   return useMemo(() => {
     const params = new URLSearchParams(window.location.search)
     const value = params.get(name)

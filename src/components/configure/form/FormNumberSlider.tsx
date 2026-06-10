@@ -7,12 +7,8 @@ import { Slider } from '@/components/ui/slider'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { InfoIcon } from 'lucide-react'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { getErrorMessage } from '@/lib/validation/validators'
 
 interface FormNumberSliderProps {
   label: string
@@ -24,7 +20,7 @@ interface FormNumberSliderProps {
   step?: number
   unit?: string
   help?: string
-  error?: string
+  error?: unknown
 }
 
 /**
@@ -134,16 +130,12 @@ export function FormNumberSlider({
             step={step}
             className="w-16 h-8 text-sm"
           />
-          {unit && (
-            <span className="text-xs text-muted-foreground min-w-[20px]">{unit}</span>
-          )}
+          {unit && <span className="text-xs text-muted-foreground min-w-[20px]">{unit}</span>}
         </div>
       </div>
 
       {/* Error Message */}
-      {error && (
-        <p className="text-xs text-destructive mt-1">{error}</p>
-      )}
+      {error && <p className="text-xs text-destructive mt-1">{getErrorMessage(error)}</p>}
     </div>
   )
 }

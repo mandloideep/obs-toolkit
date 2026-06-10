@@ -14,9 +14,13 @@ import type {
   VerticalAlign,
   ThemeName,
   GradientName,
+  GradientType,
   IconPosition,
   DecorationStyle,
+  BgShadow,
+  ColorMode,
 } from './brand.types'
+import { BG_PANEL_DEFAULTS } from '../lib/constants'
 
 /**
  * CTA Overlay Parameters
@@ -41,6 +45,8 @@ export interface CTAOverlayParams {
 
   // Text Styling
   font: FontFamily
+  textcolor: string
+  subcolor: string
   textpadx: number
   textpady: number
   letterspacing: number
@@ -54,6 +60,13 @@ export interface CTAOverlayParams {
   align: HorizontalAlign
   valign: VerticalAlign
   bg: boolean
+
+  // Background Panel
+  bgcolor: string
+  bgopacity: number
+  bgshadow: BgShadow
+  bgblur: number
+  bgradius: number
 
   // Animation
   entrance: EntranceAnimation
@@ -70,7 +83,11 @@ export interface CTAOverlayParams {
   // Global Theme
   theme: ThemeName
   gradient: GradientName
+  gradienttype: GradientType
   colors: string[]
+  colormode: ColorMode
+  bggradient: boolean
+  bggradientname: string
 }
 
 /**
@@ -80,8 +97,24 @@ export interface CTAOverlayParams {
 export interface CTAPreset {
   text?: string
   sub?: string
+  size?: number
   icon?: CTAIcon
   iconanim?: IconAnimation
+  iconcolor?: string
+  font?: FontFamily
+  textcolor?: string
+  subcolor?: string
+  decoration?: DecorationStyle
+  decorationcolor?: string
+  gradient?: GradientName
+  gradienttype?: GradientType
+  entrance?: EntranceAnimation
+  exit?: ExitAnimation
+  bg?: boolean
+  bggradient?: boolean
+  bggradientname?: string
+  colormode?: ColorMode
+  theme?: ThemeName
 }
 
 /**
@@ -99,6 +132,8 @@ export const CTA_DEFAULTS: CTAOverlayParams = {
   iconsize: 0,
   customicon: '',
   font: 'display',
+  textcolor: '',
+  subcolor: '',
   textpadx: 0,
   textpady: 0,
   letterspacing: 0,
@@ -108,6 +143,7 @@ export const CTA_DEFAULTS: CTAOverlayParams = {
   align: 'center',
   valign: 'bottom',
   bg: true,
+  ...BG_PANEL_DEFAULTS,
   entrance: 'bounce',
   exit: 'fade',
   delay: 0.5,
@@ -118,5 +154,9 @@ export const CTA_DEFAULTS: CTAOverlayParams = {
   pause: 20,
   theme: 'dark',
   gradient: 'indigo',
+  gradienttype: 'linear',
   colors: [],
+  colormode: 'normal',
+  bggradient: false,
+  bggradientname: '',
 }

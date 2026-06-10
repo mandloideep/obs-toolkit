@@ -4,12 +4,7 @@
  */
 
 import { useState, useEffect } from 'react'
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '../../ui/accordion'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../../ui/accordion'
 import { Button } from '../../ui/button'
 
 interface CollapsibleSectionProps {

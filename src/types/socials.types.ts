@@ -5,6 +5,7 @@
 
 import type {
   SocialPlatform,
+  SocialsPresetName,
   SizePreset,
   IconColorMode,
   Layout,
@@ -12,15 +13,22 @@ import type {
   ExitAnimation,
   ThemeName,
   GradientName,
+  GradientType,
   FontFamily,
   PlatformOrder,
+  BgShadow,
+  ColorMode,
 } from './brand.types'
+import { BG_PANEL_DEFAULTS } from '../lib/constants'
 
 /**
  * Socials Overlay Parameters
  * All 35+ parameters for the social media overlay
  */
 export interface SocialsOverlayParams {
+  // Preset
+  preset: SocialsPresetName
+
   // Platforms & Handles
   show: string // Comma-separated platforms
   handles: string // Override handles (github:user,youtube:@chan)
@@ -44,6 +52,7 @@ export interface SocialsOverlayParams {
   fontsize: number
   fontweight: number
   letterspacing: number
+  handlecolor: string
 
   // Entrance Animation
   entrance: EntranceAnimation
@@ -72,10 +81,21 @@ export interface SocialsOverlayParams {
   // Icon Customization
   icons: string // 'github:github,youtube:video,twitch:zap'
 
+  // Background Panel
+  bgcolor: string
+  bgopacity: number
+  bgshadow: BgShadow
+  bgblur: number
+  bgradius: number
+
   // Global Theme
   theme: ThemeName
   gradient: GradientName
+  gradienttype: GradientType
   colors: string[]
+  colormode: ColorMode
+  bggradient: boolean
+  bggradientname: string
 }
 
 /**
@@ -92,7 +112,29 @@ export interface PlatformConfig {
 /**
  * Default values for socials overlay parameters
  */
+/**
+ * Socials Preset Configuration
+ * Preset values that can be overridden by URL parameters
+ */
+export interface SocialsPreset {
+  layout?: Layout
+  size?: SizePreset
+  showtext?: boolean
+  bg?: boolean
+  iconcolor?: IconColorMode
+  font?: FontFamily
+  handlecolor?: string
+  entrance?: EntranceAnimation
+  gradient?: GradientName
+  gradienttype?: GradientType
+  bggradient?: boolean
+  bggradientname?: string
+  colormode?: ColorMode
+  theme?: ThemeName
+}
+
 export const SOCIALS_DEFAULTS: SocialsOverlayParams = {
+  preset: 'custom',
   show: '',
   handles: '',
   layout: 'horizontal',
@@ -109,6 +151,7 @@ export const SOCIALS_DEFAULTS: SocialsOverlayParams = {
   fontsize: 0,
   fontweight: 500,
   letterspacing: 0,
+  handlecolor: '',
   entrance: 'stagger',
   speed: 0.5,
   delay: 0.3,
@@ -124,9 +167,14 @@ export const SOCIALS_DEFAULTS: SocialsOverlayParams = {
   order: 'default',
   priority: '',
   icons: '',
+  ...BG_PANEL_DEFAULTS,
   theme: 'dark',
   gradient: 'indigo',
+  gradienttype: 'linear',
   colors: [],
+  colormode: 'normal',
+  bggradient: false,
+  bggradientname: '',
 }
 
 /**

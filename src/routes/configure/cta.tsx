@@ -13,15 +13,18 @@ import { CollapsibleSection } from '../../components/configure/form/CollapsibleS
 import { FormNumberSlider } from '../../components/configure/form/FormNumberSlider'
 import { FormColorArray } from '../../components/configure/form/FormColorArray'
 import { FormTextInput } from '../../components/configure/form/FormTextInput'
+import { FormColorPicker } from '../../components/configure/form/FormColorPicker'
 import { FormSelectInput } from '../../components/configure/form/FormSelectInput'
 import { FormSwitch } from '../../components/configure/form/FormSwitch'
 import { IconSelect } from '../../components/configure/form/IconSelect'
 import { FontSelect } from '../../components/configure/form/FontSelect'
 import { AnimationSelect } from '../../components/configure/form/AnimationSelect'
+import { AnimationTimeline } from '../../components/configure/form/AnimationTimeline'
 import { GradientGrid } from '../../components/configure/form/GradientGrid'
 import { PresetManager } from '../../components/configure/PresetManager'
+import { PresetCards } from '../../components/configure/PresetCards'
+import { CTA_PRESET_CARDS } from '../../config/preset-cards'
 import {
-  CTA_PRESET_OPTIONS,
   CTA_ICON_OPTIONS,
   ICON_ANIMATION_OPTIONS,
   ICON_POSITION_OPTIONS,
@@ -30,10 +33,15 @@ import {
   VERTICAL_ALIGN_OPTIONS,
   ENTRANCE_ANIMATION_OPTIONS,
   EXIT_ANIMATION_OPTIONS,
+  BG_SHADOW_OPTIONS,
+  COLOR_MODE_OPTIONS,
+  GRADIENT_TYPE_OPTIONS,
+  BG_PANEL_DEFAULTS,
 } from '../../lib/constants'
 import { CTA_DEFAULTS } from '../../types/cta.types'
 import type { CTAOverlayParams } from '../../types/cta.types'
 import { useHistory } from '../../hooks/useHistory'
+import { useGlobalSettings, applyGlobalDefaults } from '../../hooks/useGlobalSettings'
 import { useFormWithHistory } from '../../hooks/useFormWithHistory'
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts'
 import { usePresets } from '../../hooks/usePresets'
@@ -45,8 +53,15 @@ export const Route = createFileRoute('/configure/cta')({
 })
 
 function CTAConfigurator() {
+  // Global brand settings
+  const { settings: globalSettings } = useGlobalSettings()
+  const resolvedDefaults = useMemo(
+    () => applyGlobalDefaults(CTA_DEFAULTS, globalSettings),
+    [globalSettings]
+  )
+
   // History management (undo/redo + debouncing)
-  const history = useHistory<CTAOverlayParams>(CTA_DEFAULTS)
+  const history = useHistory<CTAOverlayParams>(resolvedDefaults)
   const { state: params, updateState, undo, redo, canUndo, canRedo } = history
 
   // TanStack Form with Zod validation
@@ -106,12 +121,15 @@ function CTAConfigurator() {
     }
 
     const searchParams = new URLSearchParams(
-      Object.entries(params).reduce((acc, [key, value]) => {
-        if (value !== CTA_DEFAULTS[key as keyof CTAOverlayParams]) {
-          acc[key] = String(value)
-        }
-        return acc
-      }, {} as Record<string, string>)
+      Object.entries(params).reduce(
+        (acc, [key, value]) => {
+          if (value !== CTA_DEFAULTS[key as keyof CTAOverlayParams]) {
+            acc[key] = String(value)
+          }
+          return acc
+        },
+        {} as Record<string, string>
+      )
     )
     return `${getBaseUrl()}/overlays/cta?${searchParams.toString()}`
   }, [params])
@@ -121,20 +139,11 @@ function CTAConfigurator() {
       {/* Section 1: Quick Presets */}
       <div className="config-section">
         <h2 className="text-2xl font-semibold mb-6">Quick Presets</h2>
-        <form.Field name="preset">
-          {(field) => (
-            <FormSelectInput
-              label="Preset"
-              value={params.preset}
-              onChange={(val) => {
-                field.handleChange(val as any)
-                updateState({ ...params, preset: val as any })
-              }}
-              options={CTA_PRESET_OPTIONS}
-              error={field.state.meta.errors?.[0]}
-            />
-          )}
-        </form.Field>
+        <PresetCards
+          presets={CTA_PRESET_CARDS}
+          value={params.preset}
+          onSelect={(val) => updateState({ ...params, preset: val as any })}
+        />
       </div>
 
       {/* Custom Presets Manager */}
@@ -294,7 +303,7 @@ function CTAConfigurator() {
 
             <form.Field name="iconcolor">
               {(field) => (
-                <FormTextInput
+                <FormColorPicker
                   label="Icon Color"
                   value={params.iconcolor}
                   onChange={(val) => {
@@ -303,7 +312,7 @@ function CTAConfigurator() {
                   }}
                   onBlur={field.handleBlur}
                   placeholder="Leave empty for auto color"
-                  help="Hex color (e.g., FF0000) or leave empty for gradient color"
+                  help="Leave empty for gradient color"
                   error={field.state.meta.errors?.[0]}
                 />
               )}
@@ -325,6 +334,42 @@ function CTAConfigurator() {
                   updateState({ ...params, font: value as any })
                 }}
                 showGoogleFonts={true}
+              />
+            )}
+          </form.Field>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <form.Field name="textcolor">
+            {(field) => (
+              <FormColorPicker
+                label="Text Color"
+                value={params.textcolor}
+                onChange={(val) => {
+                  field.handleChange(val)
+                  updateState({ ...params, textcolor: val })
+                }}
+                onBlur={field.handleBlur}
+                placeholder="Leave empty for theme color"
+                help="Override text color"
+                error={field.state.meta.errors?.[0]}
+              />
+            )}
+          </form.Field>
+
+          <form.Field name="subcolor">
+            {(field) => (
+              <FormColorPicker
+                label="Subtitle Color"
+                value={params.subcolor}
+                onChange={(val) => {
+                  field.handleChange(val)
+                  updateState({ ...params, subcolor: val })
+                }}
+                onBlur={field.handleBlur}
+                placeholder="Leave empty for theme color"
+                help="Override subtitle color"
+                error={field.state.meta.errors?.[0]}
               />
             )}
           </form.Field>
@@ -430,7 +475,7 @@ function CTAConfigurator() {
         {params.decoration !== 'none' && (
           <form.Field name="decorationcolor">
             {(field) => (
-              <FormTextInput
+              <FormColorPicker
                 label="Decoration Color"
                 value={params.decorationcolor}
                 onChange={(val) => {
@@ -439,7 +484,7 @@ function CTAConfigurator() {
                 }}
                 onBlur={field.handleBlur}
                 placeholder="Leave empty for auto color"
-                help="Hex color or leave empty for gradient color"
+                help="Leave empty for gradient color"
                 error={field.state.meta.errors?.[0]}
               />
             )}
@@ -495,6 +540,136 @@ function CTAConfigurator() {
           )}
         </form.Field>
       </CollapsibleSection>
+
+      {/* Background Panel */}
+      {params.bg && (
+        <CollapsibleSection title="Background Panel" defaultOpen={false} storageKey="cta-bgpanel">
+          <form.Field name="bgcolor">
+            {(field) => (
+              <FormColorPicker
+                label="Background Color"
+                value={params.bgcolor}
+                onChange={(val) => {
+                  field.handleChange(val)
+                  updateState({ ...params, bgcolor: val })
+                }}
+                onBlur={field.handleBlur}
+                placeholder="Leave empty for theme color"
+                help="Custom background color (empty = theme default)"
+                error={field.state.meta.errors?.[0]}
+              />
+            )}
+          </form.Field>
+
+          <form.Field name="bgopacity">
+            {(field) => (
+              <FormNumberSlider
+                label="Background Opacity"
+                value={Math.round(params.bgopacity * 100)}
+                onChange={(val) => {
+                  const opacity = val / 100
+                  field.handleChange(opacity)
+                  updateState({ ...params, bgopacity: opacity })
+                }}
+                onBlur={field.handleBlur}
+                min={0}
+                max={100}
+                unit="%"
+                help="Panel background transparency"
+                error={field.state.meta.errors?.[0]}
+              />
+            )}
+          </form.Field>
+
+          <form.Field name="bgshadow">
+            {(field) => (
+              <FormSelectInput
+                label="Shadow"
+                value={params.bgshadow}
+                onChange={(val) => {
+                  field.handleChange(val as any)
+                  updateState({ ...params, bgshadow: val as any })
+                }}
+                options={BG_SHADOW_OPTIONS}
+                error={field.state.meta.errors?.[0]}
+              />
+            )}
+          </form.Field>
+
+          <div className="grid grid-cols-2 gap-4">
+            <form.Field name="bgblur">
+              {(field) => (
+                <FormNumberSlider
+                  label="Backdrop Blur"
+                  value={params.bgblur}
+                  onChange={(val) => {
+                    field.handleChange(val)
+                    updateState({ ...params, bgblur: val })
+                  }}
+                  onBlur={field.handleBlur}
+                  min={0}
+                  max={50}
+                  unit="px"
+                  help="Glassmorphism blur"
+                  error={field.state.meta.errors?.[0]}
+                />
+              )}
+            </form.Field>
+
+            <form.Field name="bgradius">
+              {(field) => (
+                <FormNumberSlider
+                  label="Border Radius"
+                  value={params.bgradius}
+                  onChange={(val) => {
+                    field.handleChange(val)
+                    updateState({ ...params, bgradius: val })
+                  }}
+                  onBlur={field.handleBlur}
+                  min={0}
+                  max={50}
+                  unit="px"
+                  help="Corner rounding"
+                  error={field.state.meta.errors?.[0]}
+                />
+              )}
+            </form.Field>
+          </div>
+
+          <form.Field name="bggradient">
+            {(field) => (
+              <FormSwitch
+                label="Gradient background"
+                checked={params.bggradient}
+                onCheckedChange={(checked) => {
+                  field.handleChange(checked)
+                  updateState({ ...params, bggradient: checked })
+                }}
+                help="Use gradient colors as panel background"
+                error={field.state.meta.errors?.[0]}
+              />
+            )}
+          </form.Field>
+
+          {params.bggradient && (
+            <div>
+              <label className="config-label">Background Gradient</label>
+              <form.Field name="bggradientname">
+                {(field) => (
+                  <GradientGrid
+                    value={params.bggradientname || params.gradient}
+                    onValueChange={(value) => {
+                      field.handleChange(value as any)
+                      updateState({ ...params, bggradientname: value as any })
+                    }}
+                    onBlur={field.handleBlur}
+                  />
+                )}
+              </form.Field>
+            </div>
+          )}
+        </CollapsibleSection>
+      )}
 
       {/* Section 7: Animations */}
       <CollapsibleSection title="Animations" defaultOpen={false} storageKey="cta-animations">
@@ -653,6 +828,18 @@ function CTAConfigurator() {
         )}
       </CollapsibleSection>
 
+      {/* Animation Timeline */}
+      <AnimationTimeline
+        delay={params.delay}
+        entrancespeed={params.entrancespeed}
+        hold={params.hold}
+        exitspeed={params.exitspeed}
+        pause={params.pause}
+        loop={params.loop}
+        entrance={params.entrance}
+        exit={params.exit}
+      />
+
       {/* Section 9: Theme & Colors */}
       <CollapsibleSection
         title="Theme & Colors"
@@ -660,6 +847,22 @@ function CTAConfigurator() {
         storageKey="cta-theme"
         onReset={resetThemeColors}
       >
+        <form.Field name="colormode">
+          {(field) => (
+            <FormSelectInput
+              label="Color Mode"
+              value={params.colormode}
+              onChange={(val) => {
+                field.handleChange(val as any)
+                updateState({ ...params, colormode: val as any })
+              }}
+              options={COLOR_MODE_OPTIONS}
+              help="Adjust gradient lightness to match your background"
+              error={field.state.meta.errors?.[0]}
+            />
+          )}
+        </form.Field>
+
         <div>
           <label className="config-label">Gradient Preset</label>
           <form.Field name="gradient">
@@ -671,10 +874,28 @@ function CTAConfigurator() {
                   updateState({ ...params, gradient: value as any })
                 }}
                 onBlur={field.handleBlur}
+                colorMode={params.colormode}
+                onColorModeChange={(mode) => updateState({ ...params, colormode: mode as any })}
               />
             )}
           </form.Field>
         </div>
+
+        <form.Field name="gradienttype">
+          {(field) => (
+            <FormSelectInput
+              label="Gradient Style"
+              value={params.gradienttype}
+              onChange={(val) => {
+                field.handleChange(val as any)
+                updateState({ ...params, gradienttype: val as any })
+              }}
+              options={GRADIENT_TYPE_OPTIONS}
+              help="How gradient colors are blended"
+              error={field.state.meta.errors?.[0]}
+            />
+          )}
+        </form.Field>
 
         <form.Field name="colors">
           {(field) => (
@@ -693,11 +914,7 @@ function CTAConfigurator() {
       </CollapsibleSection>
 
       {/* Help & Guides */}
-      <CollapsibleSection
-        title="Help & Guides"
-        defaultOpen={false}
-        storageKey="cta-help"
-      >
+      <CollapsibleSection title="Help & Guides" defaultOpen={false} storageKey="cta-help">
         <CTAOverlayHelp />
       </CollapsibleSection>
     </>

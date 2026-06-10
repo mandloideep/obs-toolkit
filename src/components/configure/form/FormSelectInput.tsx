@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
+import { getErrorMessage } from '@/lib/validation/validators'
 
 interface FormSelectInputProps {
   label: string
@@ -19,7 +20,7 @@ interface FormSelectInputProps {
   options: Array<{ value: string; label: string }>
   help?: string
   placeholder?: string
-  error?: string
+  error?: unknown
 }
 
 /**
@@ -65,9 +66,7 @@ export function FormSelectInput({
       <Label className="config-label">{label}</Label>
 
       {/* Help Text */}
-      {help && (
-        <p className="text-xs text-muted-foreground -mt-1">{help}</p>
-      )}
+      {help && <p className="text-xs text-muted-foreground -mt-1">{help}</p>}
 
       {/* Select Dropdown */}
       <Select value={value} onValueChange={onChange}>
@@ -84,9 +83,7 @@ export function FormSelectInput({
       </Select>
 
       {/* Error Message */}
-      {error && (
-        <p className="text-xs text-destructive">{error}</p>
-      )}
+      {error && <p className="text-xs text-destructive">{getErrorMessage(error)}</p>}
     </div>
   )
 }

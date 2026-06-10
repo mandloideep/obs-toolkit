@@ -7,7 +7,7 @@ import {
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
 import { BRAND_CONFIG } from '@/config/brand.config'
-import type { GradientName } from '@/types/brand.types'
+import type { BrandGradientName } from '@/types/brand.types'
 
 interface GradientSelectProps {
   value: string
@@ -23,10 +23,10 @@ export function GradientSelect({
   className,
 }: GradientSelectProps) {
   // Get all gradient names from BRAND_CONFIG
-  const allGradients = Object.keys(BRAND_CONFIG.gradients) as GradientName[]
+  const allGradients = Object.keys(BRAND_CONFIG.gradients) as BrandGradientName[]
 
   // Default subset (original 8 presets) if showAll is false
-  const defaultGradients: GradientName[] = [
+  const defaultGradients: BrandGradientName[] = [
     'indigo',
     'cyan',
     'sunset',
@@ -40,7 +40,7 @@ export function GradientSelect({
   const gradientsToShow = showAll ? allGradients : defaultGradients
 
   // Render gradient strip preview
-  const renderGradientStrip = (gradientName: GradientName) => {
+  const renderGradientStrip = (gradientName: BrandGradientName) => {
     const colors = BRAND_CONFIG.gradients[gradientName]
     const gradientStyle = {
       background: `linear-gradient(to right, ${colors.join(', ')})`,
@@ -56,7 +56,7 @@ export function GradientSelect({
   }
 
   // Capitalize gradient name for display
-  const formatGradientName = (name: string) => {
+  const formatBrandGradientName = (name: string) => {
     return name.charAt(0).toUpperCase() + name.slice(1)
   }
 
@@ -64,15 +64,15 @@ export function GradientSelect({
     <Select value={value} onValueChange={onValueChange}>
       <SelectTrigger className={cn('bg-black/30 focus:ring-brand-indigo/50', className)}>
         <div className="flex items-center gap-3 w-full">
-          <span className="flex-shrink-0">{formatGradientName(value)}</span>
-          {renderGradientStrip(value as GradientName)}
+          <span className="flex-shrink-0">{formatBrandGradientName(value)}</span>
+          {renderGradientStrip(value as BrandGradientName)}
         </div>
       </SelectTrigger>
       <SelectContent>
         {gradientsToShow.map((gradientName) => (
           <SelectItem key={gradientName} value={gradientName}>
             <div className="flex items-center gap-3">
-              <span className="min-w-[80px]">{formatGradientName(gradientName)}</span>
+              <span className="min-w-[80px]">{formatBrandGradientName(gradientName)}</span>
               {renderGradientStrip(gradientName)}
             </div>
           </SelectItem>

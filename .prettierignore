@@ -1,0 +1,9 @@
+dist
+build
+node_modules
+coverage
+*.log
+.vite
+.tanstack
+src/routeTree.gen.ts
+package-lock.json

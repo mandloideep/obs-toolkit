@@ -26,8 +26,10 @@ import { OverlayContainer } from './OverlayContainer'
 import { OverlayPanel } from './OverlayPanel'
 import { COUNTER_DEFAULTS, API_SERVICE_CONFIGS } from '../../types/counter.types'
 import type { CounterOverlayParams } from '../../types/counter.types'
+import { COUNTER_PRESETS } from '../../config/counter-presets'
 import type { CounterIcon, NumberNotation } from '../../types/brand.types'
 import { createLinearGradient } from '../../utils/css.utils'
+import { hexToCssColor } from '../../utils/color.utils'
 
 /**
  * Icon mapping from parameter to Lucide icon component
@@ -92,10 +94,22 @@ function formatNumber(
 
 export function CounterOverlay() {
   // Parse URL parameters
-  const params = useOverlayParams<CounterOverlayParams>(COUNTER_DEFAULTS)
+  const urlParams = useOverlayParams<CounterOverlayParams>(COUNTER_DEFAULTS)
+
+  // Resolve preset (URL params override preset defaults)
+  const params = useMemo(() => {
+    const preset = COUNTER_PRESETS[urlParams.preset] || {}
+    return { ...COUNTER_DEFAULTS, ...preset, ...urlParams }
+  }, [urlParams])
 
   const theme = useTheme(params.theme)
-  const gradient = useGradient(params.gradient, params.colors)
+  const gradient = useGradient(params.gradient, params.colors, undefined, params.colormode)
+  const bgGradient = useGradient(
+    (params.bggradientname || params.gradient) as any,
+    params.bggradientname ? undefined : params.colors,
+    undefined,
+    params.colormode
+  )
   const fontFamily = useFontFamily(params.font)
 
   // Load Google Font if needed
@@ -137,17 +151,18 @@ export function CounterOverlay() {
   const IconComponent = ICON_MAP[params.icon]
 
   // Icon color (custom or theme default)
-  const iconColor = params.iconcolor || gradient[0]
-  const numberColor = params.numbercolor || theme.text
+  const iconColor = params.iconcolor ? hexToCssColor(params.iconcolor) : gradient[0]
+  const numberColor = params.numbercolor ? hexToCssColor(params.numbercolor) : theme.text
 
   // Trend indicator color
-  const trendColor = params.trendcolor
+  const trendColor = params.trendcolor ? hexToCssColor(params.trendcolor) : '#10b981'
 
   // Layout styles
   const containerStyle: CSSProperties = {
     display: 'flex',
     flexDirection: params.layout === 'stack' ? 'column' : 'row',
-    alignItems: params.align === 'left' ? 'flex-start' : params.align === 'right' ? 'flex-end' : 'center',
+    alignItems:
+      params.align === 'left' ? 'flex-start' : params.align === 'right' ? 'flex-end' : 'center',
     gap: params.layout === 'stack' ? '8px' : '16px',
     padding: `${params.counterpady}px ${params.counterpadx}px`,
     width: params.width !== 'auto' ? params.width : undefined,
@@ -170,7 +185,7 @@ export function CounterOverlay() {
     fontSize: `${params.labelsize}px`,
     fontWeight: 400,
     fontFamily,
-    color: theme.textMuted,
+    color: params.labelcolor ? hexToCssColor(params.labelcolor) : theme.textMuted,
     lineHeight: 1.5,
     margin: 0,
   }
@@ -190,7 +205,11 @@ export function CounterOverlay() {
           display: 'flex',
           flexDirection: 'column',
           alignItems:
-            params.align === 'left' ? 'flex-start' : params.align === 'right' ? 'flex-end' : 'center',
+            params.align === 'left'
+              ? 'flex-start'
+              : params.align === 'right'
+                ? 'flex-end'
+                : 'center',
           gap: '4px',
         }}
       >
@@ -217,7 +236,21 @@ export function CounterOverlay() {
 
   return (
     <OverlayContainer align={params.align} valign="center" showBg={false}>
-      {params.bg ? <OverlayPanel>{content}</OverlayPanel> : content}
+      {params.bg ? (
+        <OverlayPanel
+          bgcolor={params.bgcolor}
+          bgopacity={params.bgopacity}
+          bgshadow={params.bgshadow}
+          blur={params.bgblur}
+          borderRadius={params.bgradius}
+          gradientColors={params.bggradient ? bgGradient : undefined}
+          gradientType={params.gradienttype}
+        >
+          {content}
+        </OverlayPanel>
+      ) : (
+        content
+      )}
     </OverlayContainer>
   )
 }

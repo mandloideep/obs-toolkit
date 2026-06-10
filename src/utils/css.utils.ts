@@ -54,9 +54,13 @@ export function hexToRgb(hex: string): { r: number; g: number; b: number } | nul
   const cleanHex = hex.replace('#', '')
 
   // Support both 3-digit and 6-digit hex
-  const fullHex = cleanHex.length === 3
-    ? cleanHex.split('').map(c => c + c).join('')
-    : cleanHex
+  const fullHex =
+    cleanHex.length === 3
+      ? cleanHex
+          .split('')
+          .map((c) => c + c)
+          .join('')
+      : cleanHex
 
   const result = /^([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(fullHex)
 
@@ -100,11 +104,7 @@ export function rgbToHex(r: number, g: number, b: number): string {
  * // Returns '#7f007f' (middle between red and blue)
  * ```
  */
-export function interpolateColor(
-  color1: string,
-  color2: string,
-  factor: number
-): string {
+export function interpolateColor(color1: string, color2: string, factor: number): string {
   const rgb1 = hexToRgb(color1)
   const rgb2 = hexToRgb(color2)
 
@@ -145,10 +145,7 @@ export function interpolateGradient(colors: string[], factor: number): string {
 
   // Find which two colors to interpolate between
   const segmentSize = 1 / (colors.length - 1)
-  const segmentIndex = Math.min(
-    Math.floor(t / segmentSize),
-    colors.length - 2
-  )
+  const segmentIndex = Math.min(Math.floor(t / segmentSize), colors.length - 2)
 
   const localFactor = (t - segmentIndex * segmentSize) / segmentSize
 
@@ -168,11 +165,7 @@ export function lighten(color: string, percent: number): string {
 
   const amount = (255 * percent) / 100
 
-  return rgbToHex(
-    rgb.r + amount,
-    rgb.g + amount,
-    rgb.b + amount
-  )
+  return rgbToHex(rgb.r + amount, rgb.g + amount, rgb.b + amount)
 }
 
 /**
@@ -188,11 +181,7 @@ export function darken(color: string, percent: number): string {
 
   const amount = (255 * percent) / 100
 
-  return rgbToHex(
-    rgb.r - amount,
-    rgb.g - amount,
-    rgb.b - amount
-  )
+  return rgbToHex(rgb.r - amount, rgb.g - amount, rgb.b - amount)
 }
 
 /**
@@ -222,11 +211,9 @@ export function getContrastRatio(color1: string, color2: string): number {
     const rgb = hexToRgb(color)
     if (!rgb) return 0
 
-    const [r, g, b] = [rgb.r, rgb.g, rgb.b].map(val => {
+    const [r, g, b] = [rgb.r, rgb.g, rgb.b].map((val) => {
       const sRGB = val / 255
-      return sRGB <= 0.03928
-        ? sRGB / 12.92
-        : Math.pow((sRGB + 0.055) / 1.055, 2.4)
+      return sRGB <= 0.03928 ? sRGB / 12.92 : Math.pow((sRGB + 0.055) / 1.055, 2.4)
     })
 
     return 0.2126 * r + 0.7152 * g + 0.0722 * b
@@ -264,12 +251,99 @@ export function isLightColor(color: string): boolean {
  * @returns CSS linear-gradient string
  */
 export function createLinearGradient(colors: string[], angle: number = 90): string {
-  const stops = colors.map((color, index) => {
-    const position = (index / (colors.length - 1)) * 100
-    return `${color} ${position}%`
-  }).join(', ')
+  const stops = colors
+    .map((color, index) => {
+      const position = (index / (colors.length - 1)) * 100
+      return `${color} ${position}%`
+    })
+    .join(', ')
 
   return `linear-gradient(${angle}deg, ${stops})`
+}
+
+/**
+ * Generate CSS radial gradient from center
+ *
+ * @param colors - Array of color stops
+ * @returns CSS radial-gradient string
+ */
+export function createRadialGradient(colors: string[]): string {
+  const stops = colors
+    .map((color, index) => {
+      const position = (index / (colors.length - 1)) * 100
+      return `${color} ${position}%`
+    })
+    .join(', ')
+  return `radial-gradient(circle, ${stops})`
+}
+
+/**
+ * Generate CSS conic gradient
+ *
+ * @param colors - Array of color stops
+ * @param angle - Starting angle in degrees (default: 0)
+ * @returns CSS conic-gradient string
+ */
+export function createConicGradient(colors: string[], angle: number = 0): string {
+  const stops = colors
+    .map((color, index) => {
+      const position = (index / (colors.length - 1)) * 100
+      return `${color} ${position}%`
+    })
+    .join(', ')
+  return `conic-gradient(from ${angle}deg, ${stops})`
+}
+
+/**
+ * Generate CSS mesh-style gradient using stacked radial-gradients.
+ * Each color is positioned at a different location with soft falloff.
+ * Pure CSS, GPU-rendered, zero CPU overhead.
+ *
+ * @param colors - Array of color stops
+ * @returns CSS background string with stacked radial-gradients
+ */
+export function createMeshGradient(colors: string[]): string {
+  // Predefined positions for up to 8 color blobs
+  const positions = [
+    '25% 25%',
+    '75% 25%',
+    '50% 50%',
+    '25% 75%',
+    '75% 75%',
+    '10% 50%',
+    '90% 50%',
+    '50% 10%',
+  ]
+
+  const layers = colors.map((color, i) => {
+    const pos = positions[i % positions.length]
+    const rgb = hexToRgb(color)
+    if (!rgb) return `radial-gradient(ellipse at ${pos}, ${color} 0%, transparent 70%)`
+    return `radial-gradient(ellipse at ${pos}, rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.8) 0%, transparent 60%)`
+  })
+
+  return layers.join(', ')
+}
+
+/**
+ * Generate CSS gradient string based on type
+ *
+ * @param colors - Array of color stops
+ * @param type - Gradient type ('linear' | 'radial' | 'conic' | 'mesh')
+ * @param angle - Gradient angle in degrees (default: 90, used for linear/conic)
+ * @returns CSS gradient string
+ */
+export function createGradient(colors: string[], type: string, angle: number = 90): string {
+  switch (type) {
+    case 'radial':
+      return createRadialGradient(colors)
+    case 'conic':
+      return createConicGradient(colors, angle)
+    case 'mesh':
+      return createMeshGradient(colors)
+    default:
+      return createLinearGradient(colors, angle)
+  }
 }
 
 /**

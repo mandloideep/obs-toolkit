@@ -180,7 +180,9 @@ export function usePresets<T extends Record<string, unknown>>(
 
             // Check overlay type matches
             if (json.overlayType !== overlayType) {
-              throw new Error(`Preset is for ${json.overlayType} overlay, but current overlay is ${overlayType}`)
+              throw new Error(
+                `Preset is for ${json.overlayType} overlay, but current overlay is ${overlayType}`
+              )
             }
 
             // Validate params against defaults

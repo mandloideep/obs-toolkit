@@ -5,6 +5,7 @@
 
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { getErrorMessage } from '@/lib/validation/validators'
 
 interface FormTextInputProps {
   label: string
@@ -14,7 +15,7 @@ interface FormTextInputProps {
   placeholder?: string
   help?: string
   type?: 'text' | 'password' | 'email' | 'url'
-  error?: string
+  error?: unknown
 }
 
 /**
@@ -59,9 +60,7 @@ export function FormTextInput({
       <Label className="config-label">{label}</Label>
 
       {/* Help Text */}
-      {help && (
-        <p className="text-xs text-muted-foreground -mt-1">{help}</p>
-      )}
+      {help && <p className="text-xs text-muted-foreground -mt-1">{help}</p>}
 
       {/* Input Field */}
       <Input
@@ -74,9 +73,7 @@ export function FormTextInput({
       />
 
       {/* Error Message */}
-      {error && (
-        <p className="text-xs text-destructive">{error}</p>
-      )}
+      {error && <p className="text-xs text-destructive">{getErrorMessage(error)}</p>}
     </div>
   )
 }

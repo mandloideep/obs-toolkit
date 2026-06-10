@@ -77,9 +77,8 @@ export function useHistory<T>(
   // Set state with debounce
   const setState = useCallback(
     (newState: T | ((prev: T) => T)) => {
-      const resolvedState = typeof newState === 'function'
-        ? (newState as (prev: T) => T)(state)
-        : newState
+      const resolvedState =
+        typeof newState === 'function' ? (newState as (prev: T) => T)(state) : newState
 
       setInternalState(resolvedState)
       pendingState.current = resolvedState

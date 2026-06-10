@@ -18,9 +18,7 @@ function RootComponent() {
     <>
       {!isOverlayRoute && <Header />}
       <Outlet />
-      {import.meta.env.DEV && !isOverlayRoute && (
-        <TanStackRouterDevtools position="bottom-right" />
-      )}
+      {import.meta.env.DEV && !isOverlayRoute && <TanStackRouterDevtools position="bottom-right" />}
     </>
   )
 }

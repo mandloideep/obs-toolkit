@@ -25,11 +25,7 @@ function easeOutCubic(t: number): number {
  * @example
  * const count = useCountUp(1000, 2) // Animates from 0 to 1000 over 2 seconds
  */
-export function useCountUp(
-  target: number,
-  duration: number = 2,
-  enabled: boolean = true
-): number {
+export function useCountUp(target: number, duration: number = 2, enabled: boolean = true): number {
   const [currentValue, setCurrentValue] = useState(target)
   const animationRef = useRef<number>()
   const startValueRef = useRef(target)

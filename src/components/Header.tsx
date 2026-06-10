@@ -29,9 +29,7 @@ export default function Header() {
                   key={overlay.name}
                   to={overlay.configurePath}
                   className={`flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg transition-all ${
-                    isActive
-                      ? 'text-white'
-                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                    isActive ? 'text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'
                   }`}
                   style={
                     isActive

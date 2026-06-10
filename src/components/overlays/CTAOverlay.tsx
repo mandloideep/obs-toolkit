@@ -17,6 +17,7 @@ import { CTA_DEFAULTS } from '../../types/cta.types'
 import type { CTAOverlayParams } from '../../types/cta.types'
 import type { IconAnimation, LoopState } from '../../types/brand.types'
 import { createLinearGradient } from '../../utils/css.utils'
+import { hexToCssColor } from '../../utils/color.utils'
 
 /**
  * Icon mapping from parameter to Lucide icon component
@@ -127,14 +128,20 @@ export function CTAOverlay() {
       ...urlParams,
       // Override with URL params if they're not the defaults
       text: urlParams.text || preset.text || 'Subscribe',
-      sub: urlParams.sub !== undefined ? urlParams.sub : (preset.sub || ''),
+      sub: urlParams.sub !== undefined ? urlParams.sub : preset.sub || '',
       icon: urlParams.icon || preset.icon || 'sub',
       iconanim: urlParams.iconanim || preset.iconanim || 'bounce',
     }
   }, [urlParams])
 
   const theme = useTheme(params.theme)
-  const gradient = useGradient(params.gradient, params.colors)
+  const gradient = useGradient(params.gradient, params.colors, undefined, params.colormode)
+  const bgGradient = useGradient(
+    (params.bggradientname || params.gradient) as any,
+    params.bggradientname ? undefined : params.colors,
+    undefined,
+    params.colormode
+  )
   const fontFamily = useFontFamily(params.font)
 
   // Load Google Font if needed
@@ -156,9 +163,12 @@ export function CTAOverlay() {
     switch (loopState) {
       case 'entering':
         // After entrance animation, go to visible state
-        timer = setTimeout(() => {
-          setLoopState('visible')
-        }, (params.delay + params.entrancespeed) * 1000)
+        timer = setTimeout(
+          () => {
+            setLoopState('visible')
+          },
+          (params.delay + params.entrancespeed) * 1000
+        )
         break
 
       case 'visible':
@@ -185,10 +195,20 @@ export function CTAOverlay() {
     }
 
     return () => clearTimeout(timer)
-  }, [loopState, params.loop, params.delay, params.entrancespeed, params.hold, params.exitspeed, params.pause])
+  }, [
+    loopState,
+    params.loop,
+    params.delay,
+    params.entrancespeed,
+    params.hold,
+    params.exitspeed,
+    params.pause,
+  ])
 
   // Determine if component should be visible
-  const isVisible = params.loop ? loopState === 'entering' || loopState === 'visible' || loopState === 'exiting' : true
+  const isVisible = params.loop
+    ? loopState === 'entering' || loopState === 'visible' || loopState === 'exiting'
+    : true
 
   // Determine if exit animation should trigger
   const triggerExit = params.loop ? loopState === 'exiting' : shouldExit && params.exit !== 'none'
@@ -197,11 +217,11 @@ export function CTAOverlay() {
   const IconComponent = CTA_ICON_MAP[params.icon] || null
 
   // Icon color (custom or gradient primary)
-  const iconColor = params.iconcolor || gradient[0]
+  const iconColor = params.iconcolor ? hexToCssColor(params.iconcolor) : gradient[0]
   const iconSize = params.iconsize || Math.round(params.size * 1.1)
 
   // Decoration color
-  const decoColor = params.decorationcolor || gradient[0]
+  const decoColor = params.decorationcolor ? hexToCssColor(params.decorationcolor) : gradient[0]
 
   // Container flex direction based on icon position
   const getFlexDirection = (): CSSProperties['flexDirection'] => {
@@ -233,7 +253,7 @@ export function CTAOverlay() {
   }
 
   const mainTextStyle: CSSProperties = {
-    color: theme.text,
+    color: params.textcolor ? hexToCssColor(params.textcolor) : theme.text,
     fontSize: `${params.size}px`,
     fontWeight: 700,
     fontFamily,
@@ -244,7 +264,7 @@ export function CTAOverlay() {
   }
 
   const subTextStyle: CSSProperties = {
-    color: theme.textMuted,
+    color: params.subcolor ? hexToCssColor(params.subcolor) : theme.textMuted,
     fontSize: `${params.size * 0.6}px`,
     fontWeight: 400,
     fontFamily,
@@ -273,12 +293,7 @@ export function CTAOverlay() {
 
     if (params.decoration === 'swirl') {
       return (
-        <svg
-          width="60"
-          height="12"
-          viewBox="0 0 60 12"
-          style={{ marginTop: '6px' }}
-        >
+        <svg width="60" height="12" viewBox="0 0 60 12" style={{ marginTop: '6px' }}>
           <path
             d="M2,6 Q8,2 15,6 T30,6 Q38,10 45,6 Q50,4 55,6"
             stroke={decoColor}
@@ -346,7 +361,21 @@ export function CTAOverlay() {
             // Force re-mount on loop cycle to retrigger exit animation
             key={`exit-${loopCycle}`}
           >
-            {params.bg ? <OverlayPanel>{content}</OverlayPanel> : content}
+            {params.bg ? (
+              <OverlayPanel
+                bgcolor={params.bgcolor}
+                bgopacity={params.bgopacity}
+                bgshadow={params.bgshadow}
+                blur={params.bgblur}
+                borderRadius={params.bgradius}
+                gradientColors={params.bggradient ? bgGradient : undefined}
+                gradientType={params.gradienttype}
+              >
+                {content}
+              </OverlayPanel>
+            ) : (
+              content
+            )}
           </ExitAnimation>
         </EntranceAnimation>
       )}

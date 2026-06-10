@@ -4,15 +4,41 @@
  */
 
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { ArrowRight, Sparkles, Palette, Zap } from 'lucide-react'
+import { ArrowRight, Sparkles, Palette, Zap, Settings } from 'lucide-react'
 import { Button } from '../components/ui/button'
 import { OVERLAYS } from '../lib/constants'
+import { useGlobalSettings } from '../hooks/useGlobalSettings'
 
 export const Route = createFileRoute('/')({ component: Dashboard })
 
 function Dashboard() {
+  const { isSetupComplete } = useGlobalSettings()
+
   return (
     <div className="min-h-screen">
+      {/* Brand Setup Banner */}
+      {!isSetupComplete && (
+        <div className="bg-gradient-to-r from-indigo-500/15 to-purple-500/15 border-b border-indigo-500/30 px-8 py-4">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Settings size={20} className="text-indigo-400" />
+              <div>
+                <p className="text-sm font-medium">Set up your brand</p>
+                <p className="text-xs text-muted-foreground">
+                  Choose theme, colors, and fonts for all overlays
+                </p>
+              </div>
+            </div>
+            <Link to="/setup">
+              <Button variant="indigo" size="sm">
+                Get Started
+                <ArrowRight size={14} />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      )}
+
       {/* Hero Section */}
       <div className="text-center py-16 px-8 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border-b border-indigo-500/20">
         <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent">
@@ -26,7 +52,7 @@ function Dashboard() {
         <div className="flex justify-center gap-8 mt-8 flex-wrap">
           <div className="flex items-center gap-2 text-sm text-gray-400">
             <Palette size={16} />
-            <span>8 Gradient Presets</span>
+            <span>21+ Gradient Presets</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-400">
             <Zap size={16} />
@@ -37,6 +63,16 @@ function Dashboard() {
             <span>Collapsible Sections</span>
           </div>
         </div>
+
+        {isSetupComplete && (
+          <Link
+            to="/setup"
+            className="inline-flex items-center gap-1.5 mt-6 text-sm text-indigo-400 hover:text-indigo-300 transition-colors"
+          >
+            <Settings size={14} />
+            Brand Settings
+          </Link>
+        )}
       </div>
 
       {/* Overlay Cards */}

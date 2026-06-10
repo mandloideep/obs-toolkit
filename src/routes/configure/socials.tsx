@@ -13,12 +13,16 @@ import { CollapsibleSection } from '../../components/configure/form/CollapsibleS
 import { FormNumberSlider } from '../../components/configure/form/FormNumberSlider'
 import { FormColorArray } from '../../components/configure/form/FormColorArray'
 import { FormTextInput } from '../../components/configure/form/FormTextInput'
+import { FormColorPicker } from '../../components/configure/form/FormColorPicker'
 import { FormSelectInput } from '../../components/configure/form/FormSelectInput'
 import { FormSwitch } from '../../components/configure/form/FormSwitch'
 import { FontSelect } from '../../components/configure/form/FontSelect'
 import { AnimationSelect } from '../../components/configure/form/AnimationSelect'
+import { AnimationTimeline } from '../../components/configure/form/AnimationTimeline'
 import { GradientGrid } from '../../components/configure/form/GradientGrid'
 import { PresetManager } from '../../components/configure/PresetManager'
+import { PresetCards } from '../../components/configure/PresetCards'
+import { SOCIALS_PRESET_CARDS } from '../../config/preset-cards'
 import {
   LAYOUT_OPTIONS,
   SIZE_PRESET_OPTIONS,
@@ -26,6 +30,10 @@ import {
   PLATFORM_ORDER_OPTIONS,
   ENTRANCE_ANIMATION_OPTIONS,
   EXIT_ANIMATION_OPTIONS,
+  BG_SHADOW_OPTIONS,
+  COLOR_MODE_OPTIONS,
+  GRADIENT_TYPE_OPTIONS,
+  BG_PANEL_DEFAULTS,
 } from '../../lib/constants'
 import { Switch } from '../../components/ui/switch'
 import { Label } from '../../components/ui/label'
@@ -33,6 +41,7 @@ import { Input } from '../../components/ui/input'
 import { SOCIALS_DEFAULTS } from '../../types/socials.types'
 import type { SocialsOverlayParams } from '../../types/socials.types'
 import { useHistory } from '../../hooks/useHistory'
+import { useGlobalSettings, applyGlobalDefaults } from '../../hooks/useGlobalSettings'
 import { useFormWithHistory } from '../../hooks/useFormWithHistory'
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts'
 import { usePresets } from '../../hooks/usePresets'
@@ -52,8 +61,15 @@ type PlatformData = {
 type AllPlatforms = Record<SocialPlatform, PlatformData>
 
 function SocialsConfigurator() {
+  // Global brand settings
+  const { settings: globalSettings } = useGlobalSettings()
+  const resolvedDefaults = useMemo(
+    () => applyGlobalDefaults(SOCIALS_DEFAULTS, globalSettings),
+    [globalSettings]
+  )
+
   // History management (undo/redo + debouncing)
-  const history = useHistory<SocialsOverlayParams>(SOCIALS_DEFAULTS)
+  const history = useHistory<SocialsOverlayParams>(resolvedDefaults)
   const { state: params, setState: setParams, updateState, undo, redo, canUndo, canRedo } = history
 
   // TanStack Form with Zod validation
@@ -65,11 +81,14 @@ function SocialsConfigurator() {
   // Parse show and handles into individual platform states
   const [platforms, setPlatforms] = useState<AllPlatforms>(() => {
     const showList = SOCIALS_DEFAULTS.show.split(',').filter(Boolean)
-    const handlesMap = SOCIALS_DEFAULTS.handles.split(',').reduce((acc, pair) => {
-      const [platform, handle] = pair.split(':')
-      if (platform && handle) acc[platform] = handle
-      return acc
-    }, {} as Record<string, string>)
+    const handlesMap = SOCIALS_DEFAULTS.handles.split(',').reduce(
+      (acc, pair) => {
+        const [platform, handle] = pair.split(':')
+        if (platform && handle) acc[platform] = handle
+        return acc
+      },
+      {} as Record<string, string>
+    )
 
     return {
       github: { enabled: showList.includes('github'), handle: handlesMap.github || '' },
@@ -87,11 +106,14 @@ function SocialsConfigurator() {
   // Sync platforms state when params change (from undo/redo)
   useEffect(() => {
     const showList = params.show.split(',').filter(Boolean)
-    const handlesMap = params.handles.split(',').reduce((acc, pair) => {
-      const [platform, handle] = pair.split(':')
-      if (platform && handle) acc[platform] = handle
-      return acc
-    }, {} as Record<string, string>)
+    const handlesMap = params.handles.split(',').reduce(
+      (acc, pair) => {
+        const [platform, handle] = pair.split(':')
+        if (platform && handle) acc[platform] = handle
+        return acc
+      },
+      {} as Record<string, string>
+    )
 
     setPlatforms({
       github: { enabled: showList.includes('github'), handle: handlesMap.github || '' },
@@ -191,18 +213,31 @@ function SocialsConfigurator() {
     }
 
     const searchParams = new URLSearchParams(
-      Object.entries(params).reduce((acc, [key, value]) => {
-        if (value !== SOCIALS_DEFAULTS[key as keyof SocialsOverlayParams]) {
-          acc[key] = String(value)
-        }
-        return acc
-      }, {} as Record<string, string>)
+      Object.entries(params).reduce(
+        (acc, [key, value]) => {
+          if (value !== SOCIALS_DEFAULTS[key as keyof SocialsOverlayParams]) {
+            acc[key] = String(value)
+          }
+          return acc
+        },
+        {} as Record<string, string>
+      )
     )
     return `${getBaseUrl()}/overlays/socials?${searchParams.toString()}`
   }, [params])
 
   const configSections = (
     <>
+      {/* Section: Quick Presets */}
+      <div className="config-section">
+        <h2 className="text-2xl font-semibold mb-6">Quick Presets</h2>
+        <PresetCards
+          presets={SOCIALS_PRESET_CARDS}
+          value={params.preset}
+          onSelect={(val) => updateState({ ...params, preset: val as any })}
+        />
+      </div>
+
       {/* Custom Presets Manager */}
       <PresetManager
         presets={presets}
@@ -433,7 +468,11 @@ function SocialsConfigurator() {
       </CollapsibleSection>
 
       {/* Section 2: Platform Ordering */}
-      <CollapsibleSection title="Platform Ordering" defaultOpen={false} storageKey="socials-ordering">
+      <CollapsibleSection
+        title="Platform Ordering"
+        defaultOpen={false}
+        storageKey="socials-ordering"
+      >
         <form.Field name="order">
           {(field) => (
             <FormSelectInput
@@ -569,6 +608,140 @@ function SocialsConfigurator() {
           </form.Field>
         )}
       </CollapsibleSection>
+
+      {/* Background Panel */}
+      {params.bg && (
+        <CollapsibleSection
+          title="Background Panel"
+          defaultOpen={false}
+          storageKey="socials-bgpanel"
+        >
+          <form.Field name="bgcolor">
+            {(field) => (
+              <FormColorPicker
+                label="Background Color"
+                value={params.bgcolor}
+                onChange={(val) => {
+                  field.handleChange(val)
+                  updateState({ ...params, bgcolor: val })
+                }}
+                onBlur={field.handleBlur}
+                placeholder="Leave empty for theme color"
+                help="Custom background color (empty = theme default)"
+                error={field.state.meta.errors?.[0]}
+              />
+            )}
+          </form.Field>
+
+          <form.Field name="bgopacity">
+            {(field) => (
+              <FormNumberSlider
+                label="Background Opacity"
+                value={Math.round(params.bgopacity * 100)}
+                onChange={(val) => {
+                  const opacity = val / 100
+                  field.handleChange(opacity)
+                  updateState({ ...params, bgopacity: opacity })
+                }}
+                onBlur={field.handleBlur}
+                min={0}
+                max={100}
+                unit="%"
+                help="Panel background transparency"
+                error={field.state.meta.errors?.[0]}
+              />
+            )}
+          </form.Field>
+
+          <form.Field name="bgshadow">
+            {(field) => (
+              <FormSelectInput
+                label="Shadow"
+                value={params.bgshadow}
+                onChange={(val) => {
+                  field.handleChange(val as any)
+                  updateState({ ...params, bgshadow: val as any })
+                }}
+                options={BG_SHADOW_OPTIONS}
+                error={field.state.meta.errors?.[0]}
+              />
+            )}
+          </form.Field>
+
+          <div className="grid grid-cols-2 gap-4">
+            <form.Field name="bgblur">
+              {(field) => (
+                <FormNumberSlider
+                  label="Backdrop Blur"
+                  value={params.bgblur}
+                  onChange={(val) => {
+                    field.handleChange(val)
+                    updateState({ ...params, bgblur: val })
+                  }}
+                  onBlur={field.handleBlur}
+                  min={0}
+                  max={50}
+                  unit="px"
+                  help="Glassmorphism blur"
+                  error={field.state.meta.errors?.[0]}
+                />
+              )}
+            </form.Field>
+
+            <form.Field name="bgradius">
+              {(field) => (
+                <FormNumberSlider
+                  label="Border Radius"
+                  value={params.bgradius}
+                  onChange={(val) => {
+                    field.handleChange(val)
+                    updateState({ ...params, bgradius: val })
+                  }}
+                  onBlur={field.handleBlur}
+                  min={0}
+                  max={50}
+                  unit="px"
+                  help="Corner rounding"
+                  error={field.state.meta.errors?.[0]}
+                />
+              )}
+            </form.Field>
+          </div>
+
+          <form.Field name="bggradient">
+            {(field) => (
+              <FormSwitch
+                label="Gradient background"
+                checked={params.bggradient}
+                onCheckedChange={(checked) => {
+                  field.handleChange(checked)
+                  updateState({ ...params, bggradient: checked })
+                }}
+                help="Use gradient colors as panel background"
+                error={field.state.meta.errors?.[0]}
+              />
+            )}
+          </form.Field>
+
+          {params.bggradient && (
+            <div>
+              <label className="config-label">Background Gradient</label>
+              <form.Field name="bggradientname">
+                {(field) => (
+                  <GradientGrid
+                    value={params.bggradientname || params.gradient}
+                    onValueChange={(value) => {
+                      field.handleChange(value as any)
+                      updateState({ ...params, bggradientname: value as any })
+                    }}
+                    onBlur={field.handleBlur}
+                  />
+                )}
+              </form.Field>
+            </div>
+          )}
+        </CollapsibleSection>
+      )}
 
       {/* Section 4: Icon Customization */}
       <CollapsibleSection title="Icon Customization" defaultOpen={false} storageKey="socials-icons">
@@ -718,10 +891,31 @@ function SocialsConfigurator() {
             />
           )}
         </form.Field>
+
+        <form.Field name="handlecolor">
+          {(field) => (
+            <FormColorPicker
+              label="Handle Text Color"
+              value={params.handlecolor}
+              onChange={(val) => {
+                field.handleChange(val)
+                updateState({ ...params, handlecolor: val })
+              }}
+              onBlur={field.handleBlur}
+              placeholder="Leave empty for theme color"
+              help="Override handle text color"
+              error={field.state.meta.errors?.[0]}
+            />
+          )}
+        </form.Field>
       </CollapsibleSection>
 
       {/* Section 6: Entrance Animation */}
-      <CollapsibleSection title="Entrance Animation" defaultOpen={false} storageKey="socials-entrance">
+      <CollapsibleSection
+        title="Entrance Animation"
+        defaultOpen={false}
+        storageKey="socials-entrance"
+      >
         <div>
           <label className="config-label">Animation Type</label>
           <form.Field name="entrance">
@@ -966,6 +1160,19 @@ function SocialsConfigurator() {
         )}
       </CollapsibleSection>
 
+      {/* Animation Timeline */}
+      <AnimationTimeline
+        delay={params.delay}
+        entrancespeed={params.speed}
+        hold={params.hold}
+        exitspeed={params.exitspeed}
+        pause={params.pause}
+        loop={params.loop}
+        entrance={params.entrance}
+        exit={params.exit}
+        exitafter={params.exitafter}
+      />
+
       {/* Section 10: Theme & Colors */}
       <CollapsibleSection
         title="Theme & Colors"
@@ -973,6 +1180,22 @@ function SocialsConfigurator() {
         storageKey="socials-theme"
         onReset={resetThemeColors}
       >
+        <form.Field name="colormode">
+          {(field) => (
+            <FormSelectInput
+              label="Color Mode"
+              value={params.colormode}
+              onChange={(val) => {
+                field.handleChange(val as any)
+                updateState({ ...params, colormode: val as any })
+              }}
+              options={COLOR_MODE_OPTIONS}
+              help="Adjust gradient lightness to match your background"
+              error={field.state.meta.errors?.[0]}
+            />
+          )}
+        </form.Field>
+
         <div>
           <label className="config-label">Gradient Preset</label>
           <form.Field name="gradient">
@@ -984,10 +1207,28 @@ function SocialsConfigurator() {
                   updateState({ ...params, gradient: value as any })
                 }}
                 onBlur={field.handleBlur}
+                colorMode={params.colormode}
+                onColorModeChange={(mode) => updateState({ ...params, colormode: mode as any })}
               />
             )}
           </form.Field>
         </div>
+
+        <form.Field name="gradienttype">
+          {(field) => (
+            <FormSelectInput
+              label="Gradient Style"
+              value={params.gradienttype}
+              onChange={(val) => {
+                field.handleChange(val as any)
+                updateState({ ...params, gradienttype: val as any })
+              }}
+              options={GRADIENT_TYPE_OPTIONS}
+              help="How gradient colors are blended"
+              error={field.state.meta.errors?.[0]}
+            />
+          )}
+        </form.Field>
 
         <form.Field name="colors">
           {(field) => (
@@ -1006,11 +1247,7 @@ function SocialsConfigurator() {
       </CollapsibleSection>
 
       {/* Help & Guides */}
-      <CollapsibleSection
-        title="Help & Guides"
-        defaultOpen={false}
-        storageKey="socials-help"
-      >
+      <CollapsibleSection title="Help & Guides" defaultOpen={false} storageKey="socials-help">
         <SocialsOverlayHelp />
       </CollapsibleSection>
     </>

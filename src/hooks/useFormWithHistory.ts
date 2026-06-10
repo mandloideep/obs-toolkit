@@ -47,6 +47,11 @@ export function useFormWithHistory<T extends Record<string, any>>({
   // This prevents circular updates: history -> form -> history -> ...
   const updatingFromHistory = useRef(false)
 
+  // Track last synced values to prevent redundant sync cycles
+  // This is the primary guard against infinite loops: both Form→History
+  // and History→Form check against this before triggering updates
+  const lastSyncedRef = useRef<string>(JSON.stringify(history.state))
+
   // Create TanStack Form instance
   // No validatorAdapter needed — Zod v4 implements Standard Schema,
   // which TanStack Form supports natively
@@ -73,11 +78,18 @@ export function useFormWithHistory<T extends Record<string, any>>({
         return
       }
 
-      // Always update history with form values
-      // Validation errors are shown in the UI, but values still flow through
-      // This ensures preview updates immediately even before blur validation
+      // Skip if values haven't actually changed
+      // This prevents the circular update loop where:
+      // form change → history.setState → setInternalState → history.state changes
+      // → form.reset → form subscription fires again → history.setState → ...
+      const serialized = JSON.stringify(currentVal.values)
+      if (serialized === lastSyncedRef.current) {
+        return
+      }
+      lastSyncedRef.current = serialized
+
+      // Update history with form values
       // useHistory's setState is debounced (150ms)
-      // This prevents excessive history entries during rapid input
       history.setState(currentVal.values as T)
     })
 
@@ -86,13 +98,14 @@ export function useFormWithHistory<T extends Record<string, any>>({
 
   // Sync History → Form: Update form when history changes (undo/redo)
   useEffect(() => {
-    const currentValues = form.state.values
+    const historyStr = JSON.stringify(history.state)
+    const currentStr = JSON.stringify(form.state.values)
 
     // Only update if values actually changed
-    // This prevents unnecessary re-renders
-    if (JSON.stringify(currentValues) !== JSON.stringify(history.state)) {
+    if (currentStr !== historyStr) {
       // Set flag to prevent circular updates
       updatingFromHistory.current = true
+      lastSyncedRef.current = historyStr
 
       // Reset form to history state (skips validation)
       form.reset(history.state as any)

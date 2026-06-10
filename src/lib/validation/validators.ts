@@ -11,7 +11,7 @@ import { z } from 'zod'
  */
 export const hexColorValidator = z
   .string()
-  .regex(/^[0-9A-Fa-f]{6}$/, 'Invalid hex color (e.g., FF0000)')
+  .regex(/^([0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/, 'Invalid hex color (e.g., FF0000 or FF000080)')
   .or(z.literal(''))
 
 /**
@@ -58,7 +58,7 @@ export const percentageValidator = rangeValidator(0, 100, '%')
  */
 export function colorArrayValidator(maxColors: number = 5) {
   return z
-    .array(z.string().regex(/^[0-9A-Fa-f]{6}$/, 'Invalid hex color'))
+    .array(z.string().regex(/^([0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/, 'Invalid hex color'))
     .max(maxColors, `Maximum ${maxColors} colors allowed`)
 }
 
@@ -78,14 +78,15 @@ export const urlValidator = z.string().url('Invalid URL format')
  * API key validators for different services
  */
 export const apiKeyValidators = {
-  youtube: z.string().regex(
-    /^AIza[0-9A-Za-z-_]{35}$/,
-    'Invalid YouTube API key format (should start with AIza)'
-  ),
-  github: z.string().regex(
-    /^(ghp|github_pat)_[a-zA-Z0-9]{36,}$/,
-    'Invalid GitHub API key format (should start with ghp_ or github_pat_)'
-  ),
+  youtube: z
+    .string()
+    .regex(/^AIza[0-9A-Za-z-_]{35}$/, 'Invalid YouTube API key format (should start with AIza)'),
+  github: z
+    .string()
+    .regex(
+      /^(ghp|github_pat)_[a-zA-Z0-9]{36,}$/,
+      'Invalid GitHub API key format (should start with ghp_ or github_pat_)'
+    ),
   twitch: z.string().min(30, 'Twitch Client ID should be at least 30 characters'),
   custom: z.string(), // No validation for custom
 }
@@ -101,3 +102,16 @@ export const fontFamilyValidator = z.string()
  * Validates comma-separated values
  */
 export const commaSeparatedValidator = z.string()
+
+/**
+ * Extract a displayable error message from TanStack Form validation errors.
+ * Zod v4 Standard Schema can return error objects instead of strings.
+ */
+export function getErrorMessage(error: unknown): string | undefined {
+  if (!error) return undefined
+  if (typeof error === 'string') return error
+  if (typeof error === 'object' && error !== null && 'message' in error) {
+    return String((error as { message: unknown }).message)
+  }
+  return String(error)
+}

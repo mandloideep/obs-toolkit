@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SetupRouteImport } from './routes/setup'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OverlaysTextRouteImport } from './routes/overlays/text'
 import { Route as OverlaysSocialsRouteImport } from './routes/overlays/socials'
@@ -23,6 +24,11 @@ import { Route as ConfigureCtaRouteImport } from './routes/configure/cta'
 import { Route as ConfigureCounterRouteImport } from './routes/configure/counter'
 import { Route as ConfigureBorderRouteImport } from './routes/configure/border'
 
+const SetupRoute = SetupRouteImport.update({
+  id: '/setup',
+  path: '/setup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -91,6 +97,7 @@ const ConfigureBorderRoute = ConfigureBorderRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/setup': typeof SetupRoute
   '/configure/border': typeof ConfigureBorderRoute
   '/configure/counter': typeof ConfigureCounterRoute
   '/configure/cta': typeof ConfigureCtaRoute
@@ -106,6 +113,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/setup': typeof SetupRoute
   '/configure/border': typeof ConfigureBorderRoute
   '/configure/counter': typeof ConfigureCounterRoute
   '/configure/cta': typeof ConfigureCtaRoute
@@ -122,6 +130,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/setup': typeof SetupRoute
   '/configure/border': typeof ConfigureBorderRoute
   '/configure/counter': typeof ConfigureCounterRoute
   '/configure/cta': typeof ConfigureCtaRoute
@@ -139,6 +148,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/setup'
     | '/configure/border'
     | '/configure/counter'
     | '/configure/cta'
@@ -154,6 +164,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/setup'
     | '/configure/border'
     | '/configure/counter'
     | '/configure/cta'
@@ -169,6 +180,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/setup'
     | '/configure/border'
     | '/configure/counter'
     | '/configure/cta'
@@ -185,6 +197,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  SetupRoute: typeof SetupRoute
   ConfigureBorderRoute: typeof ConfigureBorderRoute
   ConfigureCounterRoute: typeof ConfigureCounterRoute
   ConfigureCtaRoute: typeof ConfigureCtaRoute
@@ -201,6 +214,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/setup': {
+      id: '/setup'
+      path: '/setup'
+      fullPath: '/setup'
+      preLoaderRoute: typeof SetupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -297,6 +317,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  SetupRoute: SetupRoute,
   ConfigureBorderRoute: ConfigureBorderRoute,
   ConfigureCounterRoute: ConfigureCounterRoute,
   ConfigureCtaRoute: ConfigureCtaRoute,

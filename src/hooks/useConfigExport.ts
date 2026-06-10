@@ -23,7 +23,11 @@ interface ConfigExport<T> {
 interface UseConfigExportReturn<T> {
   exportConfig: (params: T, overlayType: string, metadata?: Partial<ConfigMetadata>) => void
   importConfig: (file: File) => Promise<T>
-  validateConfig: (json: unknown, defaults: T, overlayType: string) => { valid: boolean; params?: T; error?: string }
+  validateConfig: (
+    json: unknown,
+    defaults: T,
+    overlayType: string
+  ) => { valid: boolean; params?: T; error?: string }
 }
 
 const CURRENT_VERSION = '1.0'
@@ -114,7 +118,9 @@ export function useConfigExport<T extends Record<string, unknown>>(): UseConfigE
 
     // Check version compatibility
     if (config.version !== CURRENT_VERSION) {
-      console.warn(`Config version ${config.version} may not be fully compatible with current version ${CURRENT_VERSION}`)
+      console.warn(
+        `Config version ${config.version} may not be fully compatible with current version ${CURRENT_VERSION}`
+      )
     }
 
     // Validate param types against defaults
@@ -135,7 +141,9 @@ export function useConfigExport<T extends Record<string, unknown>>(): UseConfigE
             validatedParams[key] = importedValue
           }
         } else {
-          console.warn(`Type mismatch for param "${String(key)}": expected ${typeof defaultValue}, got ${typeof importedValue}. Using default.`)
+          console.warn(
+            `Type mismatch for param "${String(key)}": expected ${typeof defaultValue}, got ${typeof importedValue}. Using default.`
+          )
           validatedParams[key] = defaultValue
         }
       } else {

@@ -1,6 +1,7 @@
 /**
  * Text Overlay Presets
  * Quick preset configurations for common use cases
+ * Enhanced with gradient types, bg panels, and per-element colors
  */
 
 import type { TextPreset } from '../types/text.types'
@@ -9,7 +10,7 @@ import type { TextPresetName } from '../types/brand.types'
 export const TEXT_PRESETS: Record<TextPresetName, TextPreset> = {
   /**
    * BRB Preset
-   * "Be Right Back" break screen
+   * "Be Right Back" — warm sunset tones with gradient bg panel
    */
   brb: {
     text: 'Be Right Back',
@@ -26,13 +27,18 @@ export const TEXT_PRESETS: Record<TextPresetName, TextPreset> = {
     linestyle: 'gradient',
     lineanim: 'grow',
     gradient: 'sunset',
-    textcolor: '#ef4444',
+    gradienttype: 'linear',
+    textcolor: '#fbbf24',
+    subcolor: '#fdba74',
     bg: true,
+    bggradient: true,
+    bggradientname: 'fire',
+    colormode: 'darker',
   },
 
   /**
    * Chatting Preset
-   * "Just Chatting" screen
+   * "Just Chatting" — clean indigo with gradient text
    */
   chatting: {
     text: 'Just Chatting',
@@ -49,12 +55,14 @@ export const TEXT_PRESETS: Record<TextPresetName, TextPreset> = {
     linestyle: 'gradient',
     lineanim: 'slide',
     gradient: 'indigo',
+    gradienttype: 'linear',
+    textgradient: true,
     bg: false,
   },
 
   /**
    * Starting Soon Preset
-   * Pre-stream screen
+   * "Starting Soon" — fresh emerald with gradient text and bg panel
    */
   starting: {
     text: 'Starting Soon',
@@ -71,13 +79,18 @@ export const TEXT_PRESETS: Record<TextPresetName, TextPreset> = {
     linestyle: 'gradient',
     lineanim: 'slide',
     gradient: 'emerald',
-    textcolor: '#10b981',
+    gradienttype: 'linear',
+    textgradient: true,
+    subcolor: '#6ee7b7',
     bg: true,
+    bggradient: true,
+    bggradientname: 'palette:forest',
+    colormode: 'darker',
   },
 
   /**
    * Ending Preset
-   * "Thanks for Watching" post-stream screen
+   * "Thanks for Watching" — purple radial glow with panel
    */
   ending: {
     text: 'Thanks for Watching!',
@@ -94,12 +107,18 @@ export const TEXT_PRESETS: Record<TextPresetName, TextPreset> = {
     linestyle: 'gradient',
     lineanim: 'pulse',
     gradient: 'purple',
+    gradienttype: 'radial',
+    textgradient: true,
+    subcolor: '#c4b5fd',
     bg: true,
+    bggradient: true,
+    bggradientname: 'lavender',
+    colormode: 'darker',
   },
 
   /**
    * Technical Difficulties Preset
-   * Issue notification screen
+   * "Technical Difficulties" — monochrome with amber warning
    */
   technical: {
     text: 'Technical Difficulties',
@@ -115,9 +134,88 @@ export const TEXT_PRESETS: Record<TextPresetName, TextPreset> = {
     line: true,
     linestyle: 'dashed',
     lineanim: 'none',
+    linecolor: '#f59e0b',
     gradient: 'mono',
     textcolor: '#f59e0b',
+    subcolor: '#fbbf24',
     bg: true,
+  },
+
+  /**
+   * Gaming Preset
+   * Bold neon gradient text with dark panel and pulsing line
+   */
+  gaming: {
+    text: 'LIVE',
+    sub: '',
+    size: 64,
+    weight: 900,
+    font: 'display',
+    align: 'center',
+    valign: 'center',
+    entrance: 'scale',
+    entrancespeed: 0.6,
+    line: true,
+    linestyle: 'gradient',
+    lineanim: 'pulse',
+    gradient: 'neon',
+    gradienttype: 'linear',
+    textgradient: true,
+    bg: true,
+    bggradient: true,
+    bggradientname: 'palette:neon',
+    colormode: 'darker',
+  },
+
+  /**
+   * Podcast Preset
+   * Clean minimal with solid line — lower third style
+   */
+  podcast: {
+    text: 'Episode Title',
+    sub: 'Podcast Name',
+    size: 36,
+    subsize: 16,
+    weight: 500,
+    font: 'body',
+    align: 'left',
+    valign: 'bottom',
+    entrance: 'slideRight',
+    entrancespeed: 0.8,
+    line: true,
+    linestyle: 'solid',
+    lineanim: 'grow',
+    linecolor: '#94a3b8',
+    gradient: 'slate',
+    textcolor: '#f1f5f9',
+    subcolor: '#94a3b8',
+    bg: true,
+  },
+
+  /**
+   * Creative Preset
+   * Mesh palette bg with gradient text — artistic feel
+   */
+  creative: {
+    text: 'Creative Mode',
+    sub: '',
+    size: 44,
+    weight: 700,
+    font: 'display',
+    align: 'center',
+    valign: 'center',
+    entrance: 'fade',
+    entrancespeed: 1.2,
+    line: true,
+    linestyle: 'gradient',
+    lineanim: 'slide',
+    gradient: 'palette:aurora',
+    gradienttype: 'mesh',
+    textgradient: true,
+    bg: true,
+    bggradient: true,
+    bggradientname: 'palette:twilight',
+    colormode: 'darker',
   },
 
   /**

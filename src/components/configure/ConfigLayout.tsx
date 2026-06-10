@@ -6,6 +6,8 @@
 import { useState } from 'react'
 import { Button } from '../ui/button'
 import { Undo2, Redo2 } from 'lucide-react'
+import { CompanionLayerInput, type CompanionLayerInputState } from './CompanionLayerInput'
+import { useCompanionOverlays, type CompanionKind } from '../../hooks/useCompanionOverlays'
 
 interface UndoRedoControls {
   undo: () => void
@@ -21,6 +23,12 @@ interface ConfigLayoutProps {
   overlayTitle: string
   urlGeneratorComponent: React.ReactNode
   undoRedoControls?: UndoRedoControls // Optional undo/redo controls
+  /**
+   * The kind of overlay currently being configured. When provided, the layout
+   * renders companion overlay controls so the preview can be stacked against
+   * the last-saved mesh/border/text overlays.
+   */
+  companionKind?: CompanionKind
 }
 
 type PreviewSize = '640x360' | '1280x720' | '1920x1080'
@@ -32,6 +40,15 @@ const PREVIEW_SIZES: Record<PreviewSize, { width: number; height: number }> = {
   '1920x1080': { width: 1920, height: 1080 },
 }
 
+const DEFAULT_COMPANION_STATE: CompanionLayerInputState = {
+  mesh: { enabled: false, override: '' },
+  border: { enabled: false, override: '' },
+  text: { enabled: false, override: '' },
+}
+
+// Render order behind/above the current preview iframe.
+const LAYER_ORDER: CompanionKind[] = ['mesh', 'border', 'text']
+
 export function ConfigLayout({
   configContent,
   previewUrl,
@@ -39,9 +56,28 @@ export function ConfigLayout({
   overlayTitle,
   urlGeneratorComponent,
   undoRedoControls,
+  companionKind,
 }: ConfigLayoutProps) {
   const [previewSize, setPreviewSize] = useState<PreviewSize>('1280x720')
   const [previewBg, setPreviewBg] = useState<PreviewBackground>('black')
+  const [companionState, setCompanionState] =
+    useState<CompanionLayerInputState>(DEFAULT_COMPANION_STATE)
+  const { urls: savedCompanionUrls } = useCompanionOverlays()
+
+  // Resolve which companion layers to actually render: enabled + has effective URL +
+  // not the current kind (you never overlay yourself with yourself).
+  const activeCompanionLayers = LAYER_ORDER.filter((kind) => {
+    if (!companionKind || kind === companionKind) return false
+    const layer = companionState[kind]
+    if (!layer.enabled) return false
+    return Boolean(layer.override || savedCompanionUrls[kind])
+  }).map((kind) => ({
+    kind,
+    url: companionState[kind].override || savedCompanionUrls[kind],
+  }))
+
+  // Composite z-order — mesh always behind, current iframe in middle, others on top.
+  const currentZIndex = LAYER_ORDER.indexOf(companionKind ?? 'border') + 1
 
   const bgColors: Record<PreviewBackground, string> = {
     black: 'bg-black',
@@ -119,7 +155,9 @@ export function ConfigLayout({
                       size="sm"
                       onClick={() => setPreviewSize(size)}
                       className={
-                        previewSize === size ? 'bg-brand-indigo border-brand-indigo flex-1' : 'flex-1'
+                        previewSize === size
+                          ? 'bg-brand-indigo border-brand-indigo flex-1'
+                          : 'flex-1'
                       }
                     >
                       {size}
@@ -139,7 +177,9 @@ export function ConfigLayout({
                       size="sm"
                       onClick={() => setPreviewBg(bg)}
                       className={
-                        previewBg === bg ? 'bg-brand-indigo border-brand-indigo flex-1 capitalize' : 'flex-1 capitalize'
+                        previewBg === bg
+                          ? 'bg-brand-indigo border-brand-indigo flex-1 capitalize'
+                          : 'flex-1 capitalize'
                       }
                     >
                       {bg}
@@ -160,14 +200,52 @@ export function ConfigLayout({
               >
                 {/* Background layer */}
                 <div className={`absolute inset-0 ${bgColors[previewBg]}`} />
-                {/* Iframe layer */}
+
+                {/* Companion layers behind the current preview (mesh, sometimes border) */}
+                {activeCompanionLayers
+                  .filter((l) => LAYER_ORDER.indexOf(l.kind) < currentZIndex - 1)
+                  .map((layer) => (
+                    <iframe
+                      key={`under-${layer.kind}`}
+                      src={layer.url}
+                      className="absolute top-0 left-0 w-full h-full pointer-events-none"
+                      title={`${layer.kind} layer`}
+                      allow="autoplay"
+                      style={{
+                        backgroundColor: 'transparent',
+                        zIndex: LAYER_ORDER.indexOf(layer.kind) + 1,
+                      }}
+                    />
+                  ))}
+
+                {/* The active preview iframe */}
                 <iframe
                   src={previewUrl}
                   className="absolute top-0 left-0 w-full h-full"
                   title={`${overlayTitle} Preview`}
                   allow="autoplay"
-                  style={{ backgroundColor: 'transparent' }}
+                  style={{
+                    backgroundColor: 'transparent',
+                    zIndex: currentZIndex,
+                  }}
                 />
+
+                {/* Companion layers above the current preview */}
+                {activeCompanionLayers
+                  .filter((l) => LAYER_ORDER.indexOf(l.kind) >= currentZIndex - 1)
+                  .map((layer) => (
+                    <iframe
+                      key={`over-${layer.kind}`}
+                      src={layer.url}
+                      className="absolute top-0 left-0 w-full h-full pointer-events-none"
+                      title={`${layer.kind} layer`}
+                      allow="autoplay"
+                      style={{
+                        backgroundColor: 'transparent',
+                        zIndex: LAYER_ORDER.indexOf(layer.kind) + 1,
+                      }}
+                    />
+                  ))}
               </div>
             </div>
 
@@ -176,6 +254,16 @@ export function ConfigLayout({
               {PREVIEW_SIZES[previewSize].width} × {PREVIEW_SIZES[previewSize].height}
             </p>
           </div>
+
+          {/* Companion Layer controls */}
+          {companionKind && (
+            <CompanionLayerInput
+              currentKind={companionKind}
+              savedUrls={savedCompanionUrls}
+              state={companionState}
+              onChange={setCompanionState}
+            />
+          )}
 
           {/* URL Generator Section */}
           {urlGeneratorComponent}

@@ -13,12 +13,15 @@ import { CollapsibleSection } from '../../components/configure/form/CollapsibleS
 import { FormNumberSlider } from '../../components/configure/form/FormNumberSlider'
 import { FormColorArray } from '../../components/configure/form/FormColorArray'
 import { FormTextInput } from '../../components/configure/form/FormTextInput'
+import { FormColorPicker } from '../../components/configure/form/FormColorPicker'
 import { FormSelectInput } from '../../components/configure/form/FormSelectInput'
 import { FormSwitch } from '../../components/configure/form/FormSwitch'
 import { IconSelect } from '../../components/configure/form/IconSelect'
 import { FontSelect } from '../../components/configure/form/FontSelect'
 import { GradientGrid } from '../../components/configure/form/GradientGrid'
 import { PresetManager } from '../../components/configure/PresetManager'
+import { PresetCards } from '../../components/configure/PresetCards'
+import { COUNTER_PRESET_CARDS } from '../../config/preset-cards'
 import {
   COUNTER_LAYOUT_OPTIONS,
   COUNTER_ICON_OPTIONS,
@@ -26,12 +29,17 @@ import {
   NUMBER_NOTATION_OPTIONS,
   API_SERVICE_OPTIONS,
   THEME_OPTIONS,
+  BG_SHADOW_OPTIONS,
+  COLOR_MODE_OPTIONS,
+  GRADIENT_TYPE_OPTIONS,
+  BG_PANEL_DEFAULTS,
 } from '../../lib/constants'
 import { Switch } from '../../components/ui/switch'
 import { Label } from '../../components/ui/label'
 import { COUNTER_DEFAULTS } from '../../types/counter.types'
 import type { CounterOverlayParams } from '../../types/counter.types'
 import { useHistory } from '../../hooks/useHistory'
+import { useGlobalSettings, applyGlobalDefaults } from '../../hooks/useGlobalSettings'
 import { useFormWithHistory } from '../../hooks/useFormWithHistory'
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts'
 import { usePresets } from '../../hooks/usePresets'
@@ -43,8 +51,15 @@ export const Route = createFileRoute('/configure/counter')({
 })
 
 function CounterConfigurator() {
+  // Global brand settings
+  const { settings: globalSettings } = useGlobalSettings()
+  const resolvedDefaults = useMemo(
+    () => applyGlobalDefaults(COUNTER_DEFAULTS, globalSettings),
+    [globalSettings]
+  )
+
   // History management (undo/redo + debouncing)
-  const history = useHistory<CounterOverlayParams>(COUNTER_DEFAULTS)
+  const history = useHistory<CounterOverlayParams>(resolvedDefaults)
   const { state: params, updateState, undo, redo, canUndo, canRedo } = history
 
   // TanStack Form with Zod validation
@@ -160,12 +175,15 @@ function CounterConfigurator() {
     }
 
     const searchParams = new URLSearchParams(
-      Object.entries(params).reduce((acc, [key, value]) => {
-        if (value !== COUNTER_DEFAULTS[key as keyof CounterOverlayParams]) {
-          acc[key] = String(value)
-        }
-        return acc
-      }, {} as Record<string, string>)
+      Object.entries(params).reduce(
+        (acc, [key, value]) => {
+          if (value !== COUNTER_DEFAULTS[key as keyof CounterOverlayParams]) {
+            acc[key] = String(value)
+          }
+          return acc
+        },
+        {} as Record<string, string>
+      )
     )
     return `${getBaseUrl()}/overlays/counter?${searchParams.toString()}`
   }, [params])
@@ -178,22 +196,35 @@ function CounterConfigurator() {
     }
 
     const searchParams = new URLSearchParams(
-      Object.entries(params).reduce((acc, [key, value]) => {
-        // Skip API key for security
-        if (key === 'apikey') {
+      Object.entries(params).reduce(
+        (acc, [key, value]) => {
+          // Skip API key for security
+          if (key === 'apikey') {
+            return acc
+          }
+          if (value !== COUNTER_DEFAULTS[key as keyof CounterOverlayParams]) {
+            acc[key] = String(value)
+          }
           return acc
-        }
-        if (value !== COUNTER_DEFAULTS[key as keyof CounterOverlayParams]) {
-          acc[key] = String(value)
-        }
-        return acc
-      }, {} as Record<string, string>)
+        },
+        {} as Record<string, string>
+      )
     )
     return `${getBaseUrl()}/overlays/counter?${searchParams.toString()}`
   }, [params])
 
   const configSections = (
     <>
+      {/* Section: Quick Presets */}
+      <div className="config-section">
+        <h2 className="text-2xl font-semibold mb-6">Quick Presets</h2>
+        <PresetCards
+          presets={COUNTER_PRESET_CARDS}
+          value={params.preset}
+          onSelect={(val) => updateState({ ...params, preset: val as any })}
+        />
+      </div>
+
       {/* Custom Presets Manager */}
       <PresetManager
         presets={presets}
@@ -340,7 +371,7 @@ function CounterConfigurator() {
         {params.icon !== 'none' && (
           <form.Field name="iconcolor">
             {(field) => (
-              <FormTextInput
+              <FormColorPicker
                 label="Icon Color"
                 value={params.iconcolor}
                 onChange={(val) => {
@@ -349,7 +380,7 @@ function CounterConfigurator() {
                 }}
                 onBlur={field.handleBlur}
                 placeholder="Leave empty for gradient color"
-                help="Hex color (e.g., FF0000) or leave empty for gradient color"
+                help="Leave empty for gradient color"
                 error={field.state.meta.errors?.[0]}
               />
             )}
@@ -480,6 +511,140 @@ function CounterConfigurator() {
         </form.Field>
       </CollapsibleSection>
 
+      {/* Background Panel */}
+      {params.bg && (
+        <CollapsibleSection
+          title="Background Panel"
+          defaultOpen={false}
+          storageKey="counter-bgpanel"
+        >
+          <form.Field name="bgcolor">
+            {(field) => (
+              <FormColorPicker
+                label="Background Color"
+                value={params.bgcolor}
+                onChange={(val) => {
+                  field.handleChange(val)
+                  updateState({ ...params, bgcolor: val })
+                }}
+                onBlur={field.handleBlur}
+                placeholder="Leave empty for theme color"
+                help="Custom background color (empty = theme default)"
+                error={field.state.meta.errors?.[0]}
+              />
+            )}
+          </form.Field>
+
+          <form.Field name="bgopacity">
+            {(field) => (
+              <FormNumberSlider
+                label="Background Opacity"
+                value={Math.round(params.bgopacity * 100)}
+                onChange={(val) => {
+                  const opacity = val / 100
+                  field.handleChange(opacity)
+                  updateState({ ...params, bgopacity: opacity })
+                }}
+                onBlur={field.handleBlur}
+                min={0}
+                max={100}
+                unit="%"
+                help="Panel background transparency"
+                error={field.state.meta.errors?.[0]}
+              />
+            )}
+          </form.Field>
+
+          <form.Field name="bgshadow">
+            {(field) => (
+              <FormSelectInput
+                label="Shadow"
+                value={params.bgshadow}
+                onChange={(val) => {
+                  field.handleChange(val as any)
+                  updateState({ ...params, bgshadow: val as any })
+                }}
+                options={BG_SHADOW_OPTIONS}
+                error={field.state.meta.errors?.[0]}
+              />
+            )}
+          </form.Field>
+
+          <div className="grid grid-cols-2 gap-4">
+            <form.Field name="bgblur">
+              {(field) => (
+                <FormNumberSlider
+                  label="Backdrop Blur"
+                  value={params.bgblur}
+                  onChange={(val) => {
+                    field.handleChange(val)
+                    updateState({ ...params, bgblur: val })
+                  }}
+                  onBlur={field.handleBlur}
+                  min={0}
+                  max={50}
+                  unit="px"
+                  help="Glassmorphism blur"
+                  error={field.state.meta.errors?.[0]}
+                />
+              )}
+            </form.Field>
+
+            <form.Field name="bgradius">
+              {(field) => (
+                <FormNumberSlider
+                  label="Border Radius"
+                  value={params.bgradius}
+                  onChange={(val) => {
+                    field.handleChange(val)
+                    updateState({ ...params, bgradius: val })
+                  }}
+                  onBlur={field.handleBlur}
+                  min={0}
+                  max={50}
+                  unit="px"
+                  help="Corner rounding"
+                  error={field.state.meta.errors?.[0]}
+                />
+              )}
+            </form.Field>
+          </div>
+
+          <form.Field name="bggradient">
+            {(field) => (
+              <FormSwitch
+                label="Gradient background"
+                checked={params.bggradient}
+                onCheckedChange={(checked) => {
+                  field.handleChange(checked)
+                  updateState({ ...params, bggradient: checked })
+                }}
+                help="Use gradient colors as panel background"
+                error={field.state.meta.errors?.[0]}
+              />
+            )}
+          </form.Field>
+
+          {params.bggradient && (
+            <div>
+              <label className="config-label">Background Gradient</label>
+              <form.Field name="bggradientname">
+                {(field) => (
+                  <GradientGrid
+                    value={params.bggradientname || params.gradient}
+                    onValueChange={(value) => {
+                      field.handleChange(value as any)
+                      updateState({ ...params, bggradientname: value as any })
+                    }}
+                    onBlur={field.handleBlur}
+                  />
+                )}
+              </form.Field>
+            </div>
+          )}
+        </CollapsibleSection>
+      )}
+
       {/* Section 4: Typography */}
       <CollapsibleSection title="Typography" defaultOpen={false} storageKey="counter-typography">
         <div>
@@ -500,7 +665,7 @@ function CounterConfigurator() {
 
         <form.Field name="numbercolor">
           {(field) => (
-            <FormTextInput
+            <FormColorPicker
               label="Number Color"
               value={params.numbercolor}
               onChange={(val) => {
@@ -509,7 +674,24 @@ function CounterConfigurator() {
               }}
               onBlur={field.handleBlur}
               placeholder="Leave empty for gradient color"
-              help="Hex color (e.g., FF0000) or leave empty for gradient color"
+              help="Leave empty for gradient color"
+              error={field.state.meta.errors?.[0]}
+            />
+          )}
+        </form.Field>
+
+        <form.Field name="labelcolor">
+          {(field) => (
+            <FormColorPicker
+              label="Label Color"
+              value={params.labelcolor}
+              onChange={(val) => {
+                field.handleChange(val)
+                updateState({ ...params, labelcolor: val })
+              }}
+              onBlur={field.handleBlur}
+              placeholder="Leave empty for theme color"
+              help="Override label text color"
               error={field.state.meta.errors?.[0]}
             />
           )}
@@ -517,7 +699,11 @@ function CounterConfigurator() {
       </CollapsibleSection>
 
       {/* Section 5: Number Formatting */}
-      <CollapsibleSection title="Number Formatting" defaultOpen={false} storageKey="counter-formatting">
+      <CollapsibleSection
+        title="Number Formatting"
+        defaultOpen={false}
+        storageKey="counter-formatting"
+      >
         <form.Field name="separator">
           {(field) => (
             <FormSwitch
@@ -639,7 +825,7 @@ function CounterConfigurator() {
         {params.trend && (
           <form.Field name="trendcolor">
             {(field) => (
-              <FormTextInput
+              <FormColorPicker
                 label="Trend Arrow Color"
                 value={params.trendcolor}
                 onChange={(val) => {
@@ -648,7 +834,7 @@ function CounterConfigurator() {
                 }}
                 onBlur={field.handleBlur}
                 placeholder="10b981"
-                help="Hex color for trend arrow (e.g., 10b981 for green)"
+                help="Color for trend arrow indicator"
                 error={field.state.meta.errors?.[0]}
               />
             )}
@@ -661,7 +847,8 @@ function CounterConfigurator() {
         <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 mb-4">
           <p className="text-sm text-yellow-200 font-medium">⚠️ Security Notice</p>
           <p className="text-xs text-yellow-200/80 mt-2 mb-2">
-            <strong>Important:</strong> API keys will be included in the generated URL and visible in:
+            <strong>Important:</strong> API keys will be included in the generated URL and visible
+            in:
           </p>
           <ul className="text-xs text-yellow-200/70 ml-4 list-disc space-y-1">
             <li>OBS Browser Source settings (plain text)</li>
@@ -687,7 +874,8 @@ function CounterConfigurator() {
               Remember API credentials on this device
             </Label>
             <p className="text-xs text-dark-muted mt-1">
-              Store API key, username, and metric in browser storage. Disable if sharing this computer.
+              Store API key, username, and metric in browser storage. Disable if sharing this
+              computer.
             </p>
           </div>
           <Switch
@@ -825,11 +1013,7 @@ function CounterConfigurator() {
       </CollapsibleSection>
 
       {/* Help & Guides */}
-      <CollapsibleSection
-        title="Help & Guides"
-        defaultOpen={false}
-        storageKey="counter-help"
-      >
+      <CollapsibleSection title="Help & Guides" defaultOpen={false} storageKey="counter-help">
         <CounterOverlayHelp />
       </CollapsibleSection>
 
@@ -855,6 +1039,22 @@ function CounterConfigurator() {
           )}
         </form.Field>
 
+        <form.Field name="colormode">
+          {(field) => (
+            <FormSelectInput
+              label="Color Mode"
+              value={params.colormode}
+              onChange={(val) => {
+                field.handleChange(val as any)
+                updateState({ ...params, colormode: val as any })
+              }}
+              options={COLOR_MODE_OPTIONS}
+              help="Adjust gradient lightness to match your background"
+              error={field.state.meta.errors?.[0]}
+            />
+          )}
+        </form.Field>
+
         <div>
           <label className="config-label">Gradient Preset</label>
           <form.Field name="gradient">
@@ -866,10 +1066,28 @@ function CounterConfigurator() {
                   updateState({ ...params, gradient: value as any })
                 }}
                 onBlur={field.handleBlur}
+                colorMode={params.colormode}
+                onColorModeChange={(mode) => updateState({ ...params, colormode: mode as any })}
               />
             )}
           </form.Field>
         </div>
+
+        <form.Field name="gradienttype">
+          {(field) => (
+            <FormSelectInput
+              label="Gradient Style"
+              value={params.gradienttype}
+              onChange={(val) => {
+                field.handleChange(val as any)
+                updateState({ ...params, gradienttype: val as any })
+              }}
+              options={GRADIENT_TYPE_OPTIONS}
+              help="How gradient colors are blended"
+              error={field.state.meta.errors?.[0]}
+            />
+          )}
+        </form.Field>
 
         <form.Field name="colors">
           {(field) => (

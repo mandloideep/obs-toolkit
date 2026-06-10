@@ -13,9 +13,13 @@ import type {
   VerticalAlign,
   FontFamily,
   GradientName,
+  GradientType,
   ThemeName,
   TextPresetName,
+  BgShadow,
+  ColorMode,
 } from './brand.types'
+import { BG_PANEL_DEFAULTS } from '../lib/constants'
 
 /**
  * Text Overlay Parameters
@@ -59,6 +63,7 @@ export interface TextOverlayParams {
   linelength: number
   linewidth: number
   linespeed: number
+  linecolor: string
 
   // Entrance Animation
   entrance: EntranceAnimation
@@ -75,10 +80,21 @@ export interface TextOverlayParams {
   hold: number
   pause: number
 
+  // Background Panel
+  bgcolor: string
+  bgopacity: number
+  bgshadow: BgShadow
+  bgblur: number
+  bgradius: number
+
   // Global
   theme: ThemeName
   gradient: GradientName
+  gradienttype: GradientType
   colors: string[]
+  colormode: ColorMode
+  bggradient: boolean
+  bggradientname: string
 }
 
 /**
@@ -100,9 +116,17 @@ export interface TextPreset {
   line?: boolean
   linestyle?: LineStyle
   lineanim?: LineAnimation
+  linecolor?: string
   gradient?: GradientName
+  gradienttype?: GradientType
   textcolor?: string
+  subcolor?: string
+  textgradient?: boolean
   bg?: boolean
+  bggradient?: boolean
+  bggradientname?: string
+  colormode?: ColorMode
+  theme?: ThemeName
 }
 
 /**
@@ -146,7 +170,12 @@ export const TEXT_DEFAULTS: TextOverlayParams = {
   loop: false,
   hold: 4,
   pause: 2,
+  ...BG_PANEL_DEFAULTS,
   theme: 'dark',
   gradient: 'indigo',
+  gradienttype: 'linear',
   colors: [],
+  colormode: 'normal',
+  bggradient: false,
+  bggradientname: '',
 }

@@ -6,12 +6,20 @@
 
 import { useState, useEffect, useMemo, type CSSProperties } from 'react'
 import { useOverlayParams } from '../../hooks/useOverlayParams'
-import { useTheme, useGradient, useBrand, useFontFamily, useLoadGoogleFont } from '../../hooks/useBrand'
+import {
+  useTheme,
+  useGradient,
+  useBrand,
+  useFontFamily,
+  useLoadGoogleFont,
+} from '../../hooks/useBrand'
 import { OverlayPanel } from './OverlayPanel'
 import { PLATFORMS } from '../../config/platform-icons'
 import { SOCIALS_DEFAULTS, SIZE_MAP } from '../../types/socials.types'
 import type { SocialsOverlayParams } from '../../types/socials.types'
+import { SOCIALS_PRESETS } from '../../config/socials-presets'
 import type { SocialPlatform } from '../../types/brand.types'
+import { hexToCssColor } from '../../utils/color.utils'
 
 type AnimationMode = 'idle' | 'entering' | 'visible' | 'exiting'
 
@@ -23,11 +31,23 @@ interface SocialItem {
 
 export function SocialsOverlay() {
   // Parse URL parameters
-  const params = useOverlayParams<SocialsOverlayParams>(SOCIALS_DEFAULTS)
+  const urlParams = useOverlayParams<SocialsOverlayParams>(SOCIALS_DEFAULTS)
+
+  // Resolve preset (URL params override preset defaults)
+  const params = useMemo(() => {
+    const preset = SOCIALS_PRESETS[urlParams.preset] || {}
+    return { ...SOCIALS_DEFAULTS, ...preset, ...urlParams }
+  }, [urlParams])
 
   const brand = useBrand()
   const theme = useTheme(params.theme)
-  const gradient = useGradient(params.gradient, params.colors)
+  const gradient = useGradient(params.gradient, params.colors, undefined, params.colormode)
+  const bgGradient = useGradient(
+    (params.bggradientname || params.gradient) as any,
+    params.bggradientname ? undefined : params.colors,
+    undefined,
+    params.colormode
+  )
   const fontFamily = useFontFamily(params.font)
 
   // Load Google Font if needed
@@ -163,11 +183,14 @@ export function SocialsOverlay() {
     const showAll = () => {
       setAnimationMode('visible')
       items.forEach((_, index) => {
-        setTimeout(() => {
-          setItems((prev) =>
-            prev.map((item, i) => (i === index ? { ...item, visible: true } : item))
-          )
-        }, params.entrance === 'stagger' ? index * 150 : 0)
+        setTimeout(
+          () => {
+            setItems((prev) =>
+              prev.map((item, i) => (i === index ? { ...item, visible: true } : item))
+            )
+          },
+          params.entrance === 'stagger' ? index * 150 : 0
+        )
       })
     }
 
@@ -184,16 +207,28 @@ export function SocialsOverlay() {
 
     const loopCycle = () => {
       showAll()
-      timer = setTimeout(() => {
-        hideAll()
-        timer = setTimeout(loopCycle, params.pause * 1000 + items.length * 80)
-      }, (params.hold + params.delay + (params.entrance === 'stagger' ? items.length * 0.15 : 0)) * 1000)
+      timer = setTimeout(
+        () => {
+          hideAll()
+          timer = setTimeout(loopCycle, params.pause * 1000 + items.length * 80)
+        },
+        (params.hold + params.delay + (params.entrance === 'stagger' ? items.length * 0.15 : 0)) *
+          1000
+      )
     }
 
     loopCycle()
 
     return () => clearTimeout(timer)
-  }, [params.loop, params.onebyone, params.hold, params.pause, params.delay, params.entrance, items.length])
+  }, [
+    params.loop,
+    params.onebyone,
+    params.hold,
+    params.pause,
+    params.delay,
+    params.entrance,
+    items.length,
+  ])
 
   // One-by-one mode: show each social one at a time
   useEffect(() => {
@@ -212,9 +247,12 @@ export function SocialsOverlay() {
         )
 
         // Schedule next
-        timer = setTimeout(() => {
-          setOneByOneIndex((prev) => (prev + 1) % items.length)
-        }, params.each * 1000 + params.eachpause * 1000)
+        timer = setTimeout(
+          () => {
+            setOneByOneIndex((prev) => (prev + 1) % items.length)
+          },
+          params.each * 1000 + params.eachpause * 1000
+        )
       }, 300)
     }
 
@@ -250,7 +288,7 @@ export function SocialsOverlay() {
   }
 
   const handleStyle: CSSProperties = {
-    color: theme.text,
+    color: params.handlecolor ? hexToCssColor(params.handlecolor) : theme.text,
     fontFamily,
     fontSize: `${handleSize}px`,
     fontWeight: params.fontweight,
@@ -303,7 +341,21 @@ export function SocialsOverlay() {
         pointerEvents: 'none',
       }}
     >
-      {params.bg ? <OverlayPanel>{content}</OverlayPanel> : content}
+      {params.bg ? (
+        <OverlayPanel
+          bgcolor={params.bgcolor}
+          bgopacity={params.bgopacity}
+          bgshadow={params.bgshadow}
+          blur={params.bgblur}
+          borderRadius={params.bgradius}
+          gradientColors={params.bggradient ? bgGradient : undefined}
+          gradientType={params.gradienttype}
+        >
+          {content}
+        </OverlayPanel>
+      ) : (
+        content
+      )}
     </div>
   )
 }
