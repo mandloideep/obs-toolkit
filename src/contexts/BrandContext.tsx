@@ -28,10 +28,7 @@ export function BrandProvider({ children, overrides }: BrandProviderProps) {
   const brand = useMemo(() => {
     if (!overrides) return BRAND_CONFIG
 
-    return deepMerge(
-      { ...BRAND_CONFIG, ...overrides } as BrandConfig,
-      BRAND_CONFIG
-    )
+    return deepMerge({ ...BRAND_CONFIG, ...overrides } as BrandConfig, BRAND_CONFIG)
   }, [overrides])
 
   const value = useMemo(

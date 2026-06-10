@@ -14,12 +14,7 @@ interface ColorArrayInputProps {
   maxColors?: number
 }
 
-export function ColorArrayInput({
-  label,
-  colors,
-  onChange,
-  maxColors = 5,
-}: ColorArrayInputProps) {
+export function ColorArrayInput({ label, colors, onChange, maxColors = 5 }: ColorArrayInputProps) {
   const handleColorChange = (index: number, value: string) => {
     const newColors = [...colors]
     // Remove # if user includes it

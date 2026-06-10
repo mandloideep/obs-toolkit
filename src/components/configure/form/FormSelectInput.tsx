@@ -66,9 +66,7 @@ export function FormSelectInput({
       <Label className="config-label">{label}</Label>
 
       {/* Help Text */}
-      {help && (
-        <p className="text-xs text-muted-foreground -mt-1">{help}</p>
-      )}
+      {help && <p className="text-xs text-muted-foreground -mt-1">{help}</p>}
 
       {/* Select Dropdown */}
       <Select value={value} onValueChange={onChange}>
@@ -85,9 +83,7 @@ export function FormSelectInput({
       </Select>
 
       {/* Error Message */}
-      {error && (
-        <p className="text-xs text-destructive">{getErrorMessage(error)}</p>
-      )}
+      {error && <p className="text-xs text-destructive">{getErrorMessage(error)}</p>}
     </div>
   )
 }

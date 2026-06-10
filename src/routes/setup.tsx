@@ -8,6 +8,7 @@ import { useState, useMemo } from 'react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { ChevronLeft, ChevronRight, Check, Moon, Sun } from 'lucide-react'
 import { Button } from '../components/ui/button'
+import { cn } from '@/lib/utils'
 import { GradientGrid } from '../components/configure/form/GradientGrid'
 import { FontSelect } from '../components/configure/form/FontSelect'
 import { FormSelectInput } from '../components/configure/form/FormSelectInput'
@@ -84,9 +85,7 @@ function SetupWizard() {
       <div className="flex-1 flex">
         {/* Left: Step content */}
         <div className="flex-1 p-8 overflow-y-auto">
-          {currentStep === 'Theme' && (
-            <ThemeStep value={theme} onChange={setTheme} />
-          )}
+          {currentStep === 'Theme' && <ThemeStep value={theme} onChange={setTheme} />}
           {currentStep === 'Colors' && (
             <ColorsStep
               gradient={gradient}
@@ -97,9 +96,7 @@ function SetupWizard() {
               onColormodeChange={setColormode}
             />
           )}
-          {currentStep === 'Typography' && (
-            <TypographyStep value={font} onChange={setFont} />
-          )}
+          {currentStep === 'Typography' && <TypographyStep value={font} onChange={setFont} />}
           {currentStep === 'Preview' && (
             <PreviewStep
               theme={theme}
@@ -113,31 +110,21 @@ function SetupWizard() {
 
         {/* Right: Live preview swatch */}
         <div className="w-80 border-l border-border p-6 flex flex-col gap-4">
-          <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Preview</h3>
-          <LivePreview
-            theme={theme}
-            gradient={gradient}
-            colormode={colormode}
-            font={font}
-          />
+          <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+            Preview
+          </h3>
+          <LivePreview theme={theme} gradient={gradient} colormode={colormode} font={font} />
         </div>
       </div>
 
       {/* Footer nav */}
       <div className="border-t border-border px-8 py-4 flex justify-between">
-        <Button
-          variant="outline"
-          onClick={handleBack}
-          disabled={isFirst}
-        >
+        <Button variant="outline" onClick={handleBack} disabled={isFirst}>
           <ChevronLeft size={16} />
           Back
         </Button>
         <div className="flex gap-3">
-          <Button
-            variant="ghost"
-            onClick={() => navigate({ to: '/' })}
-          >
+          <Button variant="ghost" onClick={() => navigate({ to: '/' })}>
             Skip
           </Button>
           <Button variant="indigo" onClick={handleNext}>
@@ -165,40 +152,46 @@ function ThemeStep({ value, onChange }: { value: ThemeName; onChange: (v: ThemeN
   return (
     <div>
       <h2 className="text-3xl font-bold mb-2">Choose your theme</h2>
-      <p className="text-muted-foreground mb-8">This sets the default background for all your overlays.</p>
+      <p className="text-muted-foreground mb-8">
+        This sets the default background for all your overlays.
+      </p>
 
       <div className="grid grid-cols-2 gap-4 max-w-lg">
-        <button
+        <Button
           type="button"
+          variant="ghost"
           onClick={() => onChange('dark')}
-          className={`p-6 rounded-xl border-2 text-left transition-all ${
+          className={cn(
+            'p-6 h-auto rounded-xl border-2 text-left transition-all flex flex-col items-start gap-0 whitespace-normal justify-start',
             value === 'dark'
               ? 'border-primary bg-primary/10 ring-2 ring-primary/20'
               : 'border-border hover:border-primary/50'
-          }`}
+          )}
         >
           <Moon size={32} className="mb-3 text-indigo-400" />
           <div className="text-lg font-semibold">Dark</div>
           <div className="text-sm text-muted-foreground mt-1">
             Dark backgrounds with light text. Best for stream overlays.
           </div>
-        </button>
+        </Button>
 
-        <button
+        <Button
           type="button"
+          variant="ghost"
           onClick={() => onChange('light')}
-          className={`p-6 rounded-xl border-2 text-left transition-all ${
+          className={cn(
+            'p-6 h-auto rounded-xl border-2 text-left transition-all flex flex-col items-start gap-0 whitespace-normal justify-start',
             value === 'light'
               ? 'border-primary bg-primary/10 ring-2 ring-primary/20'
               : 'border-border hover:border-primary/50'
-          }`}
+          )}
         >
           <Sun size={32} className="mb-3 text-amber-400" />
           <div className="text-lg font-semibold">Light</div>
           <div className="text-sm text-muted-foreground mt-1">
             Light backgrounds with dark text. Clean and minimal.
           </div>
-        </button>
+        </Button>
       </div>
     </div>
   )
@@ -291,7 +284,8 @@ function PreviewStep({
     <div>
       <h2 className="text-3xl font-bold mb-2">Looking good!</h2>
       <p className="text-muted-foreground mb-8">
-        Here's a summary of your brand settings. You can always change these later in each configurator.
+        Here's a summary of your brand settings. You can always change these later in each
+        configurator.
       </p>
 
       <div className="space-y-4 max-w-lg">
@@ -332,7 +326,7 @@ function LivePreview({
 
   const gradientCss = useMemo(
     () => `linear-gradient(135deg, ${gradientColors.join(', ')})`,
-    [gradientColors],
+    [gradientColors]
   )
 
   return (
@@ -346,9 +340,10 @@ function LivePreview({
           className="text-lg font-bold bg-clip-text text-transparent mb-1"
           style={{
             backgroundImage: gradientCss,
-            fontFamily: font === 'display' || font === 'body' || font === 'mono'
-              ? undefined
-              : `'${font}', sans-serif`,
+            fontFamily:
+              font === 'display' || font === 'body' || font === 'mono'
+                ? undefined
+                : `'${font}', sans-serif`,
           }}
         >
           Starting Soon
@@ -356,10 +351,7 @@ function LivePreview({
         <div className="text-xs" style={{ color: themeColors.textMuted }}>
           Stream begins in a moment...
         </div>
-        <div
-          className="h-0.5 mt-3 rounded-full"
-          style={{ background: gradientCss }}
-        />
+        <div className="h-0.5 mt-3 rounded-full" style={{ background: gradientCss }} />
       </div>
 
       {/* Mini CTA preview */}

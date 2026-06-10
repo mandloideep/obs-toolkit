@@ -53,7 +53,10 @@ export const Route = createFileRoute('/configure/counter')({
 function CounterConfigurator() {
   // Global brand settings
   const { settings: globalSettings } = useGlobalSettings()
-  const resolvedDefaults = useMemo(() => applyGlobalDefaults(COUNTER_DEFAULTS, globalSettings), [globalSettings])
+  const resolvedDefaults = useMemo(
+    () => applyGlobalDefaults(COUNTER_DEFAULTS, globalSettings),
+    [globalSettings]
+  )
 
   // History management (undo/redo + debouncing)
   const history = useHistory<CounterOverlayParams>(resolvedDefaults)
@@ -172,12 +175,15 @@ function CounterConfigurator() {
     }
 
     const searchParams = new URLSearchParams(
-      Object.entries(params).reduce((acc, [key, value]) => {
-        if (value !== COUNTER_DEFAULTS[key as keyof CounterOverlayParams]) {
-          acc[key] = String(value)
-        }
-        return acc
-      }, {} as Record<string, string>)
+      Object.entries(params).reduce(
+        (acc, [key, value]) => {
+          if (value !== COUNTER_DEFAULTS[key as keyof CounterOverlayParams]) {
+            acc[key] = String(value)
+          }
+          return acc
+        },
+        {} as Record<string, string>
+      )
     )
     return `${getBaseUrl()}/overlays/counter?${searchParams.toString()}`
   }, [params])
@@ -190,16 +196,19 @@ function CounterConfigurator() {
     }
 
     const searchParams = new URLSearchParams(
-      Object.entries(params).reduce((acc, [key, value]) => {
-        // Skip API key for security
-        if (key === 'apikey') {
+      Object.entries(params).reduce(
+        (acc, [key, value]) => {
+          // Skip API key for security
+          if (key === 'apikey') {
+            return acc
+          }
+          if (value !== COUNTER_DEFAULTS[key as keyof CounterOverlayParams]) {
+            acc[key] = String(value)
+          }
           return acc
-        }
-        if (value !== COUNTER_DEFAULTS[key as keyof CounterOverlayParams]) {
-          acc[key] = String(value)
-        }
-        return acc
-      }, {} as Record<string, string>)
+        },
+        {} as Record<string, string>
+      )
     )
     return `${getBaseUrl()}/overlays/counter?${searchParams.toString()}`
   }, [params])
@@ -504,7 +513,11 @@ function CounterConfigurator() {
 
       {/* Background Panel */}
       {params.bg && (
-        <CollapsibleSection title="Background Panel" defaultOpen={false} storageKey="counter-bgpanel">
+        <CollapsibleSection
+          title="Background Panel"
+          defaultOpen={false}
+          storageKey="counter-bgpanel"
+        >
           <form.Field name="bgcolor">
             {(field) => (
               <FormColorPicker
@@ -686,7 +699,11 @@ function CounterConfigurator() {
       </CollapsibleSection>
 
       {/* Section 5: Number Formatting */}
-      <CollapsibleSection title="Number Formatting" defaultOpen={false} storageKey="counter-formatting">
+      <CollapsibleSection
+        title="Number Formatting"
+        defaultOpen={false}
+        storageKey="counter-formatting"
+      >
         <form.Field name="separator">
           {(field) => (
             <FormSwitch
@@ -830,7 +847,8 @@ function CounterConfigurator() {
         <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 mb-4">
           <p className="text-sm text-yellow-200 font-medium">⚠️ Security Notice</p>
           <p className="text-xs text-yellow-200/80 mt-2 mb-2">
-            <strong>Important:</strong> API keys will be included in the generated URL and visible in:
+            <strong>Important:</strong> API keys will be included in the generated URL and visible
+            in:
           </p>
           <ul className="text-xs text-yellow-200/70 ml-4 list-disc space-y-1">
             <li>OBS Browser Source settings (plain text)</li>
@@ -856,7 +874,8 @@ function CounterConfigurator() {
               Remember API credentials on this device
             </Label>
             <p className="text-xs text-dark-muted mt-1">
-              Store API key, username, and metric in browser storage. Disable if sharing this computer.
+              Store API key, username, and metric in browser storage. Disable if sharing this
+              computer.
             </p>
           </div>
           <Switch
@@ -994,11 +1013,7 @@ function CounterConfigurator() {
       </CollapsibleSection>
 
       {/* Help & Guides */}
-      <CollapsibleSection
-        title="Help & Guides"
-        defaultOpen={false}
-        storageKey="counter-help"
-      >
+      <CollapsibleSection title="Help & Guides" defaultOpen={false} storageKey="counter-help">
         <CounterOverlayHelp />
       </CollapsibleSection>
 
@@ -1051,6 +1066,8 @@ function CounterConfigurator() {
                   updateState({ ...params, gradient: value as any })
                 }}
                 onBlur={field.handleBlur}
+                colorMode={params.colormode}
+                onColorModeChange={(mode) => updateState({ ...params, colormode: mode as any })}
               />
             )}
           </form.Field>

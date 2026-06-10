@@ -6,7 +6,13 @@
 
 import { useState, useEffect, useMemo, type CSSProperties } from 'react'
 import { useOverlayParams } from '../../hooks/useOverlayParams'
-import { useGradient, useTheme, useFontFamily, useLoadCustomFonts, useLoadGoogleFont } from '../../hooks/useBrand'
+import {
+  useGradient,
+  useTheme,
+  useFontFamily,
+  useLoadCustomFonts,
+  useLoadGoogleFont,
+} from '../../hooks/useBrand'
 import { EntranceAnimation } from '../animations/EntranceAnimation'
 import { ExitAnimation, useDelayedExit } from '../animations/ExitAnimation'
 import { OverlayContainer } from './OverlayContainer'
@@ -68,9 +74,12 @@ export function TextOverlay() {
     switch (loopState) {
       case 'entering':
         // After entrance animation, go to visible state
-        timer = setTimeout(() => {
-          setLoopState('visible')
-        }, (params.delay + params.entrancespeed) * 1000)
+        timer = setTimeout(
+          () => {
+            setLoopState('visible')
+          },
+          (params.delay + params.entrancespeed) * 1000
+        )
         break
 
       case 'visible':
@@ -97,7 +106,15 @@ export function TextOverlay() {
     }
 
     return () => clearTimeout(timer)
-  }, [loopState, params.loop, params.delay, params.entrancespeed, params.hold, params.exitspeed, params.pause])
+  }, [
+    loopState,
+    params.loop,
+    params.delay,
+    params.entrancespeed,
+    params.hold,
+    params.exitspeed,
+    params.pause,
+  ])
 
   // Determine if component should be visible
   const isVisible = params.loop
@@ -105,9 +122,7 @@ export function TextOverlay() {
     : true
 
   // Determine if exit animation should trigger
-  const triggerExit = params.loop
-    ? loopState === 'exiting'
-    : shouldExit && params.exit !== 'none'
+  const triggerExit = params.loop ? loopState === 'exiting' : shouldExit && params.exit !== 'none'
 
   // Calculate padding (use specific padx/pady if set, otherwise use pad)
   const paddingX = params.padx > 0 ? params.padx : params.pad
@@ -183,7 +198,15 @@ export function TextOverlay() {
   const content = (
     <div style={contentStyle}>
       {params.bg ? (
-        <OverlayPanel bgcolor={params.bgcolor} bgopacity={params.bgopacity} bgshadow={params.bgshadow} blur={params.bgblur} borderRadius={params.bgradius} gradientColors={params.bggradient ? bgGradient : undefined} gradientType={params.gradienttype}>
+        <OverlayPanel
+          bgcolor={params.bgcolor}
+          bgopacity={params.bgopacity}
+          bgshadow={params.bgshadow}
+          blur={params.bgblur}
+          borderRadius={params.bgradius}
+          gradientColors={params.bggradient ? bgGradient : undefined}
+          gradientType={params.gradienttype}
+        >
           {renderLine('top')}
           <h1 style={getTextStyle()}>{params.text}</h1>
           {params.sub && <p style={getSubStyle()}>{params.sub}</p>}
@@ -211,11 +234,7 @@ export function TextOverlay() {
   }, [])
 
   return (
-    <OverlayContainer
-      align={params.align}
-      valign={params.valign}
-      showBg={false}
-    >
+    <OverlayContainer align={params.align} valign={params.valign} showBg={false}>
       {isVisible && (
         <EntranceAnimation
           type={params.entrance}

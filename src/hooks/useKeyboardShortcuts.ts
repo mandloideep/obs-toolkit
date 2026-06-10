@@ -21,11 +21,7 @@ export function useKeyboardShortcuts(shortcuts: Shortcut[]) {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Ignore if typing in input, textarea, or contenteditable
       const target = e.target as HTMLElement
-      if (
-        target.tagName === 'INPUT' ||
-        target.tagName === 'TEXTAREA' ||
-        target.isContentEditable
-      ) {
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
         return
       }
 

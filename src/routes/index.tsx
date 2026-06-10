@@ -24,7 +24,9 @@ function Dashboard() {
               <Settings size={20} className="text-indigo-400" />
               <div>
                 <p className="text-sm font-medium">Set up your brand</p>
-                <p className="text-xs text-muted-foreground">Choose theme, colors, and fonts for all overlays</p>
+                <p className="text-xs text-muted-foreground">
+                  Choose theme, colors, and fonts for all overlays
+                </p>
               </div>
             </div>
             <Link to="/setup">

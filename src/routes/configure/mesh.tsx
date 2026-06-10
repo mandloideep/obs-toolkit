@@ -3,15 +3,16 @@
  * Visual configuration UI for mesh background overlay parameters
  */
 
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { ConfigLayout } from '../../components/configure/ConfigLayout'
+import { useCompanionOverlays } from '../../hooks/useCompanionOverlays'
 import { URLGenerator } from '../../components/configure/URLGenerator'
 import { getBaseUrl } from '../../lib/baseUrl'
 import { CollapsibleSection } from '../../components/configure/form/CollapsibleSection'
 import { FormNumberSlider } from '../../components/configure/form/FormNumberSlider'
 import { FormSelectInput } from '../../components/configure/form/FormSelectInput'
-import { FormTextInput } from '../../components/configure/form/FormTextInput'
+import { FormColorPicker } from '../../components/configure/form/FormColorPicker'
 import { PresetManager } from '../../components/configure/PresetManager'
 import { Button } from '../../components/ui/button'
 import {
@@ -113,6 +114,9 @@ function MeshConfigurator() {
     updateState({ ...params, seed: newSeed })
   }
 
+  // Companion overlays: publish our preview URL so border/text can layer against us
+  const { setUrl: setCompanionUrl } = useCompanionOverlays()
+
   // Generate preview URL
   const previewUrl = useMemo(() => {
     if (!params) {
@@ -120,15 +124,23 @@ function MeshConfigurator() {
     }
 
     const searchParams = new URLSearchParams(
-      Object.entries(params).reduce((acc, [key, value]) => {
-        if (value !== MESH_DEFAULTS[key as keyof MeshOverlayParams]) {
-          acc[key] = String(value)
-        }
-        return acc
-      }, {} as Record<string, string>)
+      Object.entries(params).reduce(
+        (acc, [key, value]) => {
+          if (value !== MESH_DEFAULTS[key as keyof MeshOverlayParams]) {
+            acc[key] = String(value)
+          }
+          return acc
+        },
+        {} as Record<string, string>
+      )
     )
     return `${getBaseUrl()}/overlays/mesh?${searchParams.toString()}`
   }, [params])
+
+  // Auto-save current preview URL for companion layering by other configurators
+  useEffect(() => {
+    setCompanionUrl('mesh', previewUrl)
+  }, [previewUrl, setCompanionUrl])
 
   const configSections = (
     <>
@@ -174,12 +186,7 @@ function MeshConfigurator() {
                 )}
               </form.Field>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={randomizeSeed}
-              className="mb-1 shrink-0"
-            >
+            <Button variant="outline" size="sm" onClick={randomizeSeed} className="mb-1 shrink-0">
               <Shuffle size={14} />
               Randomize
             </Button>
@@ -365,7 +372,7 @@ function MeshConfigurator() {
 
         <form.Field name="bg">
           {(field) => (
-            <FormTextInput
+            <FormColorPicker
               label="Background Color"
               value={params.bg}
               onChange={(val) => {
@@ -373,7 +380,10 @@ function MeshConfigurator() {
                 updateState({ ...params, bg: val })
               }}
               onBlur={field.handleBlur}
-              help="Hex color without # (e.g. 000000)"
+              showAlpha={false}
+              allowEmpty={false}
+              placeholder="000000"
+              help="Background fill behind the mesh"
               error={field.state.meta.errors?.[0]}
             />
           )}
@@ -387,6 +397,7 @@ function MeshConfigurator() {
       configContent={configSections}
       previewUrl={previewUrl}
       overlayTitle="Mesh Background"
+      companionKind="mesh"
       urlGeneratorComponent={
         <URLGenerator
           overlayPath="/overlays/mesh"

@@ -128,7 +128,7 @@ export function CTAOverlay() {
       ...urlParams,
       // Override with URL params if they're not the defaults
       text: urlParams.text || preset.text || 'Subscribe',
-      sub: urlParams.sub !== undefined ? urlParams.sub : (preset.sub || ''),
+      sub: urlParams.sub !== undefined ? urlParams.sub : preset.sub || '',
       icon: urlParams.icon || preset.icon || 'sub',
       iconanim: urlParams.iconanim || preset.iconanim || 'bounce',
     }
@@ -163,9 +163,12 @@ export function CTAOverlay() {
     switch (loopState) {
       case 'entering':
         // After entrance animation, go to visible state
-        timer = setTimeout(() => {
-          setLoopState('visible')
-        }, (params.delay + params.entrancespeed) * 1000)
+        timer = setTimeout(
+          () => {
+            setLoopState('visible')
+          },
+          (params.delay + params.entrancespeed) * 1000
+        )
         break
 
       case 'visible':
@@ -192,10 +195,20 @@ export function CTAOverlay() {
     }
 
     return () => clearTimeout(timer)
-  }, [loopState, params.loop, params.delay, params.entrancespeed, params.hold, params.exitspeed, params.pause])
+  }, [
+    loopState,
+    params.loop,
+    params.delay,
+    params.entrancespeed,
+    params.hold,
+    params.exitspeed,
+    params.pause,
+  ])
 
   // Determine if component should be visible
-  const isVisible = params.loop ? loopState === 'entering' || loopState === 'visible' || loopState === 'exiting' : true
+  const isVisible = params.loop
+    ? loopState === 'entering' || loopState === 'visible' || loopState === 'exiting'
+    : true
 
   // Determine if exit animation should trigger
   const triggerExit = params.loop ? loopState === 'exiting' : shouldExit && params.exit !== 'none'
@@ -280,12 +293,7 @@ export function CTAOverlay() {
 
     if (params.decoration === 'swirl') {
       return (
-        <svg
-          width="60"
-          height="12"
-          viewBox="0 0 60 12"
-          style={{ marginTop: '6px' }}
-        >
+        <svg width="60" height="12" viewBox="0 0 60 12" style={{ marginTop: '6px' }}>
           <path
             d="M2,6 Q8,2 15,6 T30,6 Q38,10 45,6 Q50,4 55,6"
             stroke={decoColor}
@@ -353,7 +361,21 @@ export function CTAOverlay() {
             // Force re-mount on loop cycle to retrigger exit animation
             key={`exit-${loopCycle}`}
           >
-            {params.bg ? <OverlayPanel bgcolor={params.bgcolor} bgopacity={params.bgopacity} bgshadow={params.bgshadow} blur={params.bgblur} borderRadius={params.bgradius} gradientColors={params.bggradient ? bgGradient : undefined} gradientType={params.gradienttype}>{content}</OverlayPanel> : content}
+            {params.bg ? (
+              <OverlayPanel
+                bgcolor={params.bgcolor}
+                bgopacity={params.bgopacity}
+                bgshadow={params.bgshadow}
+                blur={params.bgblur}
+                borderRadius={params.bgradius}
+                gradientColors={params.bggradient ? bgGradient : undefined}
+                gradientType={params.gradienttype}
+              >
+                {content}
+              </OverlayPanel>
+            ) : (
+              content
+            )}
           </ExitAnimation>
         </EntranceAnimation>
       )}

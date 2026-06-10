@@ -20,7 +20,15 @@ interface URLGeneratorProps {
   onImportConfig: (params: Record<string, any>) => void // Callback when config is imported
 }
 
-export function URLGenerator({ overlayPath, params, defaults, baseUrl, sensitiveParams = [], overlayType, onImportConfig }: URLGeneratorProps) {
+export function URLGenerator({
+  overlayPath,
+  params,
+  defaults,
+  baseUrl,
+  sensitiveParams = [],
+  overlayType,
+  onImportConfig,
+}: URLGeneratorProps) {
   const [copied, setCopied] = useState(false)
   const [copiedWithKey, setCopiedWithKey] = useState(false)
   const [importError, setImportError] = useState<string | null>(null)
@@ -30,49 +38,52 @@ export function URLGenerator({ overlayPath, params, defaults, baseUrl, sensitive
   const { exportConfig, importConfig, validateConfig } = useConfigExport()
 
   // Helper function to generate URL with optional param exclusions
-  const generateUrl = useCallback((excludeParams: string[] = []) => {
-    const base = baseUrl || getBaseUrl()
-    const searchParams = new URLSearchParams()
+  const generateUrl = useCallback(
+    (excludeParams: string[] = []) => {
+      const base = baseUrl || getBaseUrl()
+      const searchParams = new URLSearchParams()
 
-    // Only add parameters that differ from defaults
-    Object.keys(params).forEach((key) => {
-      // Skip if this param should be excluded
-      if (excludeParams.includes(key)) {
-        return
-      }
+      // Only add parameters that differ from defaults
+      Object.keys(params).forEach((key) => {
+        // Skip if this param should be excluded
+        if (excludeParams.includes(key)) {
+          return
+        }
 
-      const value = params[key]
-      const defaultValue = defaults[key]
+        const value = params[key]
+        const defaultValue = defaults[key]
 
-      // Skip if value matches default
-      if (JSON.stringify(value) === JSON.stringify(defaultValue)) {
-        return
-      }
+        // Skip if value matches default
+        if (JSON.stringify(value) === JSON.stringify(defaultValue)) {
+          return
+        }
 
-      // Skip empty strings, empty arrays, null, undefined
-      if (value === '' || value === null || value === undefined) {
-        return
-      }
-      if (Array.isArray(value) && value.length === 0) {
-        return
-      }
+        // Skip empty strings, empty arrays, null, undefined
+        if (value === '' || value === null || value === undefined) {
+          return
+        }
+        if (Array.isArray(value) && value.length === 0) {
+          return
+        }
 
-      // Convert value to string
-      let stringValue: string
-      if (Array.isArray(value)) {
-        stringValue = value.join(',')
-      } else if (typeof value === 'boolean') {
-        stringValue = value ? 'true' : 'false'
-      } else {
-        stringValue = String(value)
-      }
+        // Convert value to string
+        let stringValue: string
+        if (Array.isArray(value)) {
+          stringValue = value.join(',')
+        } else if (typeof value === 'boolean') {
+          stringValue = value ? 'true' : 'false'
+        } else {
+          stringValue = String(value)
+        }
 
-      searchParams.set(key, stringValue)
-    })
+        searchParams.set(key, stringValue)
+      })
 
-    const queryString = searchParams.toString()
-    return `${base}${overlayPath}${queryString ? `?${queryString}` : ''}`
-  }, [overlayPath, params, defaults, baseUrl])
+      const queryString = searchParams.toString()
+      return `${base}${overlayPath}${queryString ? `?${queryString}` : ''}`
+    },
+    [overlayPath, params, defaults, baseUrl]
+  )
 
   // Display URL: Excludes sensitive params (for security)
   const displayUrl = useMemo(() => generateUrl(sensitiveParams), [generateUrl, sensitiveParams])
@@ -107,7 +118,7 @@ export function URLGenerator({ overlayPath, params, defaults, baseUrl, sensitive
   const handleExport = () => {
     // Create params without sensitive data for export
     const exportParams = { ...params }
-    sensitiveParams.forEach(key => {
+    sensitiveParams.forEach((key) => {
       delete exportParams[key]
     })
     exportConfig(exportParams, overlayType)
@@ -170,7 +181,9 @@ export function URLGenerator({ overlayPath, params, defaults, baseUrl, sensitive
           <Button
             variant={copiedWithKey ? 'default' : 'indigo'}
             onClick={copyFullUrlToClipboard}
-            className={copiedWithKey ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300' : ''}
+            className={
+              copiedWithKey ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300' : ''
+            }
           >
             {copiedWithKey ? <Check size={16} /> : <Copy size={16} />}
             {copiedWithKey ? 'Copied with Key!' : 'Copy with API Key'}
@@ -230,7 +243,8 @@ export function URLGenerator({ overlayPath, params, defaults, baseUrl, sensitive
 
       {/* Helper text */}
       <p className="text-xs text-dark-muted mt-3 leading-relaxed">
-        💾 Export saves your current configuration as a JSON file. Import loads a previously saved configuration.
+        💾 Export saves your current configuration as a JSON file. Import loads a previously saved
+        configuration.
         {sensitiveParams.length > 0 && ' Sensitive data (API keys) are excluded from exports.'}
       </p>
     </div>

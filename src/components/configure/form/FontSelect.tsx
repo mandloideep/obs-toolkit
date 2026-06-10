@@ -12,6 +12,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useGoogleFonts } from '@/hooks/useGoogleFonts'
 import { googleFontsService } from '@/services/googleFonts'
@@ -60,20 +62,18 @@ export function FontSelect({
     if (!showGoogleFonts || !googleFonts.length) return []
 
     return googleFonts
-      .filter(f => category === 'all' || f.category === category)
-      .filter(f => f.family.toLowerCase().includes(searchQuery.toLowerCase()))
+      .filter((f) => category === 'all' || f.category === category)
+      .filter((f) => f.family.toLowerCase().includes(searchQuery.toLowerCase()))
       .slice(0, 50) // Performance limit - only show first 50 results
-      .map(f => ({
+      .map((f) => ({
         value: f.family,
         label: f.family,
-        fontFamily: `'${f.family}', ${googleFontsService.getCategoryFallback(f.category)}`
+        fontFamily: `'${f.family}', ${googleFontsService.getCategoryFallback(f.category)}`,
       }))
   }, [googleFonts, category, searchQuery, showGoogleFonts])
 
   // Combined options
-  const allOptions = showGoogleFonts
-    ? [...baseOptions, ...googleFontOptions]
-    : baseOptions
+  const allOptions = showGoogleFonts ? [...baseOptions, ...googleFontOptions] : baseOptions
 
   const selectedOption = allOptions.find((opt) => opt.value === value)
 
@@ -83,23 +83,25 @@ export function FontSelect({
       {showGoogleFonts && (
         <>
           <div className="flex gap-2">
-            <input
+            <Input
               type="text"
               placeholder="Search fonts..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="config-input flex-1"
+              className="flex-1"
             />
-            <button
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
               onClick={() => {
                 googleFontsService.clearCache()
                 refresh()
               }}
-              className="p-2 rounded bg-dark-lighter text-dark-muted hover:text-white transition-colors"
               title="Refresh fonts"
             >
               <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
-            </button>
+            </Button>
           </div>
 
           {/* Category Filters */}
@@ -111,17 +113,19 @@ export function FontSelect({
               { value: 'display', label: 'Display' },
               { value: 'monospace', label: 'Monospace' },
             ].map((cat) => (
-              <button
+              <Button
                 key={cat.value}
+                type="button"
+                variant={category === cat.value ? 'default' : 'outline'}
+                size="sm"
                 onClick={() => setCategory(cat.value)}
-                className={`text-xs px-3 py-1 rounded transition-colors ${
-                  category === cat.value
-                    ? 'bg-indigo-500 text-white'
-                    : 'bg-dark-lighter text-dark-muted hover:text-white'
-                }`}
+                className={cn(
+                  'h-7 text-xs',
+                  category === cat.value && 'bg-indigo-500 hover:bg-indigo-500/90 border-indigo-500'
+                )}
               >
                 {cat.label}
-              </button>
+              </Button>
             ))}
           </div>
 
@@ -174,21 +178,19 @@ export function FontSelect({
 
           {/* Loading State */}
           {showGoogleFonts && loading && googleFontOptions.length === 0 && (
-            <div className="text-xs text-dark-muted px-2 py-3 text-center">
-              Loading fonts...
-            </div>
+            <div className="text-xs text-dark-muted px-2 py-3 text-center">Loading fonts...</div>
           )}
 
           {/* No Results */}
           {showGoogleFonts &&
-           !loading &&
-           googleFonts.length > 0 &&
-           googleFontOptions.length === 0 &&
-           searchQuery && (
-            <div className="text-xs text-dark-muted px-2 py-3 text-center">
-              No fonts found matching "{searchQuery}"
-            </div>
-          )}
+            !loading &&
+            googleFonts.length > 0 &&
+            googleFontOptions.length === 0 &&
+            searchQuery && (
+              <div className="text-xs text-dark-muted px-2 py-3 text-center">
+                No fonts found matching "{searchQuery}"
+              </div>
+            )}
         </SelectContent>
       </Select>
     </div>
@@ -248,7 +250,7 @@ function FontPreview({ font, showValue = true }: FontPreviewProps) {
       style={{
         fontFamily: loaded ? font.fontFamily : 'system-ui',
         opacity: loaded ? 1 : 0.6,
-        transition: 'opacity 0.2s ease'
+        transition: 'opacity 0.2s ease',
       }}
     >
       {showValue ? font.label : font.value}

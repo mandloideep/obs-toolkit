@@ -4,9 +4,10 @@
  * Now with TanStack Form + Zod validation + ShadCN UI components
  */
 
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { ConfigLayout } from '../../components/configure/ConfigLayout'
+import { useCompanionOverlays } from '../../hooks/useCompanionOverlays'
 import { URLGenerator } from '../../components/configure/URLGenerator'
 import { getBaseUrl } from '../../lib/baseUrl'
 import { CollapsibleSection } from '../../components/configure/form/CollapsibleSection'
@@ -44,7 +45,10 @@ export const Route = createFileRoute('/configure/border')({
 function BorderConfigurator() {
   // Global brand settings
   const { settings: globalSettings } = useGlobalSettings()
-  const resolvedDefaults = useMemo(() => applyGlobalDefaults(BORDER_DEFAULTS, globalSettings), [globalSettings])
+  const resolvedDefaults = useMemo(
+    () => applyGlobalDefaults(BORDER_DEFAULTS, globalSettings),
+    [globalSettings]
+  )
 
   // History management (undo/redo + debouncing)
   const history = useHistory<BorderOverlayParams>(resolvedDefaults)
@@ -103,6 +107,9 @@ function BorderConfigurator() {
     })
   }
 
+  // Companion overlays: publish our preview URL so mesh/text can layer against us
+  const { setUrl: setCompanionUrl } = useCompanionOverlays()
+
   // Generate preview URL
   const previewUrl = useMemo(() => {
     // Guard against undefined params during initialization
@@ -111,15 +118,23 @@ function BorderConfigurator() {
     }
 
     const searchParams = new URLSearchParams(
-      Object.entries(params).reduce((acc, [key, value]) => {
-        if (value !== BORDER_DEFAULTS[key as keyof BorderOverlayParams]) {
-          acc[key] = String(value)
-        }
-        return acc
-      }, {} as Record<string, string>)
+      Object.entries(params).reduce(
+        (acc, [key, value]) => {
+          if (value !== BORDER_DEFAULTS[key as keyof BorderOverlayParams]) {
+            acc[key] = String(value)
+          }
+          return acc
+        },
+        {} as Record<string, string>
+      )
     )
     return `${getBaseUrl()}/overlays/border?${searchParams.toString()}`
   }, [params])
+
+  // Auto-save current preview URL for companion layering by other configurators
+  useEffect(() => {
+    setCompanionUrl('border', previewUrl)
+  }, [previewUrl, setCompanionUrl])
 
   const configSections = (
     <>
@@ -311,6 +326,8 @@ function BorderConfigurator() {
                   updateState({ ...params, gradient: value as any })
                 }}
                 onBlur={field.handleBlur}
+                colorMode={params.colormode}
+                onColorModeChange={(mode) => updateState({ ...params, colormode: mode as any })}
               />
             )}
           </form.Field>
@@ -472,11 +489,7 @@ function BorderConfigurator() {
       </CollapsibleSection>
 
       {/* Help & Guides */}
-      <CollapsibleSection
-        title="Help & Guides"
-        defaultOpen={false}
-        storageKey="border-help"
-      >
+      <CollapsibleSection title="Help & Guides" defaultOpen={false} storageKey="border-help">
         <BorderOverlayHelp />
       </CollapsibleSection>
     </>
@@ -487,6 +500,7 @@ function BorderConfigurator() {
       configContent={configSections}
       previewUrl={previewUrl}
       overlayTitle="Border Overlay"
+      companionKind="border"
       urlGeneratorComponent={
         <URLGenerator
           overlayPath="/overlays/border"

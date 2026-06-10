@@ -35,14 +35,7 @@ export function Icon({
   const LucideIcon = (LucideIcons as any)[toPascalCase(name)]
 
   if (LucideIcon) {
-    return (
-      <LucideIcon
-        size={size}
-        color={color}
-        strokeWidth={strokeWidth}
-        className={className}
-      />
-    )
+    return <LucideIcon size={size} color={color} strokeWidth={strokeWidth} className={className} />
   }
 
   // Fallback to custom icons

@@ -63,7 +63,10 @@ type AllPlatforms = Record<SocialPlatform, PlatformData>
 function SocialsConfigurator() {
   // Global brand settings
   const { settings: globalSettings } = useGlobalSettings()
-  const resolvedDefaults = useMemo(() => applyGlobalDefaults(SOCIALS_DEFAULTS, globalSettings), [globalSettings])
+  const resolvedDefaults = useMemo(
+    () => applyGlobalDefaults(SOCIALS_DEFAULTS, globalSettings),
+    [globalSettings]
+  )
 
   // History management (undo/redo + debouncing)
   const history = useHistory<SocialsOverlayParams>(resolvedDefaults)
@@ -78,11 +81,14 @@ function SocialsConfigurator() {
   // Parse show and handles into individual platform states
   const [platforms, setPlatforms] = useState<AllPlatforms>(() => {
     const showList = SOCIALS_DEFAULTS.show.split(',').filter(Boolean)
-    const handlesMap = SOCIALS_DEFAULTS.handles.split(',').reduce((acc, pair) => {
-      const [platform, handle] = pair.split(':')
-      if (platform && handle) acc[platform] = handle
-      return acc
-    }, {} as Record<string, string>)
+    const handlesMap = SOCIALS_DEFAULTS.handles.split(',').reduce(
+      (acc, pair) => {
+        const [platform, handle] = pair.split(':')
+        if (platform && handle) acc[platform] = handle
+        return acc
+      },
+      {} as Record<string, string>
+    )
 
     return {
       github: { enabled: showList.includes('github'), handle: handlesMap.github || '' },
@@ -100,11 +106,14 @@ function SocialsConfigurator() {
   // Sync platforms state when params change (from undo/redo)
   useEffect(() => {
     const showList = params.show.split(',').filter(Boolean)
-    const handlesMap = params.handles.split(',').reduce((acc, pair) => {
-      const [platform, handle] = pair.split(':')
-      if (platform && handle) acc[platform] = handle
-      return acc
-    }, {} as Record<string, string>)
+    const handlesMap = params.handles.split(',').reduce(
+      (acc, pair) => {
+        const [platform, handle] = pair.split(':')
+        if (platform && handle) acc[platform] = handle
+        return acc
+      },
+      {} as Record<string, string>
+    )
 
     setPlatforms({
       github: { enabled: showList.includes('github'), handle: handlesMap.github || '' },
@@ -204,12 +213,15 @@ function SocialsConfigurator() {
     }
 
     const searchParams = new URLSearchParams(
-      Object.entries(params).reduce((acc, [key, value]) => {
-        if (value !== SOCIALS_DEFAULTS[key as keyof SocialsOverlayParams]) {
-          acc[key] = String(value)
-        }
-        return acc
-      }, {} as Record<string, string>)
+      Object.entries(params).reduce(
+        (acc, [key, value]) => {
+          if (value !== SOCIALS_DEFAULTS[key as keyof SocialsOverlayParams]) {
+            acc[key] = String(value)
+          }
+          return acc
+        },
+        {} as Record<string, string>
+      )
     )
     return `${getBaseUrl()}/overlays/socials?${searchParams.toString()}`
   }, [params])
@@ -456,7 +468,11 @@ function SocialsConfigurator() {
       </CollapsibleSection>
 
       {/* Section 2: Platform Ordering */}
-      <CollapsibleSection title="Platform Ordering" defaultOpen={false} storageKey="socials-ordering">
+      <CollapsibleSection
+        title="Platform Ordering"
+        defaultOpen={false}
+        storageKey="socials-ordering"
+      >
         <form.Field name="order">
           {(field) => (
             <FormSelectInput
@@ -595,7 +611,11 @@ function SocialsConfigurator() {
 
       {/* Background Panel */}
       {params.bg && (
-        <CollapsibleSection title="Background Panel" defaultOpen={false} storageKey="socials-bgpanel">
+        <CollapsibleSection
+          title="Background Panel"
+          defaultOpen={false}
+          storageKey="socials-bgpanel"
+        >
           <form.Field name="bgcolor">
             {(field) => (
               <FormColorPicker
@@ -891,7 +911,11 @@ function SocialsConfigurator() {
       </CollapsibleSection>
 
       {/* Section 6: Entrance Animation */}
-      <CollapsibleSection title="Entrance Animation" defaultOpen={false} storageKey="socials-entrance">
+      <CollapsibleSection
+        title="Entrance Animation"
+        defaultOpen={false}
+        storageKey="socials-entrance"
+      >
         <div>
           <label className="config-label">Animation Type</label>
           <form.Field name="entrance">
@@ -1183,6 +1207,8 @@ function SocialsConfigurator() {
                   updateState({ ...params, gradient: value as any })
                 }}
                 onBlur={field.handleBlur}
+                colorMode={params.colormode}
+                onColorModeChange={(mode) => updateState({ ...params, colormode: mode as any })}
               />
             )}
           </form.Field>
@@ -1221,11 +1247,7 @@ function SocialsConfigurator() {
       </CollapsibleSection>
 
       {/* Help & Guides */}
-      <CollapsibleSection
-        title="Help & Guides"
-        defaultOpen={false}
-        storageKey="socials-help"
-      >
+      <CollapsibleSection title="Help & Guides" defaultOpen={false} storageKey="socials-help">
         <SocialsOverlayHelp />
       </CollapsibleSection>
     </>

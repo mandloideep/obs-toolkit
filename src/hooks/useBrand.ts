@@ -93,9 +93,7 @@ export function useGradient(
  *
  * @param themeName - Current theme name
  */
-export function useAccents(
-  themeName?: ThemeName
-): ContrastAccents {
+export function useAccents(themeName?: ThemeName): ContrastAccents {
   return useMemo(() => {
     const theme = themeName || 'dark'
 
@@ -123,10 +121,7 @@ export function useAccents(
  * @param fontName - Font family name or custom font index
  * @param customFonts - Array of custom font names from URL param
  */
-export function useFontFamily(
-  fontName?: FontFamily,
-  customFonts?: string[]
-): string {
+export function useFontFamily(fontName?: FontFamily, customFonts?: string[]): string {
   const { brand } = useBrandContext()
 
   return useMemo(() => {

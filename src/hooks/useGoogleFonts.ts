@@ -44,6 +44,6 @@ export function useGoogleFonts(): UseGoogleFontsReturn {
     fonts,
     loading,
     error,
-    refresh: loadFonts
+    refresh: loadFonts,
   }
 }

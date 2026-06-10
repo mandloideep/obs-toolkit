@@ -60,9 +60,7 @@ export function FormTextInput({
       <Label className="config-label">{label}</Label>
 
       {/* Help Text */}
-      {help && (
-        <p className="text-xs text-muted-foreground -mt-1">{help}</p>
-      )}
+      {help && <p className="text-xs text-muted-foreground -mt-1">{help}</p>}
 
       {/* Input Field */}
       <Input
@@ -75,9 +73,7 @@ export function FormTextInput({
       />
 
       {/* Error Message */}
-      {error && (
-        <p className="text-xs text-destructive">{getErrorMessage(error)}</p>
-      )}
+      {error && <p className="text-xs text-destructive">{getErrorMessage(error)}</p>}
     </div>
   )
 }

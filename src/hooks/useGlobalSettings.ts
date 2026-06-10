@@ -72,7 +72,7 @@ export function useGlobalSettings() {
       resetSettings,
       isSetupComplete,
     }),
-    [settings, updateSettings, resetSettings, isSetupComplete],
+    [settings, updateSettings, resetSettings, isSetupComplete]
   )
 }
 
@@ -82,7 +82,7 @@ export function useGlobalSettings() {
  */
 export function applyGlobalDefaults<T extends Record<string, unknown>>(
   defaults: T,
-  globalSettings: GlobalSettings,
+  globalSettings: GlobalSettings
 ): T {
   if (!globalSettings.setupComplete) return defaults
 

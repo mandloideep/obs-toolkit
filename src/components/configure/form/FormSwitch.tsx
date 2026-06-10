@@ -40,34 +40,20 @@ interface FormSwitchProps {
  * </form.Field>
  * ```
  */
-export function FormSwitch({
-  label,
-  checked,
-  onCheckedChange,
-  help,
-  error,
-}: FormSwitchProps) {
+export function FormSwitch({ label, checked, onCheckedChange, help, error }: FormSwitchProps) {
   return (
     <div className="space-y-2">
       {/* Label + Switch Row */}
       <div className="flex items-center justify-between">
         <div className="space-y-0.5">
           <Label className="config-label cursor-pointer">{label}</Label>
-          {help && (
-            <p className="text-xs text-muted-foreground">{help}</p>
-          )}
+          {help && <p className="text-xs text-muted-foreground">{help}</p>}
         </div>
-        <Switch
-          checked={checked}
-          onCheckedChange={onCheckedChange}
-          aria-label={label}
-        />
+        <Switch checked={checked} onCheckedChange={onCheckedChange} aria-label={label} />
       </div>
 
       {/* Error Message */}
-      {error && (
-        <p className="text-xs text-destructive">{getErrorMessage(error)}</p>
-      )}
+      {error && <p className="text-xs text-destructive">{getErrorMessage(error)}</p>}
     </div>
   )
 }

@@ -91,10 +91,7 @@ export const BRAND_CONFIG: BrandConfig = {
  * Deep merge utility for combining brand config with defaults
  * Preserves nested objects while allowing partial overrides
  */
-export function deepMerge<T extends Record<string, any>>(
-  target: T,
-  fallback: T
-): T {
+export function deepMerge<T extends Record<string, any>>(target: T, fallback: T): T {
   const result = { ...target }
 
   for (const key of Object.keys(fallback) as (keyof T)[]) {

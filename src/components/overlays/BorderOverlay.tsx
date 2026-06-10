@@ -49,7 +49,7 @@ export function BorderOverlay() {
   const getPerimeter = (): number => {
     if (params.shape === 'circle') {
       const minDim = Math.min(width, height)
-      const radius = (minDim / 2) - params.thickness - 2
+      const radius = minDim / 2 - params.thickness - 2
       return 2 * Math.PI * radius
     } else {
       const w = width - params.thickness - 4
@@ -59,7 +59,7 @@ export function BorderOverlay() {
       if (params.r > 0) {
         // Rounded rectangle: straight edges + arc length
         // Each corner is a quarter-circle arc, 4 corners = full circle
-        const straightEdgeLength = 2 * ((w - 2 * params.r) + (h - 2 * params.r))
+        const straightEdgeLength = 2 * (w - 2 * params.r + (h - 2 * params.r))
         const arcLength = 2 * Math.PI * params.r
         return straightEdgeLength + arcLength
       }
@@ -74,7 +74,7 @@ export function BorderOverlay() {
     (timestamp) => {
       if (params.animation !== 'dash' || !shapeRef.current) return
 
-      const progress = ((timestamp % (params.speed * 1000)) / (params.speed * 1000))
+      const progress = (timestamp % (params.speed * 1000)) / (params.speed * 1000)
       const perimeter = getPerimeter()
       const offset = -progress * perimeter
 
@@ -89,7 +89,7 @@ export function BorderOverlay() {
     (timestamp) => {
       if (params.animation !== 'rotate') return
 
-      const progress = ((timestamp % (params.speed * 1000)) / (params.speed * 1000))
+      const progress = (timestamp % (params.speed * 1000)) / (params.speed * 1000)
       setGradientRotation(progress * 360)
     },
     [params.animation, params.speed]
@@ -101,9 +101,9 @@ export function BorderOverlay() {
     (timestamp) => {
       if (params.animation !== 'pulse') return
 
-      const progress = ((timestamp % (params.speed * 1000)) / (params.speed * 1000))
+      const progress = (timestamp % (params.speed * 1000)) / (params.speed * 1000)
       const sine = Math.sin(progress * Math.PI * 2)
-      const opacity = 0.3 + (0.7 * ((sine + 1) / 2))
+      const opacity = 0.3 + 0.7 * ((sine + 1) / 2)
       setPulseOpacity(opacity * params.opacity)
     },
     [params.animation, params.speed, params.opacity]
@@ -115,7 +115,7 @@ export function BorderOverlay() {
     (timestamp) => {
       if (params.animation !== 'breathe') return
 
-      const progress = ((timestamp % (params.speed * 1000)) / (params.speed * 1000))
+      const progress = (timestamp % (params.speed * 1000)) / (params.speed * 1000)
       const sine = Math.sin(progress * Math.PI * 2)
       const glow = params.glowsize * (0.5 + 0.5 * ((sine + 1) / 2))
       setBreatheGlow(glow)
@@ -129,7 +129,7 @@ export function BorderOverlay() {
       if (!params.multicolor) return
 
       const gradientKeys = Object.keys(brand.gradients) as BrandGradientName[]
-      const progress = ((timestamp % (params.speed * 1000)) / (params.speed * 1000))
+      const progress = (timestamp % (params.speed * 1000)) / (params.speed * 1000)
       const index = Math.floor(progress * gradientKeys.length)
       const nextIndex = (index + 1) % gradientKeys.length
 
@@ -154,7 +154,7 @@ export function BorderOverlay() {
 
       const gradientKeys = Object.keys(brand.gradients) as BrandGradientName[]
       const duration = params.shiftspeed * 1000
-      const progress = ((timestamp % duration) / duration)
+      const progress = (timestamp % duration) / duration
       const index = Math.floor(progress * gradientKeys.length)
       const nextIndex = (index + 1) % gradientKeys.length
 
@@ -205,7 +205,11 @@ export function BorderOverlay() {
   }
 
   // Render the shape with optional stroke width override and gradient ID
-  const renderShape = (strokeWidthOverride?: number, isGlowLayer: boolean = false, gradientId: string = 'borderGradient') => {
+  const renderShape = (
+    strokeWidthOverride?: number,
+    isGlowLayer: boolean = false,
+    gradientId: string = 'borderGradient'
+  ) => {
     const strokeWidth = strokeWidthOverride ?? params.thickness
     const commonProps = {
       ref: isGlowLayer ? undefined : (shapeRef as any),
@@ -218,7 +222,7 @@ export function BorderOverlay() {
 
     if (params.shape === 'circle') {
       const minDim = Math.min(width, height)
-      const radius = (minDim / 2) - params.thickness - 2
+      const radius = minDim / 2 - params.thickness - 2
       return <circle cx={width / 2} cy={height / 2} r={radius} {...commonProps} />
     }
 
@@ -300,7 +304,11 @@ export function BorderOverlay() {
               direction={params.animation === 'rotate' ? gradientRotation : 90}
               type={params.gradienttype === 'radial' ? 'radial' : 'linear'}
             />
-            {renderShape(params.style === 'neon' ? params.thickness * 3 : params.thickness, true, 'glowGradient')}
+            {renderShape(
+              params.style === 'neon' ? params.thickness * 3 : params.thickness,
+              true,
+              'glowGradient'
+            )}
           </svg>
 
           {/* Extra glow layer for neon style */}

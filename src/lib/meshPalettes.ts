@@ -146,7 +146,10 @@ export function applyModeShift(
  * Convert RGB (0-255) to hex color string
  */
 function rgbToHex(r: number, g: number, b: number): string {
-  const toHex = (n: number) => Math.round(Math.max(0, Math.min(255, n))).toString(16).padStart(2, '0')
+  const toHex = (n: number) =>
+    Math.round(Math.max(0, Math.min(255, n)))
+      .toString(16)
+      .padStart(2, '0')
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`
 }
 
@@ -194,9 +197,7 @@ export function generatePaletteColors(
   }
 
   // Use hueSpread to limit total range if specified
-  const effectiveRange = palette.hueSpread
-    ? Math.min(palette.hueSpread, totalRange)
-    : totalRange
+  const effectiveRange = palette.hueSpread ? Math.min(palette.hueSpread, totalRange) : totalRange
 
   // Pick a random starting point within the available range
   const rangeStart = startHue + rng() * Math.max(0, totalRange - effectiveRange)
@@ -205,7 +206,7 @@ export function generatePaletteColors(
     // Evenly space hues across the effective range, with small random jitter
     const evenSpacing = (effectiveRange / count) * (i + 0.5)
     const jitter = (rng() - 0.5) * (effectiveRange / count) * 0.4
-    const h = ((rangeStart + evenSpacing + jitter) % 360 + 360) % 360
+    const h = (((rangeStart + evenSpacing + jitter) % 360) + 360) % 360
 
     const s = seededFloat(rng, palette.saturation[0], palette.saturation[1])
     const l = seededFloat(rng, palette.lightness[0], palette.lightness[1])
@@ -236,9 +237,7 @@ export function paletteToGradient(paletteName: string, count = 5): string[] {
     startHue = palette.hue[0]
   }
 
-  const effectiveRange = palette.hueSpread
-    ? Math.min(palette.hueSpread, totalRange)
-    : totalRange
+  const effectiveRange = palette.hueSpread ? Math.min(palette.hueSpread, totalRange) : totalRange
 
   // Use midpoints of saturation and lightness for representative colors
   const satMid = (palette.saturation[0] + palette.saturation[1]) / 2
@@ -246,7 +245,7 @@ export function paletteToGradient(paletteName: string, count = 5): string[] {
 
   const colors: string[] = []
   for (let i = 0; i < count; i++) {
-    const h = ((startHue + (effectiveRange / count) * (i + 0.5)) % 360 + 360) % 360
+    const h = (((startHue + (effectiveRange / count) * (i + 0.5)) % 360) + 360) % 360
     // Alternate lightness slightly for visual depth
     const l = lightMid + (i % 2 === 0 ? -3 : 3)
     const rgb = hslToRgb(h, satMid, l)

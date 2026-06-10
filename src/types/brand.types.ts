@@ -73,11 +73,11 @@ export interface ThemeConfig {
   light: ThemeColors
 }
 
-export type GradientName = typeof ALL_GRADIENT_NAMES[number]
+export type GradientName = (typeof ALL_GRADIENT_NAMES)[number]
 
-export type BrandGradientName = typeof GRADIENT_NAMES[number]
+export type BrandGradientName = (typeof GRADIENT_NAMES)[number]
 
-export type GradientType = typeof GRADIENT_TYPES[number]
+export type GradientType = (typeof GRADIENT_TYPES)[number]
 
 export type GradientMap = Record<BrandGradientName, string[]>
 
@@ -100,59 +100,57 @@ export interface BrandConfig {
 
 // ===== ANIMATION TYPES =====
 
-export type EntranceAnimation = typeof ENTRANCE_ANIMATIONS[number]
+export type EntranceAnimation = (typeof ENTRANCE_ANIMATIONS)[number]
 
-export type ExitAnimation = typeof EXIT_ANIMATIONS[number]
+export type ExitAnimation = (typeof EXIT_ANIMATIONS)[number]
 
-export type IconAnimation = typeof ICON_ANIMATIONS[number]
+export type IconAnimation = (typeof ICON_ANIMATIONS)[number]
 
-export type BorderAnimation = typeof BORDER_ANIMATIONS[number]
+export type BorderAnimation = (typeof BORDER_ANIMATIONS)[number]
 
-export type LineAnimation = typeof LINE_ANIMATIONS[number]
+export type LineAnimation = (typeof LINE_ANIMATIONS)[number]
 
-export type LoopState = typeof LOOP_STATES[number]
+export type LoopState = (typeof LOOP_STATES)[number]
 
 // ===== COMPONENT SHAPE/STYLE TYPES =====
 
-export type Shape = typeof SHAPES[number]
+export type Shape = (typeof SHAPES)[number]
 
-export type BorderStyle = typeof BORDER_STYLES[number]
+export type BorderStyle = (typeof BORDER_STYLES)[number]
 
-export type LineStyle = typeof LINE_STYLES[number]
+export type LineStyle = (typeof LINE_STYLES)[number]
 
-export type DecorationStyle = typeof DECORATION_STYLES[number]
+export type DecorationStyle = (typeof DECORATION_STYLES)[number]
 
 // ===== LAYOUT TYPES =====
 
-export type HorizontalAlign = typeof HORIZONTAL_ALIGNS[number]
+export type HorizontalAlign = (typeof HORIZONTAL_ALIGNS)[number]
 
-export type VerticalAlign = typeof VERTICAL_ALIGNS[number]
+export type VerticalAlign = (typeof VERTICAL_ALIGNS)[number]
 
-export type Layout = typeof LAYOUTS[number]
+export type Layout = (typeof LAYOUTS)[number]
 
-export type CounterLayout = typeof COUNTER_LAYOUTS[number]
+export type CounterLayout = (typeof COUNTER_LAYOUTS)[number]
 
-export type IconPosition = typeof ICON_POSITIONS[number]
+export type IconPosition = (typeof ICON_POSITIONS)[number]
 
-export type LinePosition = typeof LINE_POSITIONS[number]
+export type LinePosition = (typeof LINE_POSITIONS)[number]
 
 // ===== SIZE TYPES =====
 
-export type SizePreset = typeof SIZE_PRESETS[number]
+export type SizePreset = (typeof SIZE_PRESETS)[number]
 
 // ===== ICON TYPES =====
 
-export type CounterIcon = typeof COUNTER_ICONS[number]
+export type CounterIcon = (typeof COUNTER_ICONS)[number]
 
-export type CTAIcon =
-  | typeof CTA_ICONS[number]
-  | string // Allow any Lucide icon name
+export type CTAIcon = (typeof CTA_ICONS)[number] | string // Allow any Lucide icon name
 
-export type IconColorMode = typeof ICON_COLOR_MODES[number]
+export type IconColorMode = (typeof ICON_COLOR_MODES)[number]
 
 // ===== FONT TYPES =====
 
-export type StandardFontName = typeof STANDARD_FONT_NAMES[number]
+export type StandardFontName = (typeof STANDARD_FONT_NAMES)[number]
 
 export type FontFamily =
   | StandardFontName
@@ -165,53 +163,53 @@ export type FontFamily =
 
 // ===== NUMBER NOTATION TYPES =====
 
-export type NumberNotation = typeof NUMBER_NOTATIONS[number]
+export type NumberNotation = (typeof NUMBER_NOTATIONS)[number]
 
 // ===== THEME TYPES =====
 
-export type ThemeName = typeof THEMES[number]
+export type ThemeName = (typeof THEMES)[number]
 
 // ===== SOCIAL PLATFORM TYPES =====
 
-export type SocialPlatform = typeof SOCIAL_PLATFORMS[number]
+export type SocialPlatform = (typeof SOCIAL_PLATFORMS)[number]
 
 export type SocialHandles = Partial<Record<SocialPlatform, string>>
 
 // ===== API SERVICE TYPES =====
 
-export type APIService = typeof API_SERVICES[number]
+export type APIService = (typeof API_SERVICES)[number]
 
 // ===== PRESET TYPES =====
 
-export type TextPresetName = typeof TEXT_PRESETS[number]
+export type TextPresetName = (typeof TEXT_PRESETS)[number]
 
-export type CTAPresetName = typeof CTA_PRESETS[number]
+export type CTAPresetName = (typeof CTA_PRESETS)[number]
 
-export type CounterPresetName = typeof COUNTER_PRESETS[number]
+export type CounterPresetName = (typeof COUNTER_PRESETS)[number]
 
-export type SocialsPresetName = typeof SOCIALS_PRESETS[number]
+export type SocialsPresetName = (typeof SOCIALS_PRESETS)[number]
 
-export type BorderPresetName = typeof BORDER_PRESETS[number]
+export type BorderPresetName = (typeof BORDER_PRESETS)[number]
 
-export type PlatformOrder = typeof PLATFORM_ORDERS[number]
+export type PlatformOrder = (typeof PLATFORM_ORDERS)[number]
 
 // ===== MESH BACKGROUND TYPES =====
 
-export type MeshAnimation = typeof MESH_ANIMATIONS[number]
+export type MeshAnimation = (typeof MESH_ANIMATIONS)[number]
 
-export type MeshPalette = typeof MESH_PALETTES[number]
+export type MeshPalette = (typeof MESH_PALETTES)[number]
 
-export type MeshBlendMode = typeof MESH_BLEND_MODES[number]
+export type MeshBlendMode = (typeof MESH_BLEND_MODES)[number]
 
-export type MeshMode = typeof MESH_MODES[number]
+export type MeshMode = (typeof MESH_MODES)[number]
 
 // ===== BACKGROUND PANEL TYPES =====
 
-export type BgShadow = typeof BG_SHADOWS[number]
+export type BgShadow = (typeof BG_SHADOWS)[number]
 
 // ===== COLOR MODE TYPES =====
 
-export type ColorMode = typeof COLOR_MODES[number]
+export type ColorMode = (typeof COLOR_MODES)[number]
 
 // ===== UTILITY TYPES =====
 

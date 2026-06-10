@@ -73,9 +73,7 @@ function getNestedValue(obj: any, path: string): any {
  *   enabled: true
  * })
  */
-export function useAPIPolling<T = any>(
-  options: UseAPIPollingOptions
-): PollState<T> {
+export function useAPIPolling<T = any>(options: UseAPIPollingOptions): PollState<T> {
   const { config, userId, apiKey, path, interval, enabled = true } = options
 
   const [state, setState] = useState<PollState<T>>({

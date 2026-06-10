@@ -78,14 +78,15 @@ export const urlValidator = z.string().url('Invalid URL format')
  * API key validators for different services
  */
 export const apiKeyValidators = {
-  youtube: z.string().regex(
-    /^AIza[0-9A-Za-z-_]{35}$/,
-    'Invalid YouTube API key format (should start with AIza)'
-  ),
-  github: z.string().regex(
-    /^(ghp|github_pat)_[a-zA-Z0-9]{36,}$/,
-    'Invalid GitHub API key format (should start with ghp_ or github_pat_)'
-  ),
+  youtube: z
+    .string()
+    .regex(/^AIza[0-9A-Za-z-_]{35}$/, 'Invalid YouTube API key format (should start with AIza)'),
+  github: z
+    .string()
+    .regex(
+      /^(ghp|github_pat)_[a-zA-Z0-9]{36,}$/,
+      'Invalid GitHub API key format (should start with ghp_ or github_pat_)'
+    ),
   twitch: z.string().min(30, 'Twitch Client ID should be at least 30 characters'),
   custom: z.string(), // No validation for custom
 }

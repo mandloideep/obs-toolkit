@@ -186,10 +186,7 @@ export function SignatureLine({
 /**
  * Get animation style based on animation type
  */
-function getAnimationStyle(
-  animation: LineAnimation,
-  speed: number
-): CSSProperties {
+function getAnimationStyle(animation: LineAnimation, speed: number): CSSProperties {
   switch (animation) {
     case 'slide':
       return {

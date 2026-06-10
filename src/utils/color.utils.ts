@@ -16,9 +16,7 @@ export function hexToRgba(hex: string): { r: number; g: number; b: number; a: nu
   const rgb = hexToRgb(clean.slice(0, 6))
   if (!rgb) return { r: 0, g: 0, b: 0, a: 1 }
 
-  const a = clean.length === 8
-    ? parseInt(clean.slice(6, 8), 16) / 255
-    : 1
+  const a = clean.length === 8 ? parseInt(clean.slice(6, 8), 16) / 255 : 1
 
   return { ...rgb, a }
 }
@@ -89,9 +87,15 @@ export function rgbToHsl(r: number, g: number, b: number): { h: number; s: numbe
 
   let h = 0
   switch (max) {
-    case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break
-    case g: h = ((b - r) / d + 2) / 6; break
-    case b: h = ((r - g) / d + 4) / 6; break
+    case r:
+      h = ((g - b) / d + (g < b ? 6 : 0)) / 6
+      break
+    case g:
+      h = ((b - r) / d + 2) / 6
+      break
+    case b:
+      h = ((r - g) / d + 4) / 6
+      break
   }
 
   return { h: h * 360, s: s * 100, l: l * 100 }
@@ -165,10 +169,7 @@ export function shiftColorLightness(hexColor: string, shift: number): string {
  * @param colors - Array of hex color strings (with #)
  * @param mode - Color mode name
  */
-export function applyColorModeShift(
-  colors: string[],
-  mode: string
-): string[] {
+export function applyColorModeShift(colors: string[], mode: string): string[] {
   const shifts: Record<string, number> = {
     darker: -30,
     dark: -15,

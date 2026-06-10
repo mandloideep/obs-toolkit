@@ -8,6 +8,7 @@ import { RgbaColorPicker, type RgbaColor } from 'react-colorful'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Slider } from '@/components/ui/slider'
+import { Button } from '@/components/ui/button'
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
 import { hexToRgba, rgbaToHex, hexToCssColor } from '../../../utils/color.utils'
 import { getErrorMessage } from '@/lib/validation/validators'
@@ -93,8 +94,9 @@ export function FormColorPicker({
           <PopoverTrigger asChild>
             <button
               type="button"
-              className="w-8 h-8 rounded border border-border shrink-0 relative overflow-hidden focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              className="h-10 w-14 rounded-md border-2 border-border shrink-0 relative overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring hover:border-brand-indigo transition-colors"
               aria-label={`Pick color: ${value || 'none'}`}
+              title={value ? `Click to edit color (${value})` : 'Click to pick a color'}
             >
               {/* Checkerboard background for alpha visualization */}
               <div
@@ -111,34 +113,28 @@ export function FormColorPicker({
                 }}
               />
               {/* Color overlay */}
-              {value && (
-                <div
-                  className="absolute inset-0"
-                  style={{ backgroundColor: cssColor }}
-                />
-              )}
-              {/* Empty state */}
+              {value && <div className="absolute inset-0" style={{ backgroundColor: cssColor }} />}
+              {/* Empty state — make affordance unmistakable */}
               {!value && (
-                <div className="absolute inset-0 flex items-center justify-center text-muted-foreground text-xs">
-                  —
+                <div className="absolute inset-0 flex items-center justify-center text-muted-foreground text-[10px] font-semibold uppercase tracking-wide">
+                  Pick
                 </div>
               )}
             </button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-3" align="start">
             <div className="space-y-3">
-              <RgbaColorPicker
-                color={rgba}
-                onChange={handlePickerChange}
-              />
+              <RgbaColorPicker color={rgba} onChange={handlePickerChange} />
               {allowEmpty && value && (
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="sm"
                   onClick={handleClear}
-                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-xs text-muted-foreground hover:text-foreground h-7"
                 >
                   Clear color
-                </button>
+                </Button>
               )}
             </div>
           </PopoverContent>
@@ -173,21 +169,15 @@ export function FormColorPicker({
             step={1}
             className="flex-1"
           />
-          <span className="text-xs text-muted-foreground w-8 text-right font-mono">
-            {alpha}%
-          </span>
+          <span className="text-xs text-muted-foreground w-8 text-right font-mono">{alpha}%</span>
         </div>
       )}
 
       {/* Help text */}
-      {help && !error && (
-        <p className="text-xs text-muted-foreground">{help}</p>
-      )}
+      {help && !error && <p className="text-xs text-muted-foreground">{help}</p>}
 
       {/* Error message */}
-      {error && (
-        <p className="text-xs text-destructive">{getErrorMessage(error)}</p>
-      )}
+      {error && <p className="text-xs text-destructive">{getErrorMessage(error)}</p>}
     </div>
   )
 }

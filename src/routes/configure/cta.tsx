@@ -55,7 +55,10 @@ export const Route = createFileRoute('/configure/cta')({
 function CTAConfigurator() {
   // Global brand settings
   const { settings: globalSettings } = useGlobalSettings()
-  const resolvedDefaults = useMemo(() => applyGlobalDefaults(CTA_DEFAULTS, globalSettings), [globalSettings])
+  const resolvedDefaults = useMemo(
+    () => applyGlobalDefaults(CTA_DEFAULTS, globalSettings),
+    [globalSettings]
+  )
 
   // History management (undo/redo + debouncing)
   const history = useHistory<CTAOverlayParams>(resolvedDefaults)
@@ -118,12 +121,15 @@ function CTAConfigurator() {
     }
 
     const searchParams = new URLSearchParams(
-      Object.entries(params).reduce((acc, [key, value]) => {
-        if (value !== CTA_DEFAULTS[key as keyof CTAOverlayParams]) {
-          acc[key] = String(value)
-        }
-        return acc
-      }, {} as Record<string, string>)
+      Object.entries(params).reduce(
+        (acc, [key, value]) => {
+          if (value !== CTA_DEFAULTS[key as keyof CTAOverlayParams]) {
+            acc[key] = String(value)
+          }
+          return acc
+        },
+        {} as Record<string, string>
+      )
     )
     return `${getBaseUrl()}/overlays/cta?${searchParams.toString()}`
   }, [params])
@@ -868,6 +874,8 @@ function CTAConfigurator() {
                   updateState({ ...params, gradient: value as any })
                 }}
                 onBlur={field.handleBlur}
+                colorMode={params.colormode}
+                onColorModeChange={(mode) => updateState({ ...params, colormode: mode as any })}
               />
             )}
           </form.Field>
@@ -906,11 +914,7 @@ function CTAConfigurator() {
       </CollapsibleSection>
 
       {/* Help & Guides */}
-      <CollapsibleSection
-        title="Help & Guides"
-        defaultOpen={false}
-        storageKey="cta-help"
-      >
+      <CollapsibleSection title="Help & Guides" defaultOpen={false} storageKey="cta-help">
         <CTAOverlayHelp />
       </CollapsibleSection>
     </>

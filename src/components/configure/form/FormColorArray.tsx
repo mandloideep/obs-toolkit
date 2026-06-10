@@ -61,7 +61,11 @@ export function FormColorArray({
 
   const updateColor = (index: number, value: string) => {
     const newColors = [...colors]
-    newColors[index] = value.replace('#', '').toUpperCase().replace(/[^0-9A-F]/g, '').slice(0, 8)
+    newColors[index] = value
+      .replace('#', '')
+      .toUpperCase()
+      .replace(/[^0-9A-F]/g, '')
+      .slice(0, 8)
     onChange(newColors)
   }
 
@@ -109,17 +113,11 @@ export function FormColorArray({
                         backgroundPosition: '0 0, 0 4px, 4px -4px, -4px 0px',
                       }}
                     />
-                    <div
-                      className="absolute inset-0"
-                      style={{ backgroundColor: cssColor }}
-                    />
+                    <div className="absolute inset-0" style={{ backgroundColor: cssColor }} />
                   </button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-3" align="start">
-                  <RgbaColorPicker
-                    color={rgba}
-                    onChange={(c) => handlePickerChange(index, c)}
-                  />
+                  <RgbaColorPicker color={rgba} onChange={(c) => handlePickerChange(index, c)} />
                 </PopoverContent>
               </Popover>
 
@@ -154,34 +152,22 @@ export function FormColorArray({
         })}
 
         {colors.length === 0 && (
-          <p className="text-sm text-muted-foreground py-2">
-            No custom colors added
-          </p>
+          <p className="text-sm text-muted-foreground py-2">No custom colors added</p>
         )}
 
         {colors.length < maxColors && (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={addColor}
-            className="w-full"
-          >
+          <Button type="button" variant="outline" size="sm" onClick={addColor} className="w-full">
             <Plus className="h-4 w-4 mr-2" />
             Add Color {colors.length > 0 && `(${colors.length}/${maxColors})`}
           </Button>
         )}
 
         {colors.length >= maxColors && (
-          <p className="text-xs text-muted-foreground">
-            Maximum {maxColors} colors reached
-          </p>
+          <p className="text-xs text-muted-foreground">Maximum {maxColors} colors reached</p>
         )}
       </div>
 
-      {error && (
-        <p className="text-xs text-destructive">{getErrorMessage(error)}</p>
-      )}
+      {error && <p className="text-xs text-destructive">{getErrorMessage(error)}</p>}
     </div>
   )
 }

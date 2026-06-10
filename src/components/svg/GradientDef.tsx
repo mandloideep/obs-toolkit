@@ -21,12 +21,7 @@ interface GradientDefProps {
  * @param direction - Gradient direction in degrees (0-360, only for linear)
  * @param type - Gradient type (linear or radial)
  */
-export function GradientDef({
-  id,
-  colors,
-  direction = 90,
-  type = 'linear',
-}: GradientDefProps) {
+export function GradientDef({ id, colors, direction = 90, type = 'linear' }: GradientDefProps) {
   if (type === 'radial') {
     return (
       <defs>
@@ -50,11 +45,7 @@ export function GradientDef({
     <defs>
       <linearGradient id={id} {...coords}>
         {colors.map((color, index) => (
-          <stop
-            key={index}
-            offset={`${(index / (colors.length - 1)) * 100}%`}
-            stopColor={color}
-          />
+          <stop key={index} offset={`${(index / (colors.length - 1)) * 100}%`} stopColor={color} />
         ))}
       </linearGradient>
     </defs>
@@ -105,11 +96,7 @@ interface AnimatedGradientDefProps {
   duration?: number
 }
 
-export function AnimatedGradientDef({
-  id,
-  colors,
-  duration = 3,
-}: AnimatedGradientDefProps) {
+export function AnimatedGradientDef({ id, colors, duration = 3 }: AnimatedGradientDefProps) {
   if (colors.length === 0) return null
 
   return (

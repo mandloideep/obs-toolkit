@@ -65,27 +65,23 @@ export function MeshOverlay() {
     // Wider range: 0.21 at scale=0.5 to 0.70 at scale=2.0
     const spreadDist = 0.05 + params.scale * 0.325
 
-    const points: ControlPoint[] = Array.from(
-      { length: params.points },
-      (_, i) => {
-        const sectorAngle = baseAngle + angleStep * i
-        const dist = seededFloat(rng, spreadDist * 0.6, spreadDist)
-        return {
-          baseX: 0.5 + Math.cos(sectorAngle) * dist,
-          baseY: 0.5 + Math.sin(sectorAngle) * dist,
-          color: colors[i],
-          angle: seededFloat(rng, 0, Math.PI * 2),
-          radius: seededFloat(rng, 0.08, 0.25),
-          driftVx: seededFloat(rng, -1, 1),
-          driftVy: seededFloat(rng, -1, 1),
-          breathePhase: seededFloat(rng, 0, Math.PI * 2),
-          waveFreq: seededFloat(rng, 0.3, 0.8),
-          wavePhase: seededFloat(rng, 0, Math.PI * 2),
-          orbitSpeed:
-            seededFloat(rng, 0.3, 0.8) * (rng() > 0.5 ? 1 : -1),
-        }
+    const points: ControlPoint[] = Array.from({ length: params.points }, (_, i) => {
+      const sectorAngle = baseAngle + angleStep * i
+      const dist = seededFloat(rng, spreadDist * 0.6, spreadDist)
+      return {
+        baseX: 0.5 + Math.cos(sectorAngle) * dist,
+        baseY: 0.5 + Math.sin(sectorAngle) * dist,
+        color: colors[i],
+        angle: seededFloat(rng, 0, Math.PI * 2),
+        radius: seededFloat(rng, 0.08, 0.25),
+        driftVx: seededFloat(rng, -1, 1),
+        driftVy: seededFloat(rng, -1, 1),
+        breathePhase: seededFloat(rng, 0, Math.PI * 2),
+        waveFreq: seededFloat(rng, 0.3, 0.8),
+        wavePhase: seededFloat(rng, 0, Math.PI * 2),
+        orbitSpeed: seededFloat(rng, 0.3, 0.8) * (rng() > 0.5 ? 1 : -1),
       }
-    )
+    })
 
     pointsRef.current = points
 
@@ -107,10 +103,7 @@ export function MeshOverlay() {
       if (!ctx) return
 
       // Reuse ImageData to avoid allocation per frame
-      if (
-        !imageDataRef.current ||
-        imageDataRef.current.width !== RESOLUTION
-      ) {
+      if (!imageDataRef.current || imageDataRef.current.width !== RESOLUTION) {
         imageDataRef.current = ctx.createImageData(RESOLUTION, RESOLUTION)
       }
 
@@ -193,8 +186,8 @@ export function MeshOverlay() {
 
         switch (params.animation) {
           case 'drift': {
-            x += Math.sin(t * pt.driftVx * 0.5 + pt.angle) * 0.20
-            y += Math.cos(t * pt.driftVy * 0.5 + pt.breathePhase) * 0.20
+            x += Math.sin(t * pt.driftVx * 0.5 + pt.angle) * 0.2
+            y += Math.cos(t * pt.driftVy * 0.5 + pt.breathePhase) * 0.2
             break
           }
           case 'orbit': {

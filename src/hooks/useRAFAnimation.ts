@@ -24,10 +24,7 @@ export type RAFCallback = (timestamp: number) => void
  * }, [dependency])
  * ```
  */
-export function useRAFAnimation(
-  callback: RAFCallback,
-  deps: React.DependencyList = []
-): void {
+export function useRAFAnimation(callback: RAFCallback, deps: React.DependencyList = []): void {
   const requestRef = useRef<number>()
   const callbackRef = useRef(callback)
 
@@ -70,17 +67,20 @@ export function useAnimationCycle(duration: number): number {
   const progressRef = useRef(0)
   const startTimeRef = useRef<number | null>(null)
 
-  useRAFAnimation((timestamp) => {
-    if (startTimeRef.current === null) {
-      startTimeRef.current = timestamp
-    }
+  useRAFAnimation(
+    (timestamp) => {
+      if (startTimeRef.current === null) {
+        startTimeRef.current = timestamp
+      }
 
-    const elapsed = timestamp - startTimeRef.current
-    const durationMs = duration * 1000
+      const elapsed = timestamp - startTimeRef.current
+      const durationMs = duration * 1000
 
-    // Calculate progress (0-1) with modulo for looping
-    progressRef.current = ((elapsed % durationMs) / durationMs)
-  }, [duration])
+      // Calculate progress (0-1) with modulo for looping
+      progressRef.current = (elapsed % durationMs) / durationMs
+    },
+    [duration]
+  )
 
   return progressRef.current
 }
@@ -101,27 +101,27 @@ export function useAnimationCycle(duration: number): number {
  * // etc.
  * ```
  */
-export function useStaggeredEntrance(
-  count: number,
-  delayBetween: number
-): boolean[] {
+export function useStaggeredEntrance(count: number, delayBetween: number): boolean[] {
   const visibleRef = useRef<boolean[]>(new Array(count).fill(false))
   const startTimeRef = useRef<number | null>(null)
 
-  useRAFAnimation((timestamp) => {
-    if (startTimeRef.current === null) {
-      startTimeRef.current = timestamp
-    }
-
-    const elapsed = (timestamp - startTimeRef.current) / 1000 // Convert to seconds
-
-    for (let i = 0; i < count; i++) {
-      const elementDelay = i * delayBetween
-      if (elapsed >= elementDelay && !visibleRef.current[i]) {
-        visibleRef.current[i] = true
+  useRAFAnimation(
+    (timestamp) => {
+      if (startTimeRef.current === null) {
+        startTimeRef.current = timestamp
       }
-    }
-  }, [count, delayBetween])
+
+      const elapsed = (timestamp - startTimeRef.current) / 1000 // Convert to seconds
+
+      for (let i = 0; i < count; i++) {
+        const elementDelay = i * delayBetween
+        if (elapsed >= elementDelay && !visibleRef.current[i]) {
+          visibleRef.current[i] = true
+        }
+      }
+    },
+    [count, delayBetween]
+  )
 
   return visibleRef.current
 }
@@ -161,10 +161,7 @@ export function easeSine(t: number): number {
  * }, 5000)
  * ```
  */
-export function useRAFInterval(
-  callback: () => void,
-  intervalMs: number
-): void {
+export function useRAFInterval(callback: () => void, intervalMs: number): void {
   const lastCallRef = useRef<number>(0)
   const callbackRef = useRef(callback)
 
@@ -172,12 +169,15 @@ export function useRAFInterval(
     callbackRef.current = callback
   }, [callback])
 
-  useRAFAnimation((timestamp) => {
-    if (timestamp - lastCallRef.current >= intervalMs) {
-      callbackRef.current()
-      lastCallRef.current = timestamp
-    }
-  }, [intervalMs])
+  useRAFAnimation(
+    (timestamp) => {
+      if (timestamp - lastCallRef.current >= intervalMs) {
+        callbackRef.current()
+        lastCallRef.current = timestamp
+      }
+    },
+    [intervalMs]
+  )
 }
 
 /**
@@ -187,32 +187,32 @@ export function useRAFInterval(
  * @param autoStart - Start animation automatically
  * @returns Control functions and current progress
  */
-export function useControlledAnimation(
-  duration: number,
-  autoStart: boolean = true
-) {
+export function useControlledAnimation(duration: number, autoStart: boolean = true) {
   const isPlayingRef = useRef(autoStart)
   const progressRef = useRef(0)
   const startTimeRef = useRef<number | null>(null)
   const pausedAtRef = useRef(0)
 
-  useRAFAnimation((timestamp) => {
-    if (!isPlayingRef.current) return
+  useRAFAnimation(
+    (timestamp) => {
+      if (!isPlayingRef.current) return
 
-    if (startTimeRef.current === null) {
-      startTimeRef.current = timestamp - pausedAtRef.current
-    }
+      if (startTimeRef.current === null) {
+        startTimeRef.current = timestamp - pausedAtRef.current
+      }
 
-    const elapsed = timestamp - startTimeRef.current
-    const durationMs = duration * 1000
+      const elapsed = timestamp - startTimeRef.current
+      const durationMs = duration * 1000
 
-    progressRef.current = Math.min(elapsed / durationMs, 1)
+      progressRef.current = Math.min(elapsed / durationMs, 1)
 
-    // Stop when complete
-    if (progressRef.current >= 1) {
-      isPlayingRef.current = false
-    }
-  }, [duration])
+      // Stop when complete
+      if (progressRef.current >= 1) {
+        isPlayingRef.current = false
+      }
+    },
+    [duration]
+  )
 
   const play = useCallback(() => {
     isPlayingRef.current = true

@@ -161,7 +161,8 @@ export function CounterOverlay() {
   const containerStyle: CSSProperties = {
     display: 'flex',
     flexDirection: params.layout === 'stack' ? 'column' : 'row',
-    alignItems: params.align === 'left' ? 'flex-start' : params.align === 'right' ? 'flex-end' : 'center',
+    alignItems:
+      params.align === 'left' ? 'flex-start' : params.align === 'right' ? 'flex-end' : 'center',
     gap: params.layout === 'stack' ? '8px' : '16px',
     padding: `${params.counterpady}px ${params.counterpadx}px`,
     width: params.width !== 'auto' ? params.width : undefined,
@@ -204,7 +205,11 @@ export function CounterOverlay() {
           display: 'flex',
           flexDirection: 'column',
           alignItems:
-            params.align === 'left' ? 'flex-start' : params.align === 'right' ? 'flex-end' : 'center',
+            params.align === 'left'
+              ? 'flex-start'
+              : params.align === 'right'
+                ? 'flex-end'
+                : 'center',
           gap: '4px',
         }}
       >
@@ -231,7 +236,21 @@ export function CounterOverlay() {
 
   return (
     <OverlayContainer align={params.align} valign="center" showBg={false}>
-      {params.bg ? <OverlayPanel bgcolor={params.bgcolor} bgopacity={params.bgopacity} bgshadow={params.bgshadow} blur={params.bgblur} borderRadius={params.bgradius} gradientColors={params.bggradient ? bgGradient : undefined} gradientType={params.gradienttype}>{content}</OverlayPanel> : content}
+      {params.bg ? (
+        <OverlayPanel
+          bgcolor={params.bgcolor}
+          bgopacity={params.bgopacity}
+          bgshadow={params.bgshadow}
+          blur={params.bgblur}
+          borderRadius={params.bgradius}
+          gradientColors={params.bggradient ? bgGradient : undefined}
+          gradientType={params.gradienttype}
+        >
+          {content}
+        </OverlayPanel>
+      ) : (
+        content
+      )}
     </OverlayContainer>
   )
 }
