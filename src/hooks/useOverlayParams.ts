@@ -66,6 +66,43 @@ export function useOverlayParams<T extends Record<string, any>>(defaults: T): T 
 }
 
 /**
+ * Same coercion as `useOverlayParams` but returns only the keys that were
+ * actually present in the URL. Useful when a preset layer needs to override
+ * defaults but URL params (when set) need to override the preset:
+ *
+ *   const explicit = useExplicitOverlayParams(DEFAULTS)
+ *   const params = { ...DEFAULTS, ...preset, ...explicit }
+ *
+ * With the regular hook, missing URL params get default values that then
+ * overwrite the preset.
+ */
+export function useExplicitOverlayParams<T extends Record<string, any>>(defaults: T): Partial<T> {
+  return useMemo(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    const result: Record<string, ParamValue> = {}
+
+    for (const key in defaults) {
+      const urlValue = urlParams.get(key)
+      if (urlValue === null) continue
+
+      const defaultValue = defaults[key]
+      if (typeof defaultValue === 'number') {
+        const parsed = parseFloat(urlValue)
+        if (!isNaN(parsed)) result[key] = parsed
+      } else if (typeof defaultValue === 'boolean') {
+        result[key] = urlValue !== 'false' && urlValue !== '0'
+      } else if (Array.isArray(defaultValue)) {
+        result[key] = urlValue ? urlValue.split(',').map((s) => s.trim()) : []
+      } else {
+        result[key] = decodeURIComponent(urlValue)
+      }
+    }
+
+    return result as Partial<T>
+  }, [defaults])
+}
+
+/**
  * Parse a single string parameter from URL
  *
  * @param name - Parameter name

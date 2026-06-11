@@ -6,7 +6,7 @@
 
 import { useState, useEffect, useMemo, type CSSProperties } from 'react'
 import { ThumbsUp, Bell, Share2, Heart, Star, UserPlus, Youtube } from 'lucide-react'
-import { useOverlayParams } from '../../hooks/useOverlayParams'
+import { useOverlayParams, useExplicitOverlayParams } from '../../hooks/useOverlayParams'
 import { useTheme, useGradient, useFontFamily, useLoadGoogleFont } from '../../hooks/useBrand'
 import { EntranceAnimation } from '../animations/EntranceAnimation'
 import { ExitAnimation, useDelayedExit } from '../animations/ExitAnimation'
@@ -117,21 +117,19 @@ const iconAnimationStyles = `
 export function CTAOverlay() {
   // Parse URL parameters
   const urlParams = useOverlayParams<CTAOverlayParams>(CTA_DEFAULTS)
+  const explicitParams = useExplicitOverlayParams<CTAOverlayParams>(CTA_DEFAULTS)
 
-  // Resolve preset (URL params override preset defaults)
+  // Resolve preset (URL params override preset, preset overrides defaults)
   const params = useMemo(() => {
     const preset = CTA_PRESETS[urlParams.preset] || {}
+    const merged = { ...CTA_DEFAULTS, ...preset, ...explicitParams }
     return {
-      ...CTA_DEFAULTS,
-      ...preset,
-      ...urlParams,
-      // Override with URL params if they're not the defaults
-      text: urlParams.text || preset.text || 'Subscribe',
-      sub: urlParams.sub !== undefined ? urlParams.sub : preset.sub || '',
-      icon: urlParams.icon || preset.icon || 'sub',
-      iconanim: urlParams.iconanim || preset.iconanim || 'bounce',
+      ...merged,
+      text: merged.text || 'Subscribe',
+      icon: merged.icon || 'sub',
+      iconanim: merged.iconanim || 'bounce',
     }
-  }, [urlParams])
+  }, [urlParams.preset, explicitParams])
 
   const theme = useTheme(params.theme)
   const gradient = useGradient(params.gradient, params.colors, undefined, params.colormode)

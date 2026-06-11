@@ -18,7 +18,7 @@ import {
   TrendingDown,
   type LucideIcon,
 } from 'lucide-react'
-import { useOverlayParams } from '../../hooks/useOverlayParams'
+import { useOverlayParams, useExplicitOverlayParams } from '../../hooks/useOverlayParams'
 import { useTheme, useGradient, useFontFamily, useLoadGoogleFont } from '../../hooks/useBrand'
 import { useCountUpWithTrend } from '../../hooks/useCountUp'
 import { useAPIPolling } from '../../hooks/useAPIPolling'
@@ -94,12 +94,13 @@ function formatNumber(
 export function CounterOverlay() {
   // Parse URL parameters
   const urlParams = useOverlayParams<CounterOverlayParams>(COUNTER_DEFAULTS)
+  const explicitParams = useExplicitOverlayParams<CounterOverlayParams>(COUNTER_DEFAULTS)
 
-  // Resolve preset (URL params override preset defaults)
+  // Resolve preset (URL params override preset, preset overrides defaults)
   const params = useMemo(() => {
     const preset = COUNTER_PRESETS[urlParams.preset] || {}
-    return { ...COUNTER_DEFAULTS, ...preset, ...urlParams }
-  }, [urlParams])
+    return { ...COUNTER_DEFAULTS, ...preset, ...explicitParams }
+  }, [urlParams.preset, explicitParams])
 
   const theme = useTheme(params.theme)
   const gradient = useGradient(params.gradient, params.colors, undefined, params.colormode)

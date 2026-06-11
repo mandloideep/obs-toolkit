@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect, useMemo, type CSSProperties } from 'react'
-import { useOverlayParams } from '../../hooks/useOverlayParams'
+import { useOverlayParams, useExplicitOverlayParams } from '../../hooks/useOverlayParams'
 import {
   useTheme,
   useGradient,
@@ -33,11 +33,13 @@ export function SocialsOverlay() {
   // Parse URL parameters
   const urlParams = useOverlayParams<SocialsOverlayParams>(SOCIALS_DEFAULTS)
 
-  // Resolve preset (URL params override preset defaults)
+  const explicitParams = useExplicitOverlayParams<SocialsOverlayParams>(SOCIALS_DEFAULTS)
+
+  // Resolve preset (URL params override preset, preset overrides defaults)
   const params = useMemo(() => {
     const preset = SOCIALS_PRESETS[urlParams.preset] || {}
-    return { ...SOCIALS_DEFAULTS, ...preset, ...urlParams }
-  }, [urlParams])
+    return { ...SOCIALS_DEFAULTS, ...preset, ...explicitParams }
+  }, [urlParams.preset, explicitParams])
 
   const brand = useBrand()
   const theme = useTheme(params.theme)

@@ -5,7 +5,7 @@
  */
 
 import { useRef, useState, useEffect, useMemo } from 'react'
-import { useOverlayParams } from '../../hooks/useOverlayParams'
+import { useOverlayParams, useExplicitOverlayParams } from '../../hooks/useOverlayParams'
 import { useGradient, useBrand } from '../../hooks/useBrand'
 import { useRAFAnimation } from '../../hooks/useRAFAnimation'
 import { useWindowDimensions } from '../../hooks/useWindowDimensions'
@@ -18,12 +18,13 @@ import type { BrandGradientName } from '../../types/brand.types'
 
 export function BorderOverlay() {
   const urlParams = useOverlayParams<BorderOverlayParams>(BORDER_DEFAULTS)
+  const explicitParams = useExplicitOverlayParams<BorderOverlayParams>(BORDER_DEFAULTS)
 
-  // Resolve preset (URL params override preset defaults)
+  // Resolve preset (URL params override preset, preset overrides defaults)
   const params = useMemo(() => {
     const preset = BORDER_PRESETS[urlParams.preset] || {}
-    return { ...BORDER_DEFAULTS, ...preset, ...urlParams }
-  }, [urlParams])
+    return { ...BORDER_DEFAULTS, ...preset, ...explicitParams }
+  }, [urlParams.preset, explicitParams])
 
   const brand = useBrand()
 

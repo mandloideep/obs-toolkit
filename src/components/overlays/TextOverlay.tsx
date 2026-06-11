@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect, useMemo, type CSSProperties } from 'react'
-import { useOverlayParams } from '../../hooks/useOverlayParams'
+import { useOverlayParams, useExplicitOverlayParams } from '../../hooks/useOverlayParams'
 import {
   useGradient,
   useTheme,
@@ -26,21 +26,27 @@ import { createGradient } from '../../utils/css.utils'
 import { hexToCssColor } from '../../utils/color.utils'
 
 export function TextOverlay() {
-  // Parse URL parameters
+  // URL params: full (with defaults) for `preset` lookup, explicit (URL-only)
+  // for the final override layer so presets aren't clobbered by defaults.
   const urlParams = useOverlayParams<TextOverlayParams>(TEXT_DEFAULTS)
+  const explicitParams = useExplicitOverlayParams<TextOverlayParams>(TEXT_DEFAULTS)
+
+  // Placeholder mode: editor preview adds ?placeholder=1 so an empty text
+  // field still shows something. Real OBS browser sources omit the flag.
+  const placeholderMode = useMemo(
+    () => new URLSearchParams(window.location.search).get('placeholder') === '1',
+    []
+  )
 
   // Resolve preset (URL params override preset defaults)
   const params = useMemo(() => {
     const preset = TEXT_PRESETS[urlParams.preset] || {}
+    const merged = { ...TEXT_DEFAULTS, ...preset, ...explicitParams }
     return {
-      ...TEXT_DEFAULTS,
-      ...preset,
-      ...urlParams,
-      // Override with URL params if they're not the defaults
-      text: urlParams.text || preset.text || '',
-      sub: urlParams.sub || preset.sub || '',
+      ...merged,
+      text: merged.text || (placeholderMode ? 'Your text here' : ''),
     }
-  }, [urlParams])
+  }, [urlParams.preset, explicitParams, placeholderMode])
 
   const theme = useTheme(params.theme)
   const gradient = useGradient(params.gradient, params.colors, undefined, params.colormode)

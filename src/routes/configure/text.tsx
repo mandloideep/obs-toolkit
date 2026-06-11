@@ -119,12 +119,11 @@ function TextConfigurator() {
   // Companion overlays: publish our preview URL so mesh/border can layer with us
   const { setUrl: setCompanionUrl } = useCompanionOverlays()
 
-  const previewUrl = useMemo(() => {
-    // Guard against undefined params during initialization
+  // Real OBS Browser Source URL (no editor-only flags)
+  const sourceUrl = useMemo(() => {
     if (!params) {
       return `${getBaseUrl()}/overlays/text`
     }
-
     const searchParams = new URLSearchParams(
       Object.entries(params).reduce(
         (acc, [key, value]) => {
@@ -136,8 +135,16 @@ function TextConfigurator() {
         {} as Record<string, string>
       )
     )
-    return `${getBaseUrl()}/overlays/text?${searchParams.toString()}`
+    const qs = searchParams.toString()
+    return qs ? `${getBaseUrl()}/overlays/text?${qs}` : `${getBaseUrl()}/overlays/text`
   }, [params])
+
+  // Editor preview URL adds placeholder=1 so an empty text field still renders
+  // visibly; OBS users get the clean sourceUrl above.
+  const previewUrl = useMemo(() => {
+    const sep = sourceUrl.includes('?') ? '&' : '?'
+    return `${sourceUrl}${sep}placeholder=1`
+  }, [sourceUrl])
 
   // Auto-save current preview URL for companion layering by other configurators
   useEffect(() => {

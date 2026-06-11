@@ -11,3 +11,7 @@ count.txt
 .output
 .vinxi
 todos.json
+
+# Playwright MCP artifacts (screenshots and traces) at repo root
+.playwright-mcp/
+/*.png
