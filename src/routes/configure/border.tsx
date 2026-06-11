@@ -292,9 +292,9 @@ function BorderConfigurator() {
         )}
       </CollapsibleSection>
 
-      {/* Section 2: Colors & Gradient */}
+      {/* Section 2: Coloring */}
       <CollapsibleSection
-        title="Colors & Gradient"
+        title="Coloring"
         defaultOpen={true}
         storageKey="border-colors"
         onReset={resetColorsGradient}

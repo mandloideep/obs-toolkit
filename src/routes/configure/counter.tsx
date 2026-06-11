@@ -1019,8 +1019,8 @@ function CounterConfigurator() {
 
       {/* Section 9: Theme & Colors */}
       <CollapsibleSection
-        title="Theme & Colors"
-        defaultOpen={false}
+        title="Coloring"
+        defaultOpen={true}
         storageKey="counter-theme"
         onReset={resetTheme}
       >

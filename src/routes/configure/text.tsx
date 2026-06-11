@@ -972,9 +972,9 @@ function TextConfigurator() {
         exitafter={params.exitafter}
       />
 
-      {/* Section 9: Theme & Colors */}
+      {/* Section 9: Coloring */}
       <CollapsibleSection
-        title="Theme & Colors"
+        title="Coloring"
         defaultOpen={true}
         storageKey="text-theme"
         onReset={resetThemeColors}

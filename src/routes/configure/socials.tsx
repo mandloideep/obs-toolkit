@@ -1173,10 +1173,10 @@ function SocialsConfigurator() {
         exitafter={params.exitafter}
       />
 
-      {/* Section 10: Theme & Colors */}
+      {/* Section 10: Coloring */}
       <CollapsibleSection
-        title="Theme & Colors"
-        defaultOpen={false}
+        title="Coloring"
+        defaultOpen={true}
         storageKey="socials-theme"
         onReset={resetThemeColors}
       >

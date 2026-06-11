@@ -10,8 +10,10 @@ import { Label } from '@/components/ui/label'
 import { Slider } from '@/components/ui/slider'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { hexToRgba, rgbaToHex, hexToCssColor } from '../../../utils/color.utils'
 import { getErrorMessage } from '@/lib/validation/validators'
+import { PaletteSwatchPicker } from './PaletteSwatchPicker'
 
 interface FormColorPickerProps {
   label: string
@@ -123,20 +125,41 @@ export function FormColorPicker({
             </button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-3" align="start">
-            <div className="space-y-3">
-              <RgbaColorPicker color={rgba} onChange={handlePickerChange} />
-              {allowEmpty && value && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleClear}
-                  className="text-xs text-muted-foreground hover:text-foreground h-7"
-                >
-                  Clear color
-                </Button>
-              )}
-            </div>
+            <Tabs defaultValue="custom">
+              <TabsList className="grid grid-cols-2 mb-3 w-full">
+                <TabsTrigger value="custom" className="text-xs">
+                  Custom
+                </TabsTrigger>
+                <TabsTrigger value="palette" className="text-xs">
+                  From palette
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="custom" className="mt-0">
+                <div className="space-y-3">
+                  <RgbaColorPicker color={rgba} onChange={handlePickerChange} />
+                  {allowEmpty && value && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleClear}
+                      className="text-xs text-muted-foreground hover:text-foreground h-7"
+                    >
+                      Clear color
+                    </Button>
+                  )}
+                </div>
+              </TabsContent>
+              <TabsContent value="palette" className="mt-0">
+                <PaletteSwatchPicker
+                  onPick={(hex) => {
+                    onChange(hex.startsWith('#') ? hex.slice(1).toUpperCase() : hex.toUpperCase())
+                    setOpen(false)
+                    onBlur?.()
+                  }}
+                />
+              </TabsContent>
+            </Tabs>
           </PopoverContent>
         </Popover>
 

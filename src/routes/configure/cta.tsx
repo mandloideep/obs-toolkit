@@ -840,10 +840,10 @@ function CTAConfigurator() {
         exit={params.exit}
       />
 
-      {/* Section 9: Theme & Colors */}
+      {/* Section 9: Coloring */}
       <CollapsibleSection
-        title="Theme & Colors"
-        defaultOpen={false}
+        title="Coloring"
+        defaultOpen={true}
         storageKey="cta-theme"
         onReset={resetThemeColors}
       >
