@@ -44,6 +44,7 @@ import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts'
 import { usePresets } from '../../hooks/usePresets'
 import { CounterOverlayHelp } from '../../components/configure/help/CounterOverlayHelp'
 import { counterOverlaySchema } from '../../lib/validation/schemas'
+import { buildApplyGradient } from '../../lib/applyGradient'
 
 export const Route = createFileRoute('/configure/counter')({
   component: CounterConfigurator,
@@ -379,8 +380,11 @@ function CounterConfigurator() {
                 }}
                 onBlur={field.handleBlur}
                 placeholder="Leave empty for gradient color"
-                help="Leave empty for gradient color"
+                help="Pick a color, or apply a palette variant as the gradient."
                 error={field.state.meta.errors?.[0]}
+                onApplyGradient={buildApplyGradient(params, updateState, {
+                  colorField: 'iconcolor',
+                })}
               />
             )}
           </form.Field>
@@ -528,8 +532,13 @@ function CounterConfigurator() {
                 }}
                 onBlur={field.handleBlur}
                 placeholder="Leave empty for theme color"
-                help="Custom background color (empty = theme default)"
+                help="Pick a color, or apply a palette variant as a background gradient."
                 error={field.state.meta.errors?.[0]}
+                onApplyGradient={buildApplyGradient(params, updateState, {
+                  colorField: 'bgcolor',
+                  gradientField: 'bggradientname',
+                  extras: { bggradient: true } as Partial<CounterOverlayParams>,
+                })}
               />
             )}
           </form.Field>
@@ -673,8 +682,11 @@ function CounterConfigurator() {
               }}
               onBlur={field.handleBlur}
               placeholder="Leave empty for gradient color"
-              help="Leave empty for gradient color"
+              help="Pick a color, or apply a palette variant as the gradient."
               error={field.state.meta.errors?.[0]}
+              onApplyGradient={buildApplyGradient(params, updateState, {
+                colorField: 'numbercolor',
+              })}
             />
           )}
         </form.Field>
@@ -690,8 +702,11 @@ function CounterConfigurator() {
               }}
               onBlur={field.handleBlur}
               placeholder="Leave empty for theme color"
-              help="Override label text color"
+              help="Pick a color, or apply a palette variant as the gradient."
               error={field.state.meta.errors?.[0]}
+              onApplyGradient={buildApplyGradient(params, updateState, {
+                colorField: 'labelcolor',
+              })}
             />
           )}
         </form.Field>
@@ -833,8 +848,11 @@ function CounterConfigurator() {
                 }}
                 onBlur={field.handleBlur}
                 placeholder="10b981"
-                help="Color for trend arrow indicator"
+                help="Pick a color, or apply a palette variant as the gradient."
                 error={field.state.meta.errors?.[0]}
+                onApplyGradient={buildApplyGradient(params, updateState, {
+                  colorField: 'trendcolor',
+                })}
               />
             )}
           </form.Field>

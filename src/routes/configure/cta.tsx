@@ -46,6 +46,7 @@ import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts'
 import { usePresets } from '../../hooks/usePresets'
 import { CTAOverlayHelp } from '../../components/configure/help/CTAOverlayHelp'
 import { ctaOverlaySchema } from '../../lib/validation/schemas'
+import { buildApplyGradient } from '../../lib/applyGradient'
 
 export const Route = createFileRoute('/configure/cta')({
   component: CTAConfigurator,
@@ -311,8 +312,11 @@ function CTAConfigurator() {
                   }}
                   onBlur={field.handleBlur}
                   placeholder="Leave empty for auto color"
-                  help="Leave empty for gradient color"
+                  help="Pick a color, or apply a palette variant as the gradient."
                   error={field.state.meta.errors?.[0]}
+                  onApplyGradient={buildApplyGradient(params, updateState, {
+                    colorField: 'iconcolor',
+                  })}
                 />
               )}
             </form.Field>
@@ -350,8 +354,11 @@ function CTAConfigurator() {
                 }}
                 onBlur={field.handleBlur}
                 placeholder="Leave empty for theme color"
-                help="Override text color"
+                help="Pick a color, or apply a palette variant as the gradient."
                 error={field.state.meta.errors?.[0]}
+                onApplyGradient={buildApplyGradient(params, updateState, {
+                  colorField: 'textcolor',
+                })}
               />
             )}
           </form.Field>
@@ -367,8 +374,11 @@ function CTAConfigurator() {
                 }}
                 onBlur={field.handleBlur}
                 placeholder="Leave empty for theme color"
-                help="Override subtitle color"
+                help="Pick a color, or apply a palette variant as the gradient."
                 error={field.state.meta.errors?.[0]}
+                onApplyGradient={buildApplyGradient(params, updateState, {
+                  colorField: 'subcolor',
+                })}
               />
             )}
           </form.Field>
@@ -483,8 +493,11 @@ function CTAConfigurator() {
                 }}
                 onBlur={field.handleBlur}
                 placeholder="Leave empty for auto color"
-                help="Leave empty for gradient color"
+                help="Pick a color, or apply a palette variant as the gradient line."
                 error={field.state.meta.errors?.[0]}
+                onApplyGradient={buildApplyGradient(params, updateState, {
+                  colorField: 'decorationcolor',
+                })}
               />
             )}
           </form.Field>
@@ -554,8 +567,13 @@ function CTAConfigurator() {
                 }}
                 onBlur={field.handleBlur}
                 placeholder="Leave empty for theme color"
-                help="Custom background color (empty = theme default)"
+                help="Pick a color, or apply a palette variant as a background gradient."
                 error={field.state.meta.errors?.[0]}
+                onApplyGradient={buildApplyGradient(params, updateState, {
+                  colorField: 'bgcolor',
+                  gradientField: 'bggradientname',
+                  extras: { bggradient: true } as Partial<CTAOverlayParams>,
+                })}
               />
             )}
           </form.Field>

@@ -45,6 +45,7 @@ import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts'
 import { usePresets } from '../../hooks/usePresets'
 import { TextOverlayHelp } from '../../components/configure/help/TextOverlayHelp'
 import { textOverlaySchema } from '../../lib/validation/schemas'
+import { buildApplyGradient } from '../../lib/applyGradient'
 
 export const Route = createFileRoute('/configure/text')({
   component: TextConfigurator,
@@ -257,15 +258,10 @@ function TextConfigurator() {
                 placeholder="#FFFFFF or leave blank"
                 help="Pick a color, or apply a palette variant as a gradient."
                 error={field.state.meta.errors?.[0]}
-                onApplyGradient={(gradient, mode) => {
-                  updateState({
-                    ...params,
-                    textcolor: '',
-                    gradient: gradient as TextOverlayParams['gradient'],
-                    colormode: mode,
-                    textgradient: true,
-                  })
-                }}
+                onApplyGradient={buildApplyGradient(params, updateState, {
+                  colorField: 'textcolor',
+                  extras: { textgradient: true } as Partial<TextOverlayParams>,
+                })}
               />
             )}
           </form.Field>
@@ -281,8 +277,11 @@ function TextConfigurator() {
                 }}
                 onBlur={field.handleBlur}
                 placeholder="#FFFFFF or leave blank"
-                help="Click the swatch to pick. Leave empty to fall back to gradient."
+                help="Pick a color, or apply a palette variant as a gradient."
                 error={field.state.meta.errors?.[0]}
+                onApplyGradient={buildApplyGradient(params, updateState, {
+                  colorField: 'subcolor',
+                })}
               />
             )}
           </form.Field>
@@ -529,8 +528,13 @@ function TextConfigurator() {
                 }}
                 onBlur={field.handleBlur}
                 placeholder="Leave empty for theme color"
-                help="Custom background color (empty = theme default)"
+                help="Pick a color, or apply a palette variant as a background gradient."
                 error={field.state.meta.errors?.[0]}
+                onApplyGradient={buildApplyGradient(params, updateState, {
+                  colorField: 'bgcolor',
+                  gradientField: 'bggradientname',
+                  extras: { bggradient: true } as Partial<TextOverlayParams>,
+                })}
               />
             )}
           </form.Field>
@@ -779,8 +783,12 @@ function TextConfigurator() {
                   }}
                   onBlur={field.handleBlur}
                   placeholder="Leave empty for gradient"
-                  help="Override line color (empty = use gradient)"
+                  help="Pick a color, or apply a palette variant as a gradient line."
                   error={field.state.meta.errors?.[0]}
+                  onApplyGradient={buildApplyGradient(params, updateState, {
+                    colorField: 'linecolor',
+                    extras: { linestyle: 'gradient' } as Partial<TextOverlayParams>,
+                  })}
                 />
               )}
             </form.Field>

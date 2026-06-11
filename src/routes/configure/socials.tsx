@@ -46,6 +46,7 @@ import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts'
 import { usePresets } from '../../hooks/usePresets'
 import { SocialsOverlayHelp } from '../../components/configure/help/SocialsOverlayHelp'
 import { socialsOverlaySchema } from '../../lib/validation/schemas'
+import { buildApplyGradient } from '../../lib/applyGradient'
 import type { SocialPlatform } from '../../types/brand.types'
 
 export const Route = createFileRoute('/configure/socials')({
@@ -626,8 +627,13 @@ function SocialsConfigurator() {
                 }}
                 onBlur={field.handleBlur}
                 placeholder="Leave empty for theme color"
-                help="Custom background color (empty = theme default)"
+                help="Pick a color, or apply a palette variant as a background gradient."
                 error={field.state.meta.errors?.[0]}
+                onApplyGradient={buildApplyGradient(params, updateState, {
+                  colorField: 'bgcolor',
+                  gradientField: 'bggradientname',
+                  extras: { bggradient: true } as Partial<SocialsOverlayParams>,
+                })}
               />
             )}
           </form.Field>
@@ -902,8 +908,11 @@ function SocialsConfigurator() {
               }}
               onBlur={field.handleBlur}
               placeholder="Leave empty for theme color"
-              help="Override handle text color"
+              help="Pick a color, or apply a palette variant as the gradient."
               error={field.state.meta.errors?.[0]}
+              onApplyGradient={buildApplyGradient(params, updateState, {
+                colorField: 'handlecolor',
+              })}
             />
           )}
         </form.Field>
