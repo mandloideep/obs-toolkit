@@ -9,9 +9,11 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Plus, X } from 'lucide-react'
 import { hexToRgba, rgbaToHex, hexToCssColor } from '../../../utils/color.utils'
 import { getErrorMessage } from '@/lib/validation/validators'
+import { PaletteSwatchPicker } from './PaletteSwatchPicker'
 
 interface FormColorArrayProps {
   label: string
@@ -117,7 +119,30 @@ export function FormColorArray({
                   </button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-3" align="start">
-                  <RgbaColorPicker color={rgba} onChange={(c) => handlePickerChange(index, c)} />
+                  <Tabs defaultValue="custom">
+                    <TabsList className="grid grid-cols-2 mb-3 w-full">
+                      <TabsTrigger value="custom" className="text-xs">
+                        Custom
+                      </TabsTrigger>
+                      <TabsTrigger value="palette" className="text-xs">
+                        From palette
+                      </TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="custom" className="mt-0">
+                      <RgbaColorPicker
+                        color={rgba}
+                        onChange={(c) => handlePickerChange(index, c)}
+                      />
+                    </TabsContent>
+                    <TabsContent value="palette" className="mt-0">
+                      <PaletteSwatchPicker
+                        onPick={(hex) => {
+                          updateColor(index, hex)
+                          setOpenIndex(null)
+                        }}
+                      />
+                    </TabsContent>
+                  </Tabs>
                 </PopoverContent>
               </Popover>
 
