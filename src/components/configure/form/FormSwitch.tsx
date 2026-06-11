@@ -53,7 +53,7 @@ export function FormSwitch({ label, checked, onCheckedChange, help, error }: For
       </div>
 
       {/* Error Message */}
-      {error && <p className="text-xs text-destructive">{getErrorMessage(error)}</p>}
+      {Boolean(error) && <p className="text-xs text-destructive">{getErrorMessage(error)}</p>}
     </div>
   )
 }

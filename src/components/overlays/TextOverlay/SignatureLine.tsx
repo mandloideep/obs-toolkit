@@ -3,7 +3,7 @@
  * Decorative line element for text overlays with various styles and animations
  */
 
-import React, { type CSSProperties } from 'react'
+import { type CSSProperties } from 'react'
 import type { LineStyle, LineAnimation } from '../../../types/brand.types'
 import { createLinearGradient } from '../../../utils/css.utils'
 

@@ -26,7 +26,7 @@ interface UsePresetsReturn<T> {
 /**
  * Custom hook for managing presets for a specific overlay type
  */
-export function usePresets<T extends Record<string, unknown>>(
+export function usePresets<T extends object>(
   overlayType: string,
   defaults: T
 ): UsePresetsReturn<T> {
@@ -190,7 +190,9 @@ export function usePresets<T extends Record<string, unknown>>(
             for (const key of defaultKeys) {
               if (!(key in json.preset.params)) {
                 console.warn(`Missing param "${key}" in imported preset, using default`)
-                json.preset.params[key] = defaults[key]
+                ;(json.preset.params as Record<string, unknown>)[key] = (
+                  defaults as Record<string, unknown>
+                )[key]
               }
             }
 

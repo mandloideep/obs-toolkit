@@ -82,8 +82,8 @@ export function useAPIPolling<T = any>(options: UseAPIPollingOptions): PollState
     loading: true,
   })
 
-  const intervalRef = useRef<NodeJS.Timeout>()
-  const abortControllerRef = useRef<AbortController>()
+  const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined)
+  const abortControllerRef = useRef<AbortController | undefined>(undefined)
 
   // Fetch function
   const fetchData = async () => {

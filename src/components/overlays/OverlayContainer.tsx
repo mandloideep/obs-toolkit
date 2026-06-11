@@ -29,7 +29,7 @@ interface OverlayContainerProps {
  */
 export function OverlayContainer({
   children,
-  showBg = false,
+  showBg: _showBg = false,
   padding = 0,
   align = 'center',
   valign = 'center',

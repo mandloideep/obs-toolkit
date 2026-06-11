@@ -3,8 +3,6 @@
  * Generates SVG gradient definitions for use in SVG elements
  */
 
-import React from 'react'
-
 interface GradientDefProps {
   id: string
   colors: string[]

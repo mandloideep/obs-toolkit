@@ -27,9 +27,9 @@ function easeOutCubic(t: number): number {
  */
 export function useCountUp(target: number, duration: number = 2, enabled: boolean = true): number {
   const [currentValue, setCurrentValue] = useState(target)
-  const animationRef = useRef<number>()
+  const animationRef = useRef<number | undefined>(undefined)
   const startValueRef = useRef(target)
-  const startTimeRef = useRef<number>()
+  const startTimeRef = useRef<number | undefined>(undefined)
 
   useEffect(() => {
     // If animation disabled, jump to target immediately

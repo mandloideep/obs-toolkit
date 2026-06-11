@@ -64,7 +64,7 @@ export const BORDER_PRESETS: Record<BorderPresetName, BorderPreset> = {
    */
   pulse: {
     style: 'solid',
-    animation: 'glow',
+    animation: 'pulse',
     thickness: 2,
     gradient: 'indigo',
     gradienttype: 'linear',

@@ -20,7 +20,6 @@ import { GradientGrid } from '../../components/configure/form/GradientGrid'
 import { PresetManager } from '../../components/configure/PresetManager'
 import { PresetCards } from '../../components/configure/PresetCards'
 import { BORDER_PRESET_CARDS } from '../../config/preset-cards'
-import { Label } from '../../components/ui/label'
 import {
   SHAPE_OPTIONS,
   BORDER_STYLE_OPTIONS,

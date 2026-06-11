@@ -25,6 +25,16 @@ interface FormColorPickerProps {
   showAlpha?: boolean
   placeholder?: string
   allowEmpty?: boolean
+  /**
+   * Optional. Surfaces an "Apply variant as gradient" action inside the
+   * "From palette" tab. The parent translates the gradient name + variant
+   * mode into whatever fields drive its overlay's gradient (`gradient`,
+   * `colormode`, `textgradient`, clearing this color field, etc.).
+   */
+  onApplyGradient?: (
+    gradient: string,
+    mode: 'darker' | 'dark' | 'normal' | 'light' | 'lighter'
+  ) => void
 }
 
 /**
@@ -40,6 +50,7 @@ export function FormColorPicker({
   showAlpha = true,
   placeholder = 'Leave empty for auto color',
   allowEmpty = true,
+  onApplyGradient,
 }: FormColorPickerProps) {
   const [open, setOpen] = useState(false)
 
@@ -157,6 +168,15 @@ export function FormColorPicker({
                     setOpen(false)
                     onBlur?.()
                   }}
+                  onApplyGradient={
+                    onApplyGradient
+                      ? (gradient, mode) => {
+                          onApplyGradient(gradient, mode)
+                          setOpen(false)
+                          onBlur?.()
+                        }
+                      : undefined
+                  }
                 />
               </TabsContent>
             </Tabs>
@@ -200,7 +220,7 @@ export function FormColorPicker({
       {help && !error && <p className="text-xs text-muted-foreground">{help}</p>}
 
       {/* Error message */}
-      {error && <p className="text-xs text-destructive">{getErrorMessage(error)}</p>}
+      {Boolean(error) && <p className="text-xs text-destructive">{getErrorMessage(error)}</p>}
     </div>
   )
 }

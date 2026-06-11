@@ -4,7 +4,7 @@
  * Supports various number formats, layouts, and live data updates
  */
 
-import { useState, useEffect, useMemo, type CSSProperties } from 'react'
+import { useMemo, type CSSProperties } from 'react'
 import {
   Heart,
   Star,
@@ -28,7 +28,6 @@ import { COUNTER_DEFAULTS, API_SERVICE_CONFIGS } from '../../types/counter.types
 import type { CounterOverlayParams } from '../../types/counter.types'
 import { COUNTER_PRESETS } from '../../config/counter-presets'
 import type { CounterIcon, NumberNotation } from '../../types/brand.types'
-import { createLinearGradient } from '../../utils/css.utils'
 import { hexToCssColor } from '../../utils/color.utils'
 
 /**

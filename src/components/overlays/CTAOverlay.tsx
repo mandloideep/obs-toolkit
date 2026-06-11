@@ -16,7 +16,6 @@ import { CTA_PRESETS } from '../../config/cta-presets'
 import { CTA_DEFAULTS } from '../../types/cta.types'
 import type { CTAOverlayParams } from '../../types/cta.types'
 import type { IconAnimation, LoopState } from '../../types/brand.types'
-import { createLinearGradient } from '../../utils/css.utils'
 import { hexToCssColor } from '../../utils/color.utils'
 
 /**

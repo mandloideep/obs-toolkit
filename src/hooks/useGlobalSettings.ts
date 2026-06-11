@@ -80,7 +80,7 @@ export function useGlobalSettings() {
  * Apply global settings to overlay defaults.
  * Only overrides keys that exist in both the defaults and global settings.
  */
-export function applyGlobalDefaults<T extends Record<string, unknown>>(
+export function applyGlobalDefaults<T extends object>(
   defaults: T,
   globalSettings: GlobalSettings
 ): T {

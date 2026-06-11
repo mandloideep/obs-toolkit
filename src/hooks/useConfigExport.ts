@@ -35,7 +35,7 @@ const CURRENT_VERSION = '1.0'
 /**
  * Custom hook for exporting and importing overlay configurations
  */
-export function useConfigExport<T extends Record<string, unknown>>(): UseConfigExportReturn<T> {
+export function useConfigExport<T extends object>(): UseConfigExportReturn<T> {
   /**
    * Export current configuration as JSON file
    */

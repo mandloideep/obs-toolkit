@@ -3,7 +3,6 @@
  * Wrapper for Lucide React icons with fallback support
  */
 
-import React from 'react'
 import * as LucideIcons from 'lucide-react'
 import { CUSTOM_ICONS } from './icon-library'
 

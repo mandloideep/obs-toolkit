@@ -109,7 +109,7 @@ export const API_SERVICE_CONFIGS: Record<string, APIServiceConfig> = {
     path: 'items.0.statistics.subscriberCount',
   },
   twitch: {
-    url: (username, apiKey) => `https://api.twitch.tv/helix/users/follows?to_id=${username}`,
+    url: (username) => `https://api.twitch.tv/helix/users/follows?to_id=${username}`,
     path: 'total',
     headers: {
       'Client-ID': '', // Will be set from apiKey

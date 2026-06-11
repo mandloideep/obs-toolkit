@@ -16,6 +16,13 @@ type Mode = 'darker' | 'dark' | 'normal' | 'light' | 'lighter'
 
 interface PaletteSwatchPickerProps {
   onPick: (hex: string) => void
+  /**
+   * Optional. If provided, an "Apply variant as gradient" button appears once a
+   * palette + variant are selected. Receives the gradient name in the same shape
+   * the `gradient` field uses (`'indigo'` for brand, `'palette:pastel'` for mesh)
+   * plus the variant mode.
+   */
+  onApplyGradient?: (gradient: string, mode: Mode) => void
   defaultMode?: Mode
 }
 
@@ -27,7 +34,11 @@ const MODES: Array<{ label: string; mode: Mode }> = [
   { label: 'Lighter', mode: 'lighter' },
 ]
 
-export function PaletteSwatchPicker({ onPick, defaultMode = 'normal' }: PaletteSwatchPickerProps) {
+export function PaletteSwatchPicker({
+  onPick,
+  onApplyGradient,
+  defaultMode = 'normal',
+}: PaletteSwatchPickerProps) {
   const [source, setSource] = useState<Source>('brand')
   const [palette, setPalette] = useState<string | null>(null)
   const [mode, setMode] = useState<Mode>(defaultMode)
@@ -127,11 +138,25 @@ export function PaletteSwatchPicker({ onPick, defaultMode = 'normal' }: PaletteS
         </div>
       )}
 
+      {/* Apply whole gradient (when supported by parent) */}
+      {palette && onApplyGradient && (
+        <Button
+          type="button"
+          variant="default"
+          size="sm"
+          onClick={() => onApplyGradient(source === 'mesh' ? `palette:${palette}` : palette, mode)}
+          className="w-full h-8"
+          title="Use this variant as a gradient instead of a single color"
+        >
+          Apply {mode} {palette} as gradient
+        </Button>
+      )}
+
       {/* Resolved swatches */}
       {resolvedColors && (
         <div className="space-y-1.5">
           <div className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold">
-            Click to pick
+            {onApplyGradient ? 'Or pick a single color' : 'Click to pick'}
           </div>
           <div className="grid grid-cols-5 gap-1.5">
             {resolvedColors.map((hex, i) => (

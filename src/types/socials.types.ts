@@ -4,7 +4,6 @@
  */
 
 import type {
-  SocialPlatform,
   SocialsPresetName,
   SizePreset,
   IconColorMode,

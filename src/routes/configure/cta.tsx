@@ -36,7 +36,6 @@ import {
   BG_SHADOW_OPTIONS,
   COLOR_MODE_OPTIONS,
   GRADIENT_TYPE_OPTIONS,
-  BG_PANEL_DEFAULTS,
 } from '../../lib/constants'
 import { CTA_DEFAULTS } from '../../types/cta.types'
 import type { CTAOverlayParams } from '../../types/cta.types'

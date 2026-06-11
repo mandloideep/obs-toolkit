@@ -135,7 +135,7 @@ export function FormNumberSlider({
       </div>
 
       {/* Error Message */}
-      {error && <p className="text-xs text-destructive mt-1">{getErrorMessage(error)}</p>}
+      {Boolean(error) && <p className="text-xs text-destructive mt-1">{getErrorMessage(error)}</p>}
     </div>
   )
 }

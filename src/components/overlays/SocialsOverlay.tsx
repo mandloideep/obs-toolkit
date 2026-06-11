@@ -67,20 +67,6 @@ export function SocialsOverlay() {
     return overrides
   }, [params.handles])
 
-  // Parse icon overrides
-  const iconOverrides = useMemo(() => {
-    const overrides: Record<string, string> = {}
-    if (params.icons) {
-      params.icons.split(',').forEach((item) => {
-        const [platform, iconName] = item.split(':')
-        if (platform && iconName) {
-          overrides[platform.trim()] = iconName.trim()
-        }
-      })
-    }
-    return overrides
-  }, [params.icons])
-
   // Determine which platforms to show
   const platforms = useMemo(() => {
     let platformList: SocialPlatform[]
@@ -127,7 +113,7 @@ export function SocialsOverlay() {
     }))
   )
 
-  const [animationMode, setAnimationMode] = useState<AnimationMode>('entering')
+  const [, setAnimationMode] = useState<AnimationMode>('entering')
   const [oneByOneIndex, setOneByOneIndex] = useState(0)
 
   // Size configuration

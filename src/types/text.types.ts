@@ -161,6 +161,7 @@ export const TEXT_DEFAULTS: TextOverlayParams = {
   linelength: 100,
   linewidth: 2,
   linespeed: 2,
+  linecolor: '',
   entrance: 'fade',
   entrancespeed: 0.8,
   delay: 0.3,

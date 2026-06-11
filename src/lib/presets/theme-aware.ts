@@ -78,7 +78,7 @@ const CONTRAST_COLOR_KEYS = [
  * @param theme - The target theme ('dark' or 'light')
  * @returns A new preset object with adapted colors
  */
-export function getThemedPreset<T extends Record<string, unknown>>(
+export function getThemedPreset<T extends object>(
   preset: Partial<T>,
   theme: 'dark' | 'light'
 ): Partial<T> {
@@ -109,9 +109,7 @@ export function getThemedPreset<T extends Record<string, unknown>>(
 /**
  * Check if a preset has explicit color overrides that might need theme adaptation.
  */
-export function presetHasColorOverrides<T extends Record<string, unknown>>(
-  preset: Partial<T>
-): boolean {
+export function presetHasColorOverrides<T extends object>(preset: Partial<T>): boolean {
   return CONTRAST_COLOR_KEYS.some((key) => {
     const value = (preset as Record<string, unknown>)[key]
     return typeof value === 'string' && value.length >= 6

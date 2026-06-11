@@ -20,7 +20,6 @@ import type { GradientName, GradientType, ColorMode, ThemeName } from '../types/
 export const Route = createFileRoute('/setup')({ component: SetupWizard })
 
 const STEPS = ['Theme', 'Colors', 'Typography', 'Preview'] as const
-type StepName = (typeof STEPS)[number]
 
 function SetupWizard() {
   const navigate = useNavigate()

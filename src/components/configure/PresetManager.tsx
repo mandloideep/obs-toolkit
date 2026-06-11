@@ -21,7 +21,7 @@ interface PresetManagerProps<T> {
   onImportPreset: (file: File) => Promise<void>
 }
 
-export function PresetManager<T extends Record<string, unknown>>({
+export function PresetManager<T extends object>({
   presets,
   currentPresetName,
   currentParams,

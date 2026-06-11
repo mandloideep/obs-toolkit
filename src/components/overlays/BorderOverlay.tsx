@@ -4,7 +4,7 @@
  * Migrated from border.html with full feature parity
  */
 
-import React, { useRef, useState, useEffect, useMemo } from 'react'
+import { useRef, useState, useEffect, useMemo } from 'react'
 import { useOverlayParams } from '../../hooks/useOverlayParams'
 import { useGradient, useBrand } from '../../hooks/useBrand'
 import { useRAFAnimation } from '../../hooks/useRAFAnimation'
@@ -122,6 +122,13 @@ export function BorderOverlay() {
     },
     [params.animation, params.speed, params.glowsize]
   )
+
+  // Keep glow synced with glowsize when not in breathe animation
+  useEffect(() => {
+    if (params.animation !== 'breathe') {
+      setBreatheGlow(params.glowsize)
+    }
+  }, [params.animation, params.glowsize])
 
   // Multicolor Mode (cycle through all gradients)
   useRAFAnimation(
@@ -295,7 +302,7 @@ export function BorderOverlay() {
               width: '100%',
               height: '100%',
               opacity: params.style === 'neon' ? 0.7 : 0.4,
-              filter: `blur(${params.style === 'neon' ? params.glowsize * 2 : params.glowsize}px)`,
+              filter: `blur(${params.style === 'neon' ? breatheGlow * 2 : breatheGlow}px)`,
             }}
           >
             <GradientDef
@@ -321,7 +328,7 @@ export function BorderOverlay() {
                 width: '100%',
                 height: '100%',
                 opacity: 0.3,
-                filter: `blur(${params.glowsize * 4}px)`,
+                filter: `blur(${breatheGlow * 4}px)`,
               }}
             >
               <GradientDef

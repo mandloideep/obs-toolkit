@@ -25,7 +25,7 @@ export type RAFCallback = (timestamp: number) => void
  * ```
  */
 export function useRAFAnimation(callback: RAFCallback, deps: React.DependencyList = []): void {
-  const requestRef = useRef<number>()
+  const requestRef = useRef<number | undefined>(undefined)
   const callbackRef = useRef(callback)
 
   // Update callback ref when it changes

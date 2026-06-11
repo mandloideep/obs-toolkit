@@ -83,7 +83,7 @@ export function FormSelectInput({
       </Select>
 
       {/* Error Message */}
-      {error && <p className="text-xs text-destructive">{getErrorMessage(error)}</p>}
+      {Boolean(error) && <p className="text-xs text-destructive">{getErrorMessage(error)}</p>}
     </div>
   )
 }

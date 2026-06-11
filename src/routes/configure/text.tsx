@@ -35,7 +35,6 @@ import {
   BG_SHADOW_OPTIONS,
   COLOR_MODE_OPTIONS,
   GRADIENT_TYPE_OPTIONS,
-  BG_PANEL_DEFAULTS,
 } from '../../lib/constants'
 import { TEXT_DEFAULTS } from '../../types/text.types'
 import type { TextOverlayParams } from '../../types/text.types'
@@ -256,8 +255,17 @@ function TextConfigurator() {
                 }}
                 onBlur={field.handleBlur}
                 placeholder="#FFFFFF or leave blank"
-                help="Click the swatch to pick. Leave empty to fall back to gradient."
+                help="Pick a color, or apply a palette variant as a gradient."
                 error={field.state.meta.errors?.[0]}
+                onApplyGradient={(gradient, mode) => {
+                  updateState({
+                    ...params,
+                    textcolor: '',
+                    gradient: gradient as TextOverlayParams['gradient'],
+                    colormode: mode,
+                    textgradient: true,
+                  })
+                }}
               />
             )}
           </form.Field>
