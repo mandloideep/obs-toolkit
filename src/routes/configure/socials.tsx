@@ -908,11 +908,8 @@ function SocialsConfigurator() {
               }}
               onBlur={field.handleBlur}
               placeholder="Leave empty for theme color"
-              help="Pick a color, or apply a palette variant as the gradient."
+              help="Pick a color from the swatches or palette."
               error={field.state.meta.errors?.[0]}
-              onApplyGradient={buildApplyGradient(params, updateState, {
-                colorField: 'handlecolor',
-              })}
             />
           )}
         </form.Field>

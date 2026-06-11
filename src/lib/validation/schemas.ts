@@ -139,6 +139,8 @@ export const textOverlaySchema = z
     linewidth: rangeValidator(1, 20, 'px'),
     linespeed: rangeValidator(0.1, 5, 's'),
     linecolor: hexColorValidator,
+    linegradientname: z.string(),
+    linecolormode: z.enum(['', ...COLOR_MODES]).or(z.literal('')),
 
     // Entrance Animation
     entrance: z.enum(ENTRANCE_ANIMATIONS),

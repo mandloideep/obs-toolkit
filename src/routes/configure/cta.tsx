@@ -312,11 +312,8 @@ function CTAConfigurator() {
                   }}
                   onBlur={field.handleBlur}
                   placeholder="Leave empty for auto color"
-                  help="Pick a color, or apply a palette variant as the gradient."
+                  help="Pick a color from the swatches or palette."
                   error={field.state.meta.errors?.[0]}
-                  onApplyGradient={buildApplyGradient(params, updateState, {
-                    colorField: 'iconcolor',
-                  })}
                 />
               )}
             </form.Field>
@@ -354,11 +351,8 @@ function CTAConfigurator() {
                 }}
                 onBlur={field.handleBlur}
                 placeholder="Leave empty for theme color"
-                help="Pick a color, or apply a palette variant as the gradient."
+                help="Pick a color from the swatches or palette."
                 error={field.state.meta.errors?.[0]}
-                onApplyGradient={buildApplyGradient(params, updateState, {
-                  colorField: 'textcolor',
-                })}
               />
             )}
           </form.Field>
@@ -374,11 +368,8 @@ function CTAConfigurator() {
                 }}
                 onBlur={field.handleBlur}
                 placeholder="Leave empty for theme color"
-                help="Pick a color, or apply a palette variant as the gradient."
+                help="Pick a color from the swatches or palette."
                 error={field.state.meta.errors?.[0]}
-                onApplyGradient={buildApplyGradient(params, updateState, {
-                  colorField: 'subcolor',
-                })}
               />
             )}
           </form.Field>
@@ -493,11 +484,8 @@ function CTAConfigurator() {
                 }}
                 onBlur={field.handleBlur}
                 placeholder="Leave empty for auto color"
-                help="Pick a color, or apply a palette variant as the gradient line."
+                help="Pick a color from the swatches or palette."
                 error={field.state.meta.errors?.[0]}
-                onApplyGradient={buildApplyGradient(params, updateState, {
-                  colorField: 'decorationcolor',
-                })}
               />
             )}
           </form.Field>

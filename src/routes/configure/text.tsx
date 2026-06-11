@@ -284,11 +284,8 @@ function TextConfigurator() {
                 }}
                 onBlur={field.handleBlur}
                 placeholder="#FFFFFF or leave blank"
-                help="Pick a color, or apply a palette variant as a gradient."
+                help="Pick a color from the swatches or palette."
                 error={field.state.meta.errors?.[0]}
-                onApplyGradient={buildApplyGradient(params, updateState, {
-                  colorField: 'subcolor',
-                })}
               />
             )}
           </form.Field>
@@ -786,7 +783,7 @@ function TextConfigurator() {
                   value={params.linecolor}
                   onChange={(val) => {
                     field.handleChange(val)
-                    updateState({ ...params, linecolor: val })
+                    updateState({ ...params, linecolor: val, linegradientname: '' })
                   }}
                   onBlur={field.handleBlur}
                   placeholder="Leave empty for gradient"
@@ -794,6 +791,8 @@ function TextConfigurator() {
                   error={field.state.meta.errors?.[0]}
                   onApplyGradient={buildApplyGradient(params, updateState, {
                     colorField: 'linecolor',
+                    gradientField: 'linegradientname',
+                    colorModeField: 'linecolormode',
                     extras: { linestyle: 'gradient' } as Partial<TextOverlayParams>,
                   })}
                 />

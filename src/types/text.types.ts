@@ -64,6 +64,11 @@ export interface TextOverlayParams {
   linewidth: number
   linespeed: number
   linecolor: string
+  // Independent gradient for the signature line — when set, the line uses this
+  // gradient instead of the main `gradient` field, so changing the line's
+  // gradient doesn't change the text gradient.
+  linegradientname: string
+  linecolormode: ColorMode | ''
 
   // Entrance Animation
   entrance: EntranceAnimation
@@ -117,6 +122,8 @@ export interface TextPreset {
   linestyle?: LineStyle
   lineanim?: LineAnimation
   linecolor?: string
+  linegradientname?: string
+  linecolormode?: ColorMode | ''
   gradient?: GradientName
   gradienttype?: GradientType
   textcolor?: string
@@ -162,6 +169,8 @@ export const TEXT_DEFAULTS: TextOverlayParams = {
   linewidth: 2,
   linespeed: 2,
   linecolor: '',
+  linegradientname: '',
+  linecolormode: '',
   entrance: 'fade',
   entrancespeed: 0.8,
   delay: 0.3,

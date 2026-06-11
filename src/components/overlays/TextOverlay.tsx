@@ -56,6 +56,14 @@ export function TextOverlay() {
     undefined,
     params.colormode
   )
+  // Independent line gradient: when linegradientname is set, the signature line
+  // uses its own gradient so changing it doesn't ripple to the text gradient.
+  const lineGradient = useGradient(
+    (params.linegradientname || params.gradient) as any,
+    params.linegradientname ? undefined : params.colors,
+    undefined,
+    (params.linecolormode || params.colormode) as any
+  )
   const fontFamily = useFontFamily(params.font)
 
   // Load Google Font if needed
@@ -196,7 +204,7 @@ export function TextOverlay() {
         length={params.linelength}
         width={params.linewidth}
         speed={params.linespeed}
-        gradient={params.linecolor ? [hexToCssColor(params.linecolor)] : gradient}
+        gradient={params.linecolor ? [hexToCssColor(params.linecolor)] : lineGradient}
       />
     )
   }
